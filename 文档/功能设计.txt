@@ -1,0 +1,7 @@
+1.textblock：
+点击tile会在其旁边显示一个textblock，其中包含了该tile对应的Tile_text内容
+再次点击tile会将其隐藏，tile在移动过程中不会显示
+可以在操作栏上选择点击不显示该block
+点击任意非textblock区域均可以隐藏显示的textblock
+*在textblock上设计元素，使其可以被固定显示或者与tile分离（而不是固定在tile的旁边
+*textblock的大小应该是可以控制的→但是每个网页的textblock都是通用的，修改大小后会应用到全局，是否会影响观感？

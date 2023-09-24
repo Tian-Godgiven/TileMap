@@ -1,0 +1,120 @@
+@charset "utf-8";
+html,body {
+  height: 100%;
+	background-color: white;
+  margin: 0;
+
+}
+
+
+body{
+  overflow: hidden;
+  background-color:lightgrey;
+}
+
+
+#down_area{
+    width: 100%;
+    height: calc(100% - 120px);
+    display: flex;
+}
+
+
+/*右下功能区CSS*/
+#ability_area{
+  background-color: lightgrey;
+  width: 20%;
+  height: 20%;
+  position: absolute;
+  right: 0;
+  bottom:0;
+}
+
+  #delete_area{
+  width: 30%;
+  height: 90%;
+  background-color: black;
+  position: relative;
+  margin-top: 1.5%;
+  margin-left: 2.5%;
+  float: left;
+  }
+
+    #delete_text{
+      width: 100%;
+      height: 75%;
+      display: flex;  
+      text-align: center;
+      justify-content: center;
+      align-items:center;
+      color: white;
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    #delete_undelete{
+      width: 100%;
+      height:25%;
+      font-size: 20px;
+      background: white;
+    }
+
+    #dialog_confirm{
+      display: none;
+    }
+
+    #undelete_dialog{
+  display: none;
+    }
+
+
+#color_area{
+  width: 30%;
+  height: 90%;
+  background-color: lightgreen;
+  position: relative;
+  margin-top: 1.5%;
+  margin-left: 2.5%;
+  margin-right: 2.5%;
+  float: left;
+}
+
+#colorbutton{
+  width: 100%;
+  height: 100%;
+}
+
+
+#colorpickercontainer{
+  background-color: white;
+  width: 250px;
+  display: none;
+  border:3px solid;
+  border-radius: 3px;
+  position: relative;
+  right: 100px;
+  bottom: 450px;
+  cursor: move;
+  z-index: 2;
+}
+
+
+
+
+
+
+
+
+#lock_area{
+  width: 30%;
+  height: 90%;
+  background-color: lightyellow;
+  position: relative;
+  margin-top: 1.5%;
+  margin-right: 2.5%;
+  float: left;
+}
+
+
+
+

@@ -1,0 +1,164 @@
+1.find() 没有找到对象时：$(dom).find().length = 1
+eg : `if($(tile).find('.tile_title').length - 1){`
+
+---
+
+2.屏幕整体绑定事件：`$(window).on("click")`
+整体解绑：`$(window).off("click")`
+
+---
+
+3.聚焦到input框上，并令光标移动到最后一位上
+
+```
+$(input).focus()
+var value = $(input).val()
+$(input).val("").val(value)
+```
+
+---
+
+4.点击到非指定区域时，隐藏该区域的jq实现方法
+	1.使用one绑定事件：
+
+```
+		$(document).one("click",(event)=>{
+			 event.stopPropagation();
+			 if(!input.is(event.target)){
+				tile.title = $(tile).find(".tile_input").val()
+				$(tile).find(".tile_input").remove()
+				//固定调用标题修改事件
+				changeTileTitle(tile,"text");
+			}
+		})
+```
+
+​	2.使用off解绑event事件：
+```
+		$(return_focusing_huabu()).on("click",function(event){
+			event.stopPropagation();
+			//如果点击对象不是指定元素，则将其隐藏/删除并解除该事件绑定
+			if(!input.is(event.target)){
+				$(tile).find(".tile_input").remove()
+				//使用Off解绑该元素所绑定even
+				$(this).off(event)
+			}
+		})
+```
+
+---
+
+5.为新创建的元素添加事件的两种方法：
+-在元素创建时就绑定：此时需要注意要通过on的function进行转接，否则该函数会立即触发一次，可能出现Bug，并且转接过程中需要提供this作为参数
+
+```javascript
+function createHuabuButton(huabu) {
+    let button = $("<div></div>", {
+        "class": "huabu_button",
+        "id": $(huabu).attr("id") + "_button"
+    });
+    $(button).text($(huabu).attr("name"))
+
+    if($(huabu).attr("id").length<2){
+        $(button).css("width","35px")
+    }
+    $("#huabu_changeBar").append(button)
+    $(button).on("click",function(){
+        changeHuabuButton(this)
+    })
+}
+```
+
+-在绑定时将其作为变量提供给on函数
+
+```
+$(document).on('click', ".div", function () {
+略
+})
+```
+
+---
+
+6.mousedown包含右键在内，用event.button=1(左) / 2(右)来区分
+	但click只包含左键单击
+
+------------
+
+7.each()函数在使用时，必须以:
+　　　　$().each(function(){
+						内容
+				})
+	的形式来写，$().find().each(function(){}) 即可遍历某对象的所有子元素
+
+------------
+
+8.获取相对于父元素的位置：position().left or .top
+   获取位于页面的绝对位置：offset().left or .top
+
+------------
+
+9.获取第一个满足某条件的子元素
+   `$().find(“.menu:first-child”)`
+	获取该元素的兄弟元素
+	`$().siblings()`
+	获取前后的兄弟元素
+	next();//获取当前元素的下一个兄弟元素
+
+​	获取当前元素后面所有的兄弟元素
+​	nextAll();
+​	获取当前元素后面的第一个满足条件的兄弟元素
+​	nextAll(“.menu:first-child”)
+
+​	prev();//获取当前元素的前一个兄弟元素
+​	prevAll();//获取当前元素前面的所有兄弟元素
+
+---
+
+10.使用$(function(){xxxxx})来代替$(document).onready(function(){xxxx})
+	页面加载函数
+
+---
+
+11.包括了滚动条宽度的width：.prop(“offsetWidth”)
+
+------
+
+12.报错了：Uncaught SyntaxError: Cannot use import statement outside a module
+报错的原因是用了es6的语法， 浏览器默认将它作为js解析会出现问题，需要将它作为模块导入，script标签默认type=“text/javascript”，需要改为type=“module”
+
+------
+
+13.绑定数据例如数组，字典，使用.data(“a”,b)，不要用attr()！
+
+------
+
+14.查询指定元素的在数组中的位置：
+
+```
+var index = $.inArray(dot,list)
+//然后删除
+list.splice(index,1)//表示删除index号位置的元素
+```
+
+
+
+---
+
+15.添加元素
+
+```
+after():向指定元素后面增加同级元素 
+before():向指定元素前面增加同级元素
+append():向指定元素的最后添加一个子元素
+```
+
+------
+
+16.添加或删除class时要注意，不能使用选择器写法！
+
+```
+addClass("123") : class = "123"
+addClass(".123") : class = ".123"
+removeClass同理
+```
+

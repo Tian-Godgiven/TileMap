@@ -1,0 +1,37 @@
+
+
+
+
+命名规则：
+
+1.不同区域间有严重重名情况则在前方加入区域名，例如：rightArea_tile_title
+
+------
+
+对象：
+磁贴:  tile
+1.磁贴的标题：tile_title，这是磁贴的一个属性
+2.磁贴的内容：tile_text，这是磁贴指向的一个dom对象
+
+画布：huabu
+
+某个大的功能模块：block
+
+左侧功能栏
+右侧工具栏
+上方工具栏
+画布栏
+
+----
+
+【右侧】
+
+#right_area：右侧工具栏
+	#rightArea_top：右侧工具栏标题框
+		.rightArea_top_block：右侧工具栏标题模块
+	.rightArea_inner：右侧工具栏内容框，其ID为对应的标题ID+“_inner”
+		.rightArea_inner_block：右侧工具栏内容模块
+			.rightArea_inner_ability：内容模块中的基础的功能组件
+				.rightArea_inner_ability_title：功能组件的名称
+				.rightArea_inner_ability_inner：功能组件的内容
+

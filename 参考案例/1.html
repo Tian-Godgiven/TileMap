@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>以鼠标位置为中心的滑轮放大功能demo</title>
+		<style type="text/css">
+			html,
+			body {
+				height: 100%;
+				overflow: hidden;
+			}
+			
+			body {
+				margin: 0;
+				padding: 0;
+			}
+			
+			#oImg {
+				position: absolute;
+				left: 50px;
+				top: 50px;
+				z-index: 1;
+				width: 600px;
+				height: 600px;
+			}
+		</style>
+		<script type="text/javascript">
+			/*绑定事件*/
+			function addEvent(obj, sType, fn) {
+				if(obj.addEventListener) {
+					obj.addEventListener(sType, fn, false);
+				} else {
+					obj.attachEvent('on' + sType, fn);
+				}
+			};
+
+	
+			//获取滚轮方向
+			function prEvent(ev) {
+				var oEvent = ev || window.event;
+				if(oEvent.preventDefault) {
+					oEvent.preventDefault();
+				}
+				return oEvent;
+			}
+			/*添加滑轮事件*/
+			function addWheelEvent(obj, callback) {
+				if(window.navigator.userAgent.toLowerCase().indexOf('firefox') != -1) {
+					addEvent(obj, 'DOMMouseScroll', wheel);
+				} else {
+					addEvent(obj, 'mousewheel', wheel);
+				}
+
+				function wheel(ev) {
+					console.log(ev)
+					var oEvent = prEvent(ev),
+						delta = oEvent.detail ? oEvent.detail > 0 : oEvent.wheelDelta < 0;
+					callback && callback.call(oEvent, delta);
+					return false;
+				}
+			};
+			/*页面载入后*/
+			window.onload = function() {
+				var oImg = document.getElementById('oImg');
+				
+				/*以鼠标位置为中心的滑轮放大功能*/
+				(function() {
+					addWheelEvent(oImg, function(delta) {
+						var ratioL = (this.clientX - oImg.offsetLeft) / oImg.offsetWidth,
+							ratioT = (this.clientY - oImg.offsetTop) / oImg.offsetHeight,
+							ratioDelta = !delta ? 1 + 0.1 : 1 - 0.1,
+							w = parseInt(oImg.offsetWidth * ratioDelta),
+							h = parseInt(oImg.offsetHeight * ratioDelta),
+							l = Math.round(this.clientX - (w * ratioL)),
+							t = Math.round(this.clientY - (h * ratioT));
+						with(oImg.style) {
+							width = w + 'px';
+							height = h + 'px';
+							left = l + 'px';
+							top = t + 'px';
+						}
+					});
+				})();
+			};
+		</script>
+	</head>
+
+	<body>
+		<div>1234</div>
+		<div id="oImg">
+			<div class="aaa">
+				这里可以用svg替换aaa，放大厂区图功能
+			</div>
+		</div>
+	</body>
+<style type="text/css">
+	.aaa{width: 100%;height: 100%;background: greenyellow;}
+</style>
+</html>

@@ -1,0 +1,85 @@
+1.上下居中：其中`display：flex`为必要条件
+
+```
+  display:flex;  
+  text-align: center;
+  justify-content: center;
+  align-items:center;
+```
+
+------
+
+2.禁用文本换行/禁止换行：white-space : nowrap;
+
+---
+
+3.相较于文档永久固定位置：position : fixed
+	防止元素在滚动过程中脱离某位置：position : sticky
+
+---
+
+4.滚动条需要手动设置：overflow : scroll
+
+---
+
+5.继承颜色：background-color : inherit
+
+---
+
+6.滚动条CSS，前面加滚动条载体
+::-webkit-scrollbar 滚动条整体，相当于包在最外面的父盒子
+::-webkit-scrollbar-thumb  滚动条里面的小方块（可以刺溜刺溜移动的那个）
+::-webkit-scrollbar-track  滚动条的轨道（你就理解成父盒子的背景）
+::-webkit-scrollbar-button 滚动条的轨道的两端按钮
+::-webkit-scrollbar-track-piece 内层轨道（就是track减去thumb剩余部分）
+::-webkit-scrollbar-corner 边角，垂直和水平两个滚动条的交汇处
+::-webkit-resizer 放在两个滚动条的交汇处，用于拖动调整元素大小的控件
+
+------
+
+7.阻止滚动穿透：子元素的滚动行为不会带动父元素的滚动行为
+	`overscroll-behavior-y:contain;`
+
+---
+
+8.不透明度：opacity:1 不透明，越小越透明，0为完全透明！
+
+------
+
+9.制作不同方向的半圆形：
+	`	background: linear-gradient(to top, #000 50%, transparent 50%);`
+
+------
+
+10.纯div虚线
+
+```
+/*虚线css*/
+#dash{
+	width:100px;
+	height:10px;
+	background: linear-gradient(to left,transparent 0%,transparent 50%,black 50%,black 100%);
+	background-size: 10px 10px;
+	background-repeat: repeat-x;
+} 
+```
+
+------
+
+11.改变图标的颜色，适用于纯色图标，原理是生成一个形状相同的投影（drop-shadow）控制投影的位置使其不与原图标重叠，同时令父元素将内部的内容移动（text-indent:-x)，使得原图标移出父元素被隐藏（overflow:hidden），同时投影来到原图标的位置
+
+    <div id="icon_color">
+        <img  id="icon" src="./img/arrow_1.png">
+    </div>
+    
+    #icon_color{
+    	text-indent:-100px;
+    	width:100px;
+    	height:100px;
+    	overflow:hidden;
+    }
+    #icon{
+    	width:100px;
+    	height:100px;
+    	filter:drop-shadow(100px 0 red);
+    }

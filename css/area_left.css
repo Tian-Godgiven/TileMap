@@ -1,0 +1,68 @@
+/*左侧操作面版CSS*/
+#left_area{
+    position:relative;
+    width: 20%;
+    height: 100%;
+    background-color: lightblue;
+}
+
+#leftArea_tile_container{
+    width:100%;
+    max-height:calc(100% - 70px);
+    overflow-y:overlay;
+}
+
+#leftArea_tile_container::-webkit-scrollbar{
+    width:10px;
+    height:10px;
+}
+
+#leftArea_tile_container::-webkit-scrollbar-thumb{
+    background-color:#49494980;
+    background-clip: padding-box;
+    border: solid transparent;
+    border-radius:100px;
+}
+
+
+.button_container{
+    float: left;
+    height: 80px;
+    width: 100%;
+    position: relative;
+}
+
+.button{
+    width: 100%;
+    height: 100%;
+    background-color: #777aff;
+    border: 1px solid #fff;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 8px;
+}
+
+#import_tile{
+    width:100%;
+    height:70px;
+    position:sticky;
+    left:0px;
+    bottom:0px;
+    background-color:inherit;
+}
+
+#import_tile > div{
+    width:70%;
+    height:50px;
+
+    display:flex;  
+    text-align: center;
+    justify-content: center;
+    align-items:center;
+
+    position:relative;
+    left:15%;
+    top:10px;
+    
+    background-color:#CB93FFFF;
+}
