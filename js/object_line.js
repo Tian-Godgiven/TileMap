@@ -17,9 +17,11 @@ function createLineStyle(){
 var focusing_line
 var line_id = 0
 function createLine(width,height,color,style,style_width){
+
 	//这个半径是line_dot的半径
 	var radius = 8
-	var width_inner = parseInt(width) - 2*radius + "px"
+	var width = parseInt(width)
+	var width_inner = width - 2*radius
 	var top = (radius - parseInt(height)/2)+ "px"
 	var left = radius + "px"
 
@@ -78,10 +80,23 @@ function createArrowLeft(){
 	creatArrow(line,"left","arrow_1")
 }
 
-
 //线条line的移动
 $("#huabu_container").on("mouseenter", ".line:not(.ui-draggable-handle)", function() {
-	$(this).draggable()
+	var click = { x:0, y:0};
+	$(this).draggable({
+		start: function(event) {
+        	click.x = event.clientX;
+        	click.y = event.clientY;
+    	},
+    	drag: function(event, ui) {
+        	var huabu_scale = return_scale();
+        	var original = ui.originalPosition;
+        	ui.position = {
+            	left: (event.clientX - click.x + original.left) / huabu_scale,
+            	top:  (event.clientY - click.y + original.top ) / huabu_scale
+        	};
+    	}
+	})
 })
 
 //鼠标点击在画布中的line上时显示其中的dot，将其聚焦
@@ -122,7 +137,7 @@ $("#huabu_container").on("mouseenter",".line > .line_dot:not(.ui-draggable-handl
 	if($(this).is(".line_dotMidway")){
 		$(this).draggable({
 			handle: $(this).children(".line_dotMidway_inner"),
-			drag: function() {
+			drag: function(event,ui) {
 				dragLineDot(this)
 	    	},
 	    	stop:function(){
@@ -133,7 +148,7 @@ $("#huabu_container").on("mouseenter",".line > .line_dot:not(.ui-draggable-handl
 	else{
 		$(this).draggable({
 			handle: false,
-			drag: function() {
+			drag: function(event,ui) {
 				dragLineDot(this)
 	    	},
 	    	stop:function(){
@@ -244,43 +259,6 @@ function dragLineDot(dot,time){
 	}
 }
 
-//将一个dot_innner转化为一个dot_midway，返回这个dot_midway
-function InnerTurnToMidway(line_inner,dot_inner){
-	//修改Dot的class
-	$(dot_inner).attr("class",'line_dot line_dotMidway')
-	//生成inner和border
-	var midway_inner = $("<div>",{
-		"class":"line_dotMidway_inner line_dot",
-	})
-	var midway_border = $("<div>",{
-		"class":"line_dotMidway_border"
-	})
-	//修改border的颜色，半径
-	var color = $(line_inner).css('background-color')
-	var height = parseInt($(line_inner).css('height'))
-	$(midway_border).css({
-		"width":height + "px",
-		"height":height + "px",
-		"background":color
-	})
-	//把inner和Border放进去
-	$(dot_inner).append(midway_border)
-	$(dot_inner).append(midway_inner)
-
-	return dot_inner
-}
-
-//将一个dot_midway转化为一个dot_inner，返回这个dot_inner
-function MidwayTurnToInner(line_inner,dot_midway){
-	//修改Dot的class
-	$(dot_midway).attr("class",'line_dot line_dotInner')
-	//把inner和Border删掉
-	$(dot_midway).children().remove()
-
-
-	return dot_midway
-}
-
 //通过修改line_inner链接左右两个line_dot，同时还会把其中点dot_inner移到线段中心
 function connectLineDot(dot_left,dot_right,dot_inner,line_inner){
 	//获取dot的半径，这个数值等于dot的宽度的一半
@@ -294,6 +272,9 @@ function connectLineDot(dot_left,dot_right,dot_inner,line_inner){
 
 	//获取两点之间的间距和角度
 	var width = Math.sqrt(Math.pow(distant_x,2) + Math.pow(distant_y,2))
+	//圆心的位置会受到缩放的影响，所以这里要对width进行缩放大小的调整
+	var huabu_scale = return_scale()
+	width = width / huabu_scale
 	var angle = getAngle(distant_x,distant_y)
 	var radian = Math.PI * angle /180
 
@@ -340,21 +321,16 @@ function connectLineDot(dot_left,dot_right,dot_inner,line_inner){
 		width_arrow += height_arrow
 	}
 
-
-
-
-
-	//修改线条的位置，使其永远与dot_left相连，其左上角应位于与dot_left相距h/2处，且边缘切过
-	//圆心，因此只需使其沿着圆心的位置（left,top）使其向上移动粗度/2的位置就行了
-	//另外，如果存在箭头的话，还需要将其移动箭头的偏差值，这个值是箭头粗度与角度的三角函数
-	//因为箭头的顶点是圆心，所以
-	//随后调整角度和长度，使其连接上dot_right
-	//从而实现了链接两个dot的线条
+	//修改线条的位置，使其永远与dot_left相连
+	//其左上角应位于与dot_left相距h/2处，且边缘切过圆心
+	//因此只需使其沿着圆心的位置（left,top）使其向上移动粗度/2的位置就行了
+	//另外，如果存在箭头的话，还需要修改其起始点位置和长度
+	//最终改变角度和长度，使其连接上dot_right，从而实现了链接两个dot的线条
 	$(line_inner).attr('angle',angle)
 	$(line_inner).css({
 		"left": left + x_arrow + "px",
 		"top":top - height_line/2 + y_arrow + "px",
-		"width":width - width_arrow,
+		"width":width - width_arrow + "px",
 		"transform":"rotate(" + angle + "deg)",
 	})
 	//使dot_inner回到line中间
@@ -395,20 +371,19 @@ function creatArrow(line,direction,style){
 
 //修改某个arrow的位置使其能够对准所处的线段上
 function changeArrow(arrow){
-	//获取操作对象
+	//取操作对象
 	var line = $(arrow).parent('.line')
 	var arrow_inner = $(arrow).children()
 	var arrow_img = $(arrow_inner).children()
+	var dot = $(arrow).prev(".line_dot")
 
 	//根据箭头的方向选择箭头附着的dot
-	if($(arrow).is(".line_arrow_left")){
-		var dot = $(line).children(".line_dotLeft")
+	if($(dot).is(".line_dotLeft")){
 		var line_inner = $(dot).nextAll(".line_inner:first")
 		//是左侧点，要+270度
 		var basic_angle = 270
 	}
-	else if($(arrow).is(".line_arrow_right")){
-		var dot = $(line).children(".line_dotRight")
+	else if($(dot).is(".line_dotRight")){
 		var line_inner = $(dot).prevAll(".line_inner:first")
 		//是右侧侧点，要+90度
 		var basic_angle = 90
@@ -449,15 +424,50 @@ function changeArrow(arrow){
 		"height":height,
 		"filter":"drop-shadow("+width+ "px 0" +" " +color+")",
 	})
-	//位置则是其箭头底端（下边缘的中点）与dot的圆心相同
-	//由于进行旋转的是的img所以不用担心旋转引发的位置偏移
-	//减1是为了更加贴合线条本身
+	//位置则是其箭头顶端（上边缘的中点）与dot的圆心相同
+	//由于进行旋转的是img所以不用担心旋转引发的位置偏移
 	$(arrow).offset({
 		left: x - (width/2),
 		top: y ,
 	})
 }
 
+//将一个dot_innner转化为一个dot_midway，返回这个dot_midway
+function InnerTurnToMidway(line_inner,dot_inner){
+	//修改Dot的class
+	$(dot_inner).attr("class",'line_dot line_dotMidway')
+	//生成inner和border
+	var midway_inner = $("<div>",{
+		"class":"line_dotMidway_inner line_dot",
+	})
+	var midway_border = $("<div>",{
+		"class":"line_dotMidway_border"
+	})
+	//修改border的颜色，半径
+	var color = $(line_inner).css('background-color')
+	var height = parseInt($(line_inner).css('height'))
+	$(midway_border).css({
+		"width":height + "px",
+		"height":height + "px",
+		"background":color
+	})
+	//把inner和Border放进去
+	$(dot_inner).append(midway_border)
+	$(dot_inner).append(midway_inner)
+
+	return dot_inner
+}
+
+//将一个dot_midway转化为一个dot_inner，返回这个dot_inner
+function MidwayTurnToInner(line_inner,dot_midway){
+	//修改Dot的class
+	$(dot_midway).attr("class",'line_dot line_dotInner')
+	//把inner和Border删掉
+	$(dot_midway).children().remove()
+
+
+	return dot_midway
+}
 
 //将线条中点line_dotInner放到他的前后两个有效点的中间
 //如果没有中点，就在这个线段上创建一个中点

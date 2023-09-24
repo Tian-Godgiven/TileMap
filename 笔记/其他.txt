@@ -1,0 +1,55 @@
+返回函数：
+
+1.画布
+	(1)返回当前展示的画布对象：return_focusing_huabu()
+	(2)返回当前展示画布的缩放值：return_scale()
+
+这是由于jquery-ui的draggable组件不会正确识别到scale带来的比例性变化，通过代码可以人工调整其出现的位置和移动的举例，以下为代码内容：
+
+	//一个作为全局变量的初值，用于存储当前鼠标的位置
+	var click = { x:0, y:0};
+	$("可拖拽对象").draggable({
+		start: function(event) {
+			//将event事件，即当我们开始拖动“可拖拽对象”时进行的点击事件时，鼠标的位置记录下来
+	    	click.x = event.clientX;
+	    	click.y = event.clientY;
+		},
+		//进入拖动阶段，此时的event是每一个拖动的瞬间，所进行的位移事件，而ui则是“可拖拽对象”
+		//（关于ui的详细定义请参考jquery官方文档）
+		drag: function(event, ui) {
+			//通过任意手段得到父元素的scale的具体的值，此处我将这个值保存进了父元素的“scale”属性中
+	    	var 父元素_scale = $(父元素).attr("scale");
+			//这是ui对象在拖动事件开始时的位置，在此处我们将其用作位移的初始量，在scale变化后，这个值不会随之改变，这也是在拖动行为的一瞬间，出现“瞬移”情况的原因
+	    	var original = ui.originalPosition;
+			//此时，我们对ui，也就是这个可拖拽对象的位置进行修改，由于通过originalPosition得到的位置是一个Position，即“相对于父元素的位置”，所以此处我们在修改ui的位置时，也要使用position()进行定位，而不是offset()
+	    	ui.position = {
+				//此处的值包括：位移起始点，拖动事件的鼠标位置，之前记录拖动开始时的鼠标，详细解释此处难以放置，请见下方详解
+	        	left: (original.left + event.clientX - click.x) / 父元素_scale,
+	        	top:  (event.clientY - click.y + original.top ) / 父元素_scale
+	    	};
+		}
+	})
+
+ui position变化的详解，以下使用ui来代指可拖动对象，请注意区分
+1.首先，我们可以得知，original所代表的是拖动开始之前，ui所在的位置，我们将这里设置为位移变化的起始点
+2.此处的event.clinetX/Y代表的是drag事件中，鼠标移动后的位置，因此，(event.cliketX - click.x)就表示了从拖拽开始start，到drag的过程中，鼠标在x轴上移动的距离。我们希望ui持续跟随鼠标移动，那么我们就令ui在位置起始点的基础上，在x轴和y轴（也就是left和top）上对应地增加鼠标移动的距离，这样就能使得ui对象的“移动速度”和鼠标的“移动速度”打成一致了
+3.最后，我们将得到的这个位置 / 父元素_scale，这包含了两方面的作用，首先，我们要知道的是，在scale后的元素上，鼠标的移动不会收到比例地影响，但是元素的位置变化却会收到scale的等比例影响，例如在scale = 0.5的父元素中向→移动100px，这会在视觉上表现为 想→移动了50px。而" / 父元素_scale"则能够将这种比例地变化调整回来，使得我们的鼠标向→拖拽了100px，对应的ui对象也向→移动了100px，最终便达成了我们需要的，在父元素经过scale处理后的元素上，仍然能够正常地移动
+
+综上所述，这是我在实际的代码编辑中遇到的问题和解决的办法，这可能不是最好的或者效率最高的，但我认为，这仍然可以帮到一些人实现他们的功能。如果我的代码对任何人有帮助或者参考价值，我感到十分荣幸！
+
+另外，在此处附上完整的，不带备注的代码，希望这能便于您使用：
+
+	$(您的拖拽元素).draggable({
+		start: function(event) {
+	    	click.x = event.clientX;
+	    	click.y = event.clientY;
+		},
+		drag: function(event, ui) {
+	    	var 您的父元素的scale = return_scale();
+	    	var original = ui.originalPosition;
+	    	ui.position = {
+	        	left: (event.clientX - click.x + original.left) / 您的父元素的scale,
+	        	top:  (event.clientY - click.y + original.top ) / 您的父元素的scale
+	    	};
+		}
+	})
