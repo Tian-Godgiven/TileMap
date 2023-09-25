@@ -6,6 +6,19 @@
 }
 
 
+
+/*画布区域内的菜单*/
+#huabu_area .menu{
+    position:absolute;
+    background-color:white;
+    width:150px;
+    height:100px;
+    display:none;
+    border:2px solid black;
+    z-index:100;
+}
+
+
   .draw_block{
     text-align:center;
     padding:0px 5px;
@@ -49,17 +62,17 @@
 
 
 /*画布创建弹窗*/
-  #addHuabu_alerttext{
-    font-size:30px;
-  }
-  .addHuabu_input{
-    font-size:25px;
-    height:30px;
-    width:100px;
-  }
+#addHuabu_alerttext{
+font-size:30px;
+}
+.addHuabu_input{
+font-size:25px;
+height:30px;
+width:100px;
+}
 
-/*画布放置区CSS*/
-  #huabu_area{
+    /*画布放置区CSS*/
+    #huabu_area{
     width:60%;
     height:100%;
     position: relative;
@@ -67,34 +80,34 @@
 
     border:2px solid black;
     border-top:none;
-  }
+    }
 
-  #huabu_container{
-  width:100%;
-  height:100%;
-  float: left;
-  position:absolute;
-  overflow:hidden;
-  }
+    #huabu_container{
+    width:100%;
+    height:100%;
+    float: left;
+    position:absolute;
+    overflow:hidden;
+    }
 
-  .tileContainer{
-  width:100%;
-  height:100%;
-  position:absolute;
-  left::0px;
-  top:0px;
-  }
+    .tileContainer{
+    width:100%;
+    height:100%;
+    position:absolute;
+    left::0px;
+    top:0px;
+    }
 
-/*画布按键*/
-  #huabu_changeBar{
+    /*画布按键*/
+    #huabu_changeBar{
     width:100%;
     height:30px;
     background-color:black;
     position:absolute;
     bottom:0;
-  }
+    }
 
-  .huabu_button{
+    .huabu_button{
     text-align:center;
     font-size:20px;
     padding-left:5px;
@@ -104,9 +117,9 @@
     float:left;
     position:relative;
     border-right: 2px solid;
-  }
+    }
 
-  #huabu_button_alert{
+    #huabu_button_alert{
       display:none;
       border:2px solid;
       width:200px;
@@ -143,19 +156,20 @@
 
 
 
-/*画布两侧调整大小半透明条*/
-  .resize_block{
+    /*画布两侧调整大小半透明条*/
+    .resize_block{
     opacity:0;
     height:95%;
     width:15px;
     background-color:grey;
     position:absolute;
     z-index:2;
-  }
-  #left_resize{
+    }
+    #left_resize{
     left:0;
-  }
+    }
 
-  #right_resize{
+    #right_resize{
     right:0;
-  }
+    }
+

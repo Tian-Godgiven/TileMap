@@ -17,7 +17,6 @@ function createLineStyle(){
 var focusing_line
 var line_id = 0
 function createLine(width,height,color,style,style_width){
-
 	//这个半径是line_dot的半径
 	var radius = 8
 	var width = parseInt(width)
@@ -564,6 +563,16 @@ function backToMidway(line_inner,dot_midway){
 	})
 }
 
+//右键dot_inner和dot_midway事件，弹出一个选项框
+var focusing_dot
+$("#huabu_container").on("mousedown",".line_dot:not(.line_dotLeft , .line_dotRight)",function(event){
+	event.stopPropagation()
+	//判断是否为右键
+	if(event.which == 3){
+		//显示该菜单，并
+		showMenu("line_dotInner_menu")
+	}
+})
 
 //当dot移入tile中，使其与tile绑定
 function DotIntoTile(event,ui,tile){
