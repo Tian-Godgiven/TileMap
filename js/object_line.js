@@ -619,8 +619,8 @@ function dragTileConnect(event,ui,tile,click_dot,huabu_scale){
 				var old_position = $(dot).offset()
 	    		//修改dot的位置，使其【增加】tile的移动量
 	    		$(dot).offset({
-	    			left: (old_position.left + x) / huabu_scale,
-	    			top: (old_position.top + y) / huabu_scale
+	    			left: old_position.left + x / huabu_scale,
+	    			top: old_position.top + y / huabu_scale
 	    		})
 	    		dragLineDot(dot)
 			}
