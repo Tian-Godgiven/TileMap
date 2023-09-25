@@ -29,6 +29,10 @@
 
 <body>
 
+    <div id="pointer">
+        这里
+    </div>
+
 <div id="top_area">
     <div id="top_icon">图标</div>
 
@@ -201,12 +205,22 @@
 
         <div id="draw_ability">
 
-            <div class="draw_block">放大</div>
-            <div class="draw_block">当前缩放比例</div>
-            <div class="draw_block">缩小</div>
+            <div id="draw_ability_ScaleUp" class="draw_block">
+                <img class="draw_ability_button" src="./img/ScaleUp.png">
+            </div>
+            <div id="draw_ability_ScaleShow" class="draw_block">
+                <div>100%</div>
+            </div>
+            <div id="draw_ability_ScaleDown" class="draw_block">
+                <img class="draw_ability_button" src="./img/ScaleDown.png">
+            </div>
 
-            <div class="draw_block">撤回</div>
-            <div class="draw_block">重做</div>
+            <div class="draw_block">
+                <img class="draw_ability_button" src="./img/undo.png">
+            </div>
+            <div class="draw_block">
+                <img class="draw_ability_button" src="./img/redo.png">
+            </div>
 
             <div class="draw_block">删除</div>
             <div class="draw_block">上浮</div>
@@ -517,6 +531,8 @@
     <script src="./js/object_tiletext.js"></script>
 
     <script src="./js/area_huabu.js"></script>
+    <script src="./js/area_huabu_ability.js"></script>
+
     <script src="./js/area_left.js"></script>
     <script src="./js/area_right.js"></script>
     <script src="./js/area_top.js"></script>

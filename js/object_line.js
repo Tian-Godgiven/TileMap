@@ -133,32 +133,41 @@ $("#huabu_container").on("mousedown",".line",function(){
 });
 
 //拖拽dot
+var click = { x:0, y:0};
 $("#huabu_container").on("mouseenter",".line > .line_dot:not(.ui-draggable-handle)",function(){
 	if($(this).is(".line_dotMidway")){
-		$(this).draggable({
-			handle: $(this).children(".line_dotMidway_inner"),
-			drag: function(event,ui) {
-				dragLineDot(this)
-	    	},
-	    	stop:function(){
-	    		dragLineDot(this,"stop")
-	    	}
-		})
+		$(this).draggable({handle: $(this).children(".line_dotMidway_inner")})
 	}
 	else{
-		$(this).draggable({
-			handle: false,
-			drag: function(event,ui) {
-				dragLineDot(this)
-	    	},
-	    	stop:function(){
-	    		dragLineDot(this)
-	    	}
-		})
+		$(this).draggable({handle: false,})
 	}
+	$(this).draggable({
+		start: function(event,ui) {
+			var huabu_scale = return_scale();
+			var original = ui.originalPosition;
+			ui.position = {
+            	left: (original.left) / huabu_scale,
+            	top:  (original.top ) / huabu_scale
+        	};
+        	click.x = event.clientX;
+        	click.y = event.clientY;
+    	},
+		drag: function(event,ui) {
+			var huabu_scale = return_scale();
+        	var original = ui.originalPosition;
+        	ui.position = {
+            	left: (event.clientX - click.x + original.left) / huabu_scale,
+            	top:  (event.clientY - click.y + original.top ) / huabu_scale
+        	};
+			dragLineDot(this)
+	    },
+	    stop: function(){
+	    	dragLineDot(this,"stop")
+	    }
+	})
 })
 
-//拖拽line_dot的函数
+//拖拽line_dot的分辨函数
 function dragLineDot(dot,time){
 	//如果是一个左端点，则其相连的是下一个dot_inner的再下一个dot,如果这个Dot是midway，则提取其子元素
 	if($(dot).is(".line_dotLeft")){
@@ -243,16 +252,27 @@ function dragLineDot(dot,time){
 				$(inner_left).remove()
 				$(inner_right).remove()
 				dot = MidwayTurnToInner(line_right,dot)
-				//拖动事件
+				//补充拖动事件
 				$(dot).draggable()
+				var click = { x:0, y:0};
 				$(dot).draggable({
-						drag: function() {
-							dragLineDot(dot)
-				    	},
-				    	stop:function(){
-				    		dragLineDot(dot)
-				    	}
-					})
+					start: function(event) {
+			        	click.x = event.clientX;
+			        	click.y = event.clientY;
+			    	},
+					drag: function(event,ui) {
+						var huabu_scale = return_scale();
+			        	var original = ui.originalPosition;
+			        	ui.position = {
+			            	left: (event.clientX - click.x + original.left) / huabu_scale,
+			            	top:  (event.clientY - click.y + original.top ) / huabu_scale
+			        	};
+						dragLineDot(this)
+				    },
+				    stop: function(){
+				    	dragLineDot(this,"stop")
+				    }
+				})
 				connectLineDot(left,right,dot,line_right)
 			}
 		}
@@ -390,9 +410,11 @@ function changeArrow(arrow){
 	}
 
 	//获取圆心的位置
-	var radius = parseInt($(dot).css("width"))/2
+	var huabu_scale = return_scale()
+	var radius = (parseInt($(dot).css("width"))/2)*huabu_scale
 	var x = $(dot).offset().left + radius
 	var y = $(dot).offset().top + radius
+
 	//获取对应线段的粗度颜色和角度
 	var thick = parseInt($(line_inner).css("height"))
 	var angle = parseInt($(line_inner).attr("angle"))
@@ -404,8 +426,8 @@ function changeArrow(arrow){
 	angle = basic_angle + angle
 
 	//箭头的宽度和高度与线条正相关
-	var width = thick*1.5 + 15
-	var height = thick*1.2 + 10
+	var width = (thick*1.5 + 15)
+	var height = (thick*1.2 + 10)
 
 	//修饰arrow_inner，其中arrow的颜色与线条相同，大小比线条的粗度稍大，角度根据其dot有所变化
 	$(arrow_inner).css({
@@ -427,7 +449,7 @@ function changeArrow(arrow){
 	//位置则是其箭头顶端（上边缘的中点）与dot的圆心相同
 	//由于进行旋转的是img所以不用担心旋转引发的位置偏移
 	$(arrow).offset({
-		left: x - (width/2),
+		left: x - (width/2)*huabu_scale,
 		top: y ,
 	})
 }
@@ -487,17 +509,18 @@ function backToCenter(line_inner,dot_inner){
 	}
 
 	//获取半径
-	var radius = parseInt($(dot_inner).css("width"))/2
+	var huabu_scale = return_scale()
+	var radius = parseInt($(dot_inner).css("width"))/2 * huabu_scale
 	//转化角度为弧度
 	var radian = Math.PI * angle /180
 	//得到dotLeft的圆心所在的位置,圆心相较于div起始点各有一个半径的差距，所以要+radius
 	var dot_left = $(dot_inner).prevAll(".line_dot:not(.line_dotInner):first")
-	var radius_1 = parseInt($(dot_left).css("width"))/2
+	var radius_1 = parseInt($(dot_left).css("width"))/2  * huabu_scale
 	var x_1 = dot_left.offset().left + radius_1
 	var y_1 = dot_left.offset().top + radius_1
 	//得到dotRight的圆心所在的位置
 	var dot_right = $(dot_inner).nextAll(".line_dot:not(.line_dotInner):first")
-	var radius_2 = parseInt($(dot_right).css("width"))/2
+	var radius_2 = parseInt($(dot_right).css("width"))/2  * huabu_scale
 	var x_2 = dot_right.offset().left + radius_2
 	var y_2 = dot_right.offset().top + radius_2
 
@@ -533,11 +556,11 @@ function backToMidway(line_inner,dot_midway){
 	var left = start_dot.offset().left
 	var top = start_dot.offset().top
 
-
+	var huabu_scale = return_scale()
 	//移动dotInner的圆心到中点去，圆心相较于offset有着left和top + radius的偏移量，所以这里要减去radius
 	$(dot_midway).offset({
-		left: left + x - radius + basic_radius,
-		top: top + y - radius + basic_radius,
+		left: left + (x - radius + basic_radius) * huabu_scale,
+		top: top + (y - radius + basic_radius) * huabu_scale,
 	})
 }
 

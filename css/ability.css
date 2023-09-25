@@ -1,3 +1,14 @@
+#pointer{
+	position:absolute;
+	width:100px;
+	height:100px;
+	background-color:red;
+	z-index: 100;
+}
+
+
+
+
 /*滑块标题样式*/
     .slide_title{
         background-color: #0BFFFFFF;

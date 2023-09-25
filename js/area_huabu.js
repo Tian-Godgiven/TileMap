@@ -182,6 +182,7 @@ function changeHuabu() {
 	$("#" + $(focusing_huabu).attr("id") + "_button").css("color", "red")
 	//附加事件
 	rightArea_clearContent()//清空右侧区域显示的内容并关闭编辑权限
+	ScaleShow(focusing_huabu)//显示该画布的scale
 }
 
 //画布右键拖动实现
@@ -351,30 +352,29 @@ function createTileContainer(huabu) {
 }
 
 
-
-//画布放大缩小基础函数
-var huabu_scale
-	//缩小页面
-	function narrowPage() {
-	if ($(focusing_huabu).attr("scale") > 0.3) {
-		huabu_scale = parseFloat($(focusing_huabu).attr("scale"))
-		huabu_scale -= 0.1;
-		$(focusing_huabu).attr("scale", huabu_scale)
-		$(focusing_huabu).css({
-			transform: 'scale(' + huabu_scale + ')',
-		});
-	}
-	}
-
-	//放大页面
-	function enlargePage() {
+//放大当前聚焦的画布
+function enlargePage() {
 	if ($(focusing_huabu).attr("scale") < 3) {
-		huabu_scale = parseFloat($(focusing_huabu).attr("scale")) //变成浮点数
-		huabu_scale = huabu_scale + 0.1;
+		var huabu_scale = parseFloat($(focusing_huabu).attr("scale")) //变成浮点数
+		huabu_scale = Math.round((huabu_scale + 0.05)*100)/100
 		$(focusing_huabu).attr("scale", huabu_scale) //把修改后的值放回来
 		$(focusing_huabu).css({
 			transform: 'scale(' + huabu_scale + ')',
 		});
+		ScaleShow(focusing_huabu)
+	}
+}
+
+//缩小当前聚焦的画布
+function narrowPage() {
+	if ($(focusing_huabu).attr("scale") > 0.1) {
+		var huabu_scale = parseFloat($(focusing_huabu).attr("scale"))
+		huabu_scale = Math.round((huabu_scale - 0.05)*100)/100
+		$(focusing_huabu).attr("scale", huabu_scale)
+		$(focusing_huabu).css({
+			transform: 'scale(' + huabu_scale + ')',
+		});
+		ScaleShow(focusing_huabu)
 	}
 }
 
@@ -409,17 +409,17 @@ window.onload = function() {
 }
 
 //画布界面的resize功能，原理是拖动一个长条div改变两边的width
-	//移动到上面时，会显示透明的拖动条
-	$(".resize_block").mouseenter(function(){
-	$(this).css({
-		"opacity":"0.3"
-		})
-	})	
-	$(".resize_block").mouseleave(function(){
-	$(this).css({
-		"opacity":"0"
-		})
-	})	
+//移动到上面时，会显示透明的拖动条
+$(".resize_block").mouseenter(function(){
+$(this).css({
+	"opacity":"0.3"
+	})
+})	
+$(".resize_block").mouseleave(function(){
+$(this).css({
+	"opacity":"0"
+	})
+})	
 
 //拖动resize可以将两侧栏与画布的width相对改变
 var resize_dragging = false;

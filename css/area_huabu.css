@@ -12,8 +12,9 @@
     height:49px;
     float:left;
     background-color:#1F9098D2;
-    vertical-align:middle;
     display: flex; 
+
+    justify-content:center;
     align-items: center;
   }
 
@@ -33,7 +34,15 @@
   position:absolute;
 }
 
+.draw_ability_button{
+  max-width:25px;
+}
 
+#draw_ability_ScaleShow{
+  justify-content:right;
+  text-align:right;
+  width:70px;
+}
 
 
 
