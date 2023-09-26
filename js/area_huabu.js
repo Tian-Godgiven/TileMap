@@ -473,3 +473,10 @@ $(".resize_block").on("mousedown",function(event){
 		resize_dragging = false
 	}
 })
+
+//画布内拖动时，对元素进行位置的修正
+function dragFix(event, ui) {
+	var scale = $(focusing_huabu).attr("scale")
+    ui.position.left = ui.position.left / scale;
+    ui.position.top = ui.position.top  / scale;
+}

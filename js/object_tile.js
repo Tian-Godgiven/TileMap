@@ -92,7 +92,7 @@ $("#huabu_container").on("mouseenter", ".tile:not(.ui-draggable-handle)", functi
             	left: (event.clientX - click.x + original.left) / huabu_scale,
             	top:  (event.clientY - click.y + original.top ) / huabu_scale
         	};
-        	dragTileConnect(event,ui,this,click_dot,huabu_scale)
+        	dragTileConnect(event,ui,this,click_dot)
     	}
 	});
     //修改大小

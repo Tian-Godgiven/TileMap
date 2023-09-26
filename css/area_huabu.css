@@ -5,7 +5,12 @@
   font-size:25px;
 }
 
-
+#pointer{
+    width:100px;
+    height:100px;
+    position:absolute;
+    background:red;
+}
 
 /*画布区域内的菜单*/
 #huabu_area .menu{

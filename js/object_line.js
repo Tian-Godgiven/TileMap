@@ -99,21 +99,9 @@ function createArrowLeft(){
 
 //线条line的移动
 $("#huabu_container").on("mouseenter", ".line:not(.ui-draggable-handle)", function() {
-	var click = { x:0, y:0};
 	$(this).draggable({
-		start: function(event) {
-        	click.x = event.clientX;
-        	click.y = event.clientY;
-    	},
-    	drag: function(event, ui) {
-        	var huabu_scale = return_scale();
-        	var original = ui.originalPosition;
-        	ui.position = {
-            	left: (event.clientX - click.x + original.left) / huabu_scale,
-            	top:  (event.clientY - click.y + original.top ) / huabu_scale
-        	};
-    	}
-	})
+    	drag: dragFix,
+    })
 })
 
 //鼠标点击在画布中的line上时显示其中的dot，将其聚焦
@@ -150,7 +138,6 @@ $("#huabu_container").on("mousedown",".line",function(){
 });
 
 //拖拽dot
-var click = { x:0, y:0};
 $("#huabu_container").on("mouseenter",".line > .line_dot:not(.ui-draggable-handle)",function(){
 	if($(this).is(".line_dotMidway")){
 		$(this).draggable({handle: $(this).children(".line_dotMidway_inner")})
@@ -158,24 +145,10 @@ $("#huabu_container").on("mouseenter",".line > .line_dot:not(.ui-draggable-handl
 	else{
 		$(this).draggable({handle: false,})
 	}
+
 	$(this).draggable({
-		start: function(event,ui) {
-			var huabu_scale = return_scale();
-			var original = ui.originalPosition;
-			ui.position = {
-            	left: (original.left) / huabu_scale,
-            	top:  (original.top ) / huabu_scale
-        	};
-        	click.x = event.clientX;
-        	click.y = event.clientY;
-    	},
 		drag: function(event,ui) {
-			var huabu_scale = return_scale();
-        	var original = ui.originalPosition;
-        	ui.position = {
-            	left: (event.clientX - click.x + original.left) / huabu_scale,
-            	top:  (event.clientY - click.y + original.top ) / huabu_scale
-        	};
+			dragFix(event,ui)
 			dragLineDot(this)
 	    },
 	    stop: function(){
@@ -186,78 +159,58 @@ $("#huabu_container").on("mouseenter",".line > .line_dot:not(.ui-draggable-handl
 
 //拖拽line_dot的分辨函数
 function dragLineDot(dot,time){
-	//如果这不是一个中继点，即是左右端点或者一个中点的话
-	if(!$(dot).is(".line_dotMidway")){
-		var list = $(dot).data("connected")
-		for(i in list){
-			var data = list[i]
-			var left  = data["dot_left"]
-			var right = data["dot_right"]
-			var inner = data["dot_inner"]
-			var line  = data["line_inner"]
+	//用于记录这个点所链接的所有线段的角度
+	var line_list = []
+	//用于标识这个点是否是某一个链接中的Inner或者是否是一个midway
+	var thisIsInner = false
+	var thisIsMidway = false
+	var list = $(dot).data("connected")
+	for(i in list){
+		var data = list[i]
+		var left  = data["dot_left"]
+		var right = data["dot_right"]
+		var inner = data["dot_inner"]
+		var line  = data["line_inner"]
 
-			//如果在这个关系中，dot是inner的话，就要把dot变成midway
-			if($(dot).is(inner)){
+		//如果是midway的话，就把line角度存储进去
+		if($(dot).is(".line_dotMidway")){
+			thisIsMidway = true
+			line_list[line_list.length] = [i,$(line).attr("angle")]
+		}
+
+		//如果在这个链接中，dot是inner的话，就要把dot变成midway
+		if($(dot).is(inner)){
+			thisIsInner = true
+			//但如果这个他就是一个midway的话，就不进行这个操作
+			if(!$(dot).is(".line_dotMidway")){
 				InnerTurnToMidway(left,right,list,i,line,dot)
 				i += 1
-			}
-			else{
-				connectLineDot(left,right,inner,line)
-			}
-		}
-	}
-	//如果这是一个线段中继点，则其相连的是前后各间隔一个dot_inner的Dot
-	else if($(dot).is(".line_dotMidway")){
-		//用于记录这个点所链接的所有线段的角度
-		var line_list = []
-		//用于标识这个点是否是某一个链接中的Inner
-		var thisIsInner = false
-		//遍历与这个dot有关的链接
-		var list = $(dot).data("connected")
-		for(i in list){
-			var data = list[i]
-			var left  = data["dot_left"]
-			var right = data["dot_right"]
-			var inner = data["dot_inner"]
-			var line  = data["line_inner"]
-
-			//如果这个点是某一个链接中的inner
-			if($(dot).is(inner)){
-				thisIsInner = true
-			}
-			//把这个链接的line的角度存储进去
-			line_list[line_list.length] = [i,$(line).attr("angle")]
-			//令这个链接互联
-			connectLineDot(left,right,inner,line)
-		}
-
-		//遍历line_list，依次对比两两线段之间的角度，如果存在某两条线段持平，则令这个midway转化为inner
-		//删去其前方的line_inner和前后两个dot_Inner再把后线条连接到前后两个点上
-		if(time == "stop"){
-			//如果这个点是一段链接中的inner,则不再令其他链接进行融合
-			if(thisIsInner){
 				return 0
 			}
-			for(i=0; i < line_list.length-1; i++){
-				for(j = i+1; j <line_list.length; j++){
-					//通line_list内存储的两个链接的名称
+		}
+		
+		connectLineDot(left,right,inner,line)
+	}
+	//遍历line_list，依次对比两两线段之间的角度，如果存在某两条线段持平，则令这个midway转化为inner
+	//删去其前方的line_inner和前后两个dot_Inner再把后线条连接到前后两个点上
+	//如果这个midway不是任何一个链接中的中继点的话，才进行这个操作
+	if(thisIsMidway  && !thisIsInner && time == "stop"){
+		for(i=0; i < line_list.length-1; i++){
+			for(j = i+1; j <line_list.length; j++){
+				var angle_1 = line_list[i][1] - line_list[j][1]
+				var angle_2 = line_list[i][1] + line_list[j][1]
+				//如果这两个线段的角度匹配，则令这个链接消失，同时将midway转化为inner
+				if((angle_1 <= 1 && angle_1 >= -3) || (angle_2 > 359 && angle_2 <= 361) ){
+					//获得line_list内存储的两个链接的名称
 					var connect_1 = line_list[i][0]
 					var connect_2 = line_list[j][0]
-
-					var angle_1 = line_list[i][1] - line_list[j][1]
-					var angle_2 = line_list[i][1] + line_list[j][1]
-					//如果这两个线段的角度匹配，则令这个链接消失
-					if((angle_1 <= 1 && angle_1 >= -3) || (angle_2 > 359 && angle_2 <= 361) ){
-						//将这个Midway转化为inner
-						MidwayTurnToInner(connect_1,connect_2,dot)
-					}
+					//将这个Midway转化为inner
+					MidwayTurnToInner(connect_1,connect_2,dot)
 				}
 			}
-
-
-			
 		}
 	}
+	
 }
 
 //通过修改line_inner链接左右两个dot_left和dot_right
@@ -376,8 +329,8 @@ function creatArrow(line,direction,style){
 	$(arrow_inner).append(arrow_img)
 	$(arrow).append(arrow_inner)
 	$(dot).after(arrow)
-
 	changeArrow(arrow)
+	dragLineDot(dot)
 }
 
 //修改某个arrow的位置使其能够对准所处的线段上
@@ -445,7 +398,7 @@ function changeArrow(arrow){
 	})
 }
 
-//将一个dot_innner转化为一个dot_midway
+//将一个dot_inner转化为一个dot_midway
 function InnerTurnToMidway(dot_left,dot_right,list,i,line_right,dot){
 	//复制一个line_inner并将其添加到dot的前面
 	var line_left = $(line_right).clone()
@@ -527,7 +480,7 @@ function InnerTurnToMidway(dot_left,dot_right,list,i,line_right,dot){
 	connectLineDot(dot_inner,dot_right,dot_inner_right,line_right)
 }
 
-//将一个dot_midway转化为一个dot_inner，返回这个dot_inner
+//将一个dot_midway转化为一个dot_inner
 function MidwayTurnToInner(connect_1,connect_2,dot_midway){
 
 	var list = $(dot_midway).data("connected")
@@ -685,27 +638,28 @@ function DotOutTile(event,ui,tile){
 
 
 //tile的拖拽函数的补充，使其带动绑定的line_dot一起移动
-function dragTileConnect(event,ui,tile,click_dot,huabu_scale){
+function dragTileConnect(event,ui,tile,click_dot){
 	var list = ($(tile).data("connected"))
+	//移动dot
+	if(list != undefined){
+		var huabu_scale = return_scale()
 		var original = ui.originalPosition;
 		//获取移动量
 		var x = event.clientX - click_dot.x
 		var y = event.clientY - click_dot.y
 		click_dot.x = event.clientX;
 		click_dot.y = event.clientY;
-		//移动dot
-		if(list != undefined){
-			//在tile移动的同时也会移动connected中的内容
-			for(i = 0 ; i < list.length ; i++){
-				var dot = list[i]
-				//获取dot的位置和移动量
-				var old_position = $(dot).offset()
-	    		//修改dot的位置，使其【增加】tile的移动量
-	    		$(dot).offset({
-	    			left: old_position.left + x / huabu_scale,
-	    			top: old_position.top + y / huabu_scale
-	    		})
-	    		dragLineDot(dot)
-			}
+		//在tile移动的同时也会移动connected中的内容
+		for(i = 0 ; i < list.length ; i++){
+			var dot = list[i]
+			//获取dot的位置和移动量
+			var old_position = $(dot).offset()
+    		//修改dot的位置，使其【增加】tile的移动量
+    		$(dot).offset({
+    			left: old_position.left + x / huabu_scale,
+    			top: old_position.top + y / huabu_scale
+    		})
+    		dragLineDot(dot)
 		}
+	}
 }
