@@ -298,7 +298,7 @@ function connectLineDot(dot_left,dot_right,dot_inner,line_inner){
 		"transform":"rotate(" + angle + "deg)",
 	})
 	//使dot_inner回到line中间
-	backToCenter(line_inner,dot_inner)
+	backToCenter(dot_left,dot_right,dot_inner,line_inner)
 	//修改箭头的位置和旋转的角度
 	$($(line_inner).parent()).find(".line_arrow").each(function(){
 		changeArrow(this)
@@ -475,6 +475,7 @@ function InnerTurnToMidway(dot_left,dot_right,list,i,line_right,dot){
 	$(dot_inner_right).data("connected",list_right)
 	//用完id记得+1
 	connect_id += 1
+	console.log($(dot).data("connected"))
 
 	connectLineDot(dot_left,dot_inner,dot_inner_left,line_left)
 	connectLineDot(dot_inner,dot_right,dot_inner_right,line_right)
@@ -484,36 +485,47 @@ function InnerTurnToMidway(dot_left,dot_right,list,i,line_right,dot){
 function MidwayTurnToInner(connect_1,connect_2,dot_midway){
 
 	var list = $(dot_midway).data("connected")
-	//通过名称获取两个链接
-	var connect_left = list[connect_1]
-	var connect_right = list[connect_2]
+	console.log("1是：",list[connect_1])
+	console.log("2是：",list[connect_2])
+	//通过dot_midway所处的位置获取两个链接的左右顺序
+	if($(dot_midway).is(list[connect_1]["dot_right"])){
+		connect_left = connect_1
+		connect_right = connect_2
+	}
+	else if($(dot_midway).is(list[connect_1]["dot_left"])){
+		connect_left = connect_2
+		connect_right = connect_1
+	}
 
 	//删除两个链接中的dot_inner
-	connect_left["dot_inner"].remove()
-	connect_right["dot_inner"].remove()
+	list[connect_left]["dot_inner"].remove()
+	list[connect_right]["dot_inner"].remove()
 	//删除前一个链接中的line_inner
-	connect_left["line_inner"].remove()
+	list[connect_left]["line_inner"].remove()
 
 	//重构connect_left链接，使其链接两个两个链接中的dot_left和dot_right
-	var dot_left = connect_left["dot_left"]
-	var dot_right = connect_right["dot_right"]
-	var line_inner = connect_right["line_inner"]
+	var dot_left = list[connect_left]["dot_left"]
+	var dot_right = list[connect_right]["dot_right"]
+	var line_inner = list[connect_right]["line_inner"]
 	var new_connect = {
 		"dot_left":dot_left,
 		"dot_right":dot_right,
 		"dot_inner":dot_midway,
 		"line_inner":line_inner
 	}
+
+	console.log("new：", new_connect)
 	//将dot_miday中的connect_1替换为new_connect
-	list[connect_1] = new_connect
-	delete list[connect_2]	//随后删除掉另一个链接
+	list[connect_left] = new_connect
+	delete list[connect_right]	//随后删除掉另一个链接
 	//将dot_left中的connect_1替换为new_connect
-	$(dot_left).data("connected")[connect_1] = new_connect
+	$(dot_left).data("connected")[connect_left] = new_connect
 	//将dot_right中的connect_2删除，加入名称为connect_1的new_connect
-	$(dot_right).data("connected")[connect_1] = new_connect
-	delete $(dot_right).data("connected")[connect_2]
+	$(dot_right).data("connected")[connect_left] = new_connect
+	delete $(dot_right).data("connected")[connect_right]
 
 	//如果这个dot只剩下一个链接的话，就将其变为dot_inner，否则不修改其样式)
+	console.log(Object.keys(list).length)
 	if(Object.keys(list).length == 1){
 		//修改Dot的class
 		$(dot_midway).attr("class",'line_dot line_dotInner')
@@ -528,7 +540,7 @@ function MidwayTurnToInner(connect_1,connect_2,dot_midway){
 //将线条中点line_dotInner放到他的前后两个有效点的中间
 //如果没有中点，就在这个线段上创建一个中点
 //angle是line_inner的偏转角度，难以通过jq方式获取
-function backToCenter(line_inner,dot_inner){
+function backToCenter(dot_left,dot_right,dot_inner,line_inner){
 	var angle = $(line_inner).attr("angle")
 	if(angle == undefined){
 		angle = 0
@@ -540,15 +552,13 @@ function backToCenter(line_inner,dot_inner){
 	//转化角度为弧度
 	var radian = Math.PI * angle /180
 	//得到dotLeft的圆心所在的位置,圆心相较于div起始点各有一个半径的差距，所以要+radius
-	var dot_left = $(dot_inner).prevAll(".line_dot:not(.line_dotInner):first")
 	var radius_1 = parseInt($(dot_left).css("width"))/2  * huabu_scale
-	var x_1 = dot_left.offset().left + radius_1
-	var y_1 = dot_left.offset().top + radius_1
+	var x_1 = $(dot_left).offset().left + radius_1
+	var y_1 = $(dot_left).offset().top + radius_1
 	//得到dotRight的圆心所在的位置
-	var dot_right = $(dot_inner).nextAll(".line_dot:not(.line_dotInner):first")
 	var radius_2 = parseInt($(dot_right).css("width"))/2  * huabu_scale
-	var x_2 = dot_right.offset().left + radius_2
-	var y_2 = dot_right.offset().top + radius_2
+	var x_2 = $(dot_right).offset().left + radius_2
+	var y_2 = $(dot_right).offset().top + radius_2
 
 	//移动dotInner的圆心到两点间距的中心
 	//圆心相较于offset有着left和top + radius的偏移量，所以这里要减去自身的radius
@@ -635,7 +645,6 @@ function DotOutTile(event,ui,tile){
 			$(dot).parent(".line").draggable("enable")
 		}
 }
-
 
 //tile的拖拽函数的补充，使其带动绑定的line_dot一起移动
 function dragTileConnect(event,ui,tile,click_dot){

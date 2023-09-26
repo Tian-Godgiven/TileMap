@@ -20,7 +20,7 @@
 	border-radius: 50%;
 	z-index: 2;
 	box-sizing: border-box;
-	opacity:0;
+	opacity:1;
 }
 
 	.line_dotMidway{
