@@ -165,3 +165,24 @@ removeClass同理
 ---
 
 17.使用offset()移动对象时，若参数中包含某些常量，则要对常量进行scale转化，才能在缩放后的父元素中正确移动
+
+---
+
+18.获取字典对象所包含的键值对个数：
+
+```
+Object.keys(字典对象).length
+```
+
+---
+
+19.mouseenter事件丢失对象后（例如remove()后）重复触发问题：
+
+```
+加上：	event.stopPropagation()
+```
+
+------
+
+20.拖动排序功能：sortable
+	 拉框选择功能：selectable

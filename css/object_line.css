@@ -31,6 +31,7 @@
 		text-align: center;
 		justify-content: center;
 		align-items:center;
+		opacity:1 !important;
 	}
 
 		.line_dotMidway_inner{

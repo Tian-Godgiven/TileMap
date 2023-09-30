@@ -17,6 +17,22 @@ function createLineStyle(){
 var focusing_line
 var line_id = 0
 var connect_id = 0
+var focusing_dot
+
+//创建新链接的函数，只允许该通过该函数调用connect_id
+function createConnect(dot_left,dot_right,dot_inner,line_inner){
+	var connect = {
+			"dot_left":dot_left,
+			"dot_right":dot_right,
+			"dot_inner":dot_inner,
+			"line_inner":line_inner}
+	var the_id = "connect_" + connect_id 
+	connect_id += 1
+
+	return [the_id,connect]
+}
+
+//创建一条定制的线条
 function createLine(width,height,color,style,style_width){
 	//这个半径是line_dot的半径
 	var radius = 8
@@ -33,15 +49,12 @@ function createLine(width,height,color,style,style_width){
 	var line_dotRight = $("<div>",{ "class":"line_dot line_dotRight"})
 	var line_inner = $("<div>",{ "class" :"line_inner"})
 
-	var connected = {
-				"dot_left":line_dotLeft,
-				"dot_right":line_dotRight,
-				"line_inner":line_inner,
-				"dot_inner":line_dotInner}
+
 
 	var connect_list = {}
-	connect_list["connected_" + connect_id] = connected
-	connect_id += 1
+	var connect = createConnect(line_dotLeft,line_dotRight,line_dotInner,line_inner)
+	connect_list[connect[0]] = connect[1]
+
 
 	//对line的修饰
 	$(line).css("width",width)
@@ -120,7 +133,8 @@ $("#huabu_container").on("mousedown",".line",function(){
 	})
 	//点击其他地方时修改透明度隐藏dot，失去聚焦的line
 	$("#huabu_container").on("click",function(event){
-		if(!$(line).children().is(event.target)){
+		event.stopPropagation()
+		if(!$(line).find("div").is(event.target) ){
 			focusing_line = undefined
 			$(line).find(".line_dot").each(function(){
 				var dot = this
@@ -183,7 +197,7 @@ function dragLineDot(dot,time){
 			thisIsInner = true
 			//但如果这个他就是一个midway的话，就不进行这个操作
 			if(!$(dot).is(".line_dotMidway")){
-				InnerTurnToMidway(left,right,list,i,line,dot)
+				InnerTurnToMidway(dot,i)
 				i += 1
 				return 0
 			}
@@ -193,8 +207,8 @@ function dragLineDot(dot,time){
 	}
 	//遍历line_list，依次对比两两线段之间的角度，如果存在某两条线段持平，则令这个midway转化为inner
 	//删去其前方的line_inner和前后两个dot_Inner再把后线条连接到前后两个点上
-	//如果这个midway不是任何一个链接中的中继点的话，才进行这个操作
-	if(thisIsMidway  && !thisIsInner && time == "stop"){
+	//如果这个midway不是任何一个链接中的中继点并且也没有分支的话，才进行这个操作
+	if(thisIsMidway  && !thisIsInner && time == "stop" && line_list.length == 2){
 		for(i=0; i < line_list.length-1; i++){
 			for(j = i+1; j <line_list.length; j++){
 				var angle_1 = line_list[i][1] - line_list[j][1]
@@ -209,8 +223,7 @@ function dragLineDot(dot,time){
 				}
 			}
 		}
-	}
-	
+	}	
 }
 
 //通过修改line_inner链接左右两个dot_left和dot_right
@@ -226,8 +239,8 @@ function connectLineDot(dot_left,dot_right,dot_inner,line_inner){
 	}
 
 	//获取dot的半径，这个数值等于dot的宽度的一半
-	var radius_left = parseInt($(dot_left).css("width"))/2
-	var radius_right = parseInt($(dot_right).css("width"))/2
+	var radius_left = $(dot_left).width()/2
+	var radius_right = $(dot_right).width()/2
 	//找到两个dot的圆心的位置,是分别的offset+radius,并求出距离差
 	var distant_x = ($(dot_left).offset().left + radius_left) - 
 					($(dot_right).offset().left + radius_right)
@@ -340,15 +353,18 @@ function changeArrow(arrow){
 	var arrow_inner = $(arrow).children()
 	var arrow_img = $(arrow_inner).children()
 	var dot = $(arrow).prev(".line_dot")
+	//箭头只与端点绑定，而端点只有一个链接
+	var list = $(dot).data("connected")
+	for(i in list){
+		var line_inner = list[i]["line_inner"]
+	}
 
 	//根据箭头的方向选择箭头附着的dot
 	if($(dot).is(".line_dotLeft")){
-		var line_inner = $(dot).nextAll(".line_inner:first")
 		//是左侧点，要+270度
 		var basic_angle = 270
 	}
 	else if($(dot).is(".line_dotRight")){
-		var line_inner = $(dot).prevAll(".line_inner:first")
 		//是右侧侧点，要+90度
 		var basic_angle = 90
 	}
@@ -399,13 +415,20 @@ function changeArrow(arrow){
 }
 
 //将一个dot_inner转化为一个dot_midway
-function InnerTurnToMidway(dot_left,dot_right,list,i,line_right,dot){
+function InnerTurnToMidway(dot_inner,connect_id){
+
+	var list = $(dot_inner).data("connected")
+	var old_connect = list[connect_id]
+	var dot_left = old_connect["dot_left"]
+	var dot_right = old_connect["dot_right"]
+	var line_right = old_connect["line_inner"]
+
 	//复制一个line_inner并将其添加到dot的前面
 	var line_left = $(line_right).clone()
-	$(dot).before(line_left)
+	$(dot_inner).before(line_left)
 
 	//将inner变为midway,修改Dot的class
-	$(dot).attr("class",'line_dot line_dotMidway')
+	$(dot_inner).attr("class",'line_dot line_dotMidway')
 	//生成midway_inner和midway_border
 	var midway_inner = $("<div>",{
 		"class":"line_dotMidway_inner line_dot",
@@ -422,12 +445,11 @@ function InnerTurnToMidway(dot_left,dot_right,list,i,line_right,dot){
 		"background":color
 	})
 	//把inner和Border放进dot
-	$(dot).append(midway_border)
-	$(dot).append(midway_inner)
+	$(dot_inner).append(midway_border)
+	$(dot_inner).append(midway_inner)
 
-	var dot_inner = midway_inner
 	//变大之后位置也发生了变化，所以这里使其回到原本的位置，也就是中点
-	backToCenter(line_left,dot)
+	backToCenter(line_left,dot_inner)
 
 	//随后在两边各创建一个dot_Inner，放在各自的line_inner前面
 	var dot_inner_left = $("<div>",{"class":"line_dot line_dotInner"})
@@ -436,57 +458,50 @@ function InnerTurnToMidway(dot_left,dot_right,list,i,line_right,dot){
 	$(line_left).before(dot_inner_left)
 	$(line_right).before(dot_inner_right)
 
-	//修改dot的list，将这个关系删除，加上两个新的关系
+	//修改connect_left
 	var connected_left = {
 		"dot_left":dot_left,
-		"dot_right":$(dot),
+		"dot_right":$(dot_inner),
 		"line_inner":line_left,
 		"dot_inner":dot_inner_left}
-
-	var connected_right = {
-		"dot_left":$(dot),
-		"dot_right":dot_right,
-		"line_inner":line_right,
-		"dot_inner":dot_inner_right}
+	//创建connect_right
+	var connect_right = createConnect($(dot_inner),dot_right,dot_inner_right,line_right)
 
 	//修改left一侧的点的list
-	$(dot).data("connected")[i] = connected_left//覆盖旧的链接
-	$(dot_left).data("connected")[i] = connected_left
+	$(dot_inner).data("connected")[connect_id] = connected_left//覆盖旧的链接
+	$(dot_left).data("connected")[connect_id] = connected_left
 	//给新创建dot_inner放入list
 	var list_left = {}
-	list_left[i] = connected_left
+	list_left[connect_id] = connected_left
 	$(dot_inner_left).data("connected",list_left)
 
-
-	//修改right一侧的点的list,
-	var new_id = "connected_" + connect_id
-	//修改Dot的list
-	var dot_list = $.extend(true, {}, $(dot).data("connected"));
-	dot_list[new_id] = connected_right
-	$(dot).data("connected",dot_list)
-	//修改right的list
+	//修改Dot的list，先复制一份旧的list，然后将这个connect_right加入进去
+	var dot_list = $.extend(true, {}, $(dot_inner).data("connected"));
+	dot_list[connect_right[0]] = connect_right[1]
+	$(dot_inner).data("connected",dot_list)
+	//修改right的list，
 	var new_list = $.extend(true, {}, $(dot_right).data("connected"));
 	delete new_list[i]//删除旧的链接
-	new_list[new_id] = connected_right
+	new_list[connect_right[0]] = connect_right[1]
 	$(dot_right).data("connected",new_list)
 	//同样给新的dot_inner放入list
 	var list_right = {}
-	list_right[new_id] = connected_right
+	list_right[connect_right[0]] = connect_right[1]
 	$(dot_inner_right).data("connected",list_right)
-	//用完id记得+1
-	connect_id += 1
-	console.log($(dot).data("connected"))
 
-	connectLineDot(dot_left,dot_inner,dot_inner_left,line_left)
-	connectLineDot(dot_inner,dot_right,dot_inner_right,line_right)
+	connectLineDot(dot_left,midway_inner,dot_inner_left,line_left)
+	connectLineDot(midway_inner,dot_right,dot_inner_right,line_right)
 }
 
 //将一个dot_midway转化为一个dot_inner
 function MidwayTurnToInner(connect_1,connect_2,dot_midway){
 
 	var list = $(dot_midway).data("connected")
-	console.log("1是：",list[connect_1])
-	console.log("2是：",list[connect_2])
+	//修改Dot的class
+	$(dot_midway).attr("class",'line_dot line_dotInner')
+	//把inner和Border删掉
+	$(dot_midway).children().remove()
+
 	//通过dot_midway所处的位置获取两个链接的左右顺序
 	if($(dot_midway).is(list[connect_1]["dot_right"])){
 		connect_left = connect_1
@@ -514,7 +529,6 @@ function MidwayTurnToInner(connect_1,connect_2,dot_midway){
 		"line_inner":line_inner
 	}
 
-	console.log("new：", new_connect)
 	//将dot_miday中的connect_1替换为new_connect
 	list[connect_left] = new_connect
 	delete list[connect_right]	//随后删除掉另一个链接
@@ -524,21 +538,11 @@ function MidwayTurnToInner(connect_1,connect_2,dot_midway){
 	$(dot_right).data("connected")[connect_left] = new_connect
 	delete $(dot_right).data("connected")[connect_right]
 
-	//如果这个dot只剩下一个链接的话，就将其变为dot_inner，否则不修改其样式)
-	console.log(Object.keys(list).length)
-	if(Object.keys(list).length == 1){
-		//修改Dot的class
-		$(dot_midway).attr("class",'line_dot line_dotInner')
-		//把inner和Border删掉
-		$(dot_midway).children().remove()
-	}
 	//最后恢复这个链接
 	connectLineDot(dot_left,dot_right,dot_midway,line_inner)
-
 }
 
 //将线条中点line_dotInner放到他的前后两个有效点的中间
-//如果没有中点，就在这个线段上创建一个中点
 //angle是line_inner的偏转角度，难以通过jq方式获取
 function backToCenter(dot_left,dot_right,dot_inner,line_inner){
 	var angle = $(line_inner).attr("angle")
@@ -600,16 +604,7 @@ function backToMidway(line_inner,dot_midway){
 	})
 }
 
-//右键dot_inner和dot_midway事件，弹出一个选项框
-var focusing_dot
-$("#huabu_container").on("mousedown",".line_dot:not(.line_dotLeft , .line_dotRight)",function(event){
-	event.stopPropagation()
-	//判断是否为右键
-	if(event.which == 3){
-		//显示该菜单，并
-		showMenu("line_dotInner_menu")
-	}
-})
+
 
 //当dot移入tile中，使其与tile绑定
 function DotIntoTile(event,ui,tile){
@@ -672,3 +667,198 @@ function dragTileConnect(event,ui,tile,click_dot){
 		}
 	}
 }
+
+
+
+
+
+
+//右键dot_inner和dot_midway事件，弹出一个选项框
+var focusing_dot
+$("#huabu_container").on("mousedown",".line_dot:not(.line_dotLeft , .line_dotRight)",function(event){
+	event.stopPropagation()
+	//判断是否为右键
+	if(event.which == 3){
+		//显示该菜单，并将这个dot作为focusing_dot
+		var dot
+		if($(this).is(".line_dotMidway_inner")){
+			focusing_dot = $(this).parent(".line_dotMidway")
+		}
+		else{
+			focusing_dot = this
+		}
+		showHuabuMenu("line_dotInner_menu")
+	}
+})
+
+//右键Dot菜单选项事件1：增加分支，以该dot为dot_left，创建一个新的链接
+$("#line_dotInner_create_branch").on("click",function(){
+	createBranch(focusing_dot)//增加分支
+})
+//创建分支函数
+function createBranch(dot){
+	//如果点击的是midway_inner的话，要转换会line_dotMidway
+	if($(dot).is(".line_dotMidway_inner")){
+		dot = $(dot).parent(".line_dotMidway")
+	}
+	var list = $(dot).data("connected")
+
+	//新链接中的left_dot,dot_inner,line_inner
+	var line = $(dot).parent('.line')
+	var dot_left = $(dot)
+	var dot_right = $("<div>",{"class":"line_dot line_dotRight line_branch"})
+	var dot_inner = $("<div>",{"class":"line_dot line_dotInner line_branch"})
+	var line_inner = $(line).find(".line_inner:first").clone()
+
+	//修改line_inner的角度使其不与该dot已经链接的线段重合
+	var angle_list = []
+	for(i in list){
+		var connect_id = i //供下方的变化为midway使用
+		angle_list[angle_list.length] = parseInt(list[i]["line_inner"].attr("angle"))
+	}
+	var biggest_angle = Math.max(...angle_list)
+	var smallest_angle = 180 - Math.min(...angle_list)
+	//获取最大和最小的两个角的中间值
+	var the_angle = (biggest_angle + smallest_angle)/2
+	//如果这一个dot_inner的话，那么两个角的大小一样，给角度+90使其出现在线段中央
+	if($(dot).is(".line_dotInner")){
+		the_angle += 360
+	}
+	var radian = Math.PI * the_angle /180
+
+	//如果有原本的线条存在角的话，也要给dot_left加上
+	if($(line).find(".line_arrow:first").length > 0){
+		var arrow = $(line).find(".line_arrow:first").clone(false)
+		$(arrow).attr("class","line_arrow line_arrow_right")
+	}
+	//创建新链接，加入三个dot中
+	var new_connect = createConnect(dot_left,dot_right,dot_inner,line_inner)
+	var right_list = {}
+	right_list[new_connect[0]] = new_connect[1]
+
+	//修改dot_left的list，加入新链接
+	var left_list = $.extend(true, {}, list);
+	left_list[new_connect[0]] = new_connect[1]
+	$(dot_left).data("connected",left_list)
+	//另外两个是新创建的dot，直接加入list便可
+	$(dot_right).data("connected",right_list)
+	console.log()
+	$(dot_inner).data("connected",right_list)
+
+	//创建三个dot，分别以line_inner,dot_inner,dot_right,arrow的顺序放在dot_left之后
+	$(dot_left).after(line_inner)
+	$(line_inner).after(dot_inner)
+	$(dot_inner).after(dot_right)
+	$(dot_right).after(arrow)
+
+	//如果这个dot是一个dot_inner则将该dot变为Midway使其成为一个分支点
+	if($(dot).is(".line_dotInner")){
+		//其list中只有一个connect，在上面遍历的时候获取了其id
+		InnerTurnToMidway(dot,connect_id)
+	}
+
+	//使得dot_right出现在夹角位置，距离dot_left 100px
+	var left = $(dot_left).offset().left
+	var top = $(dot_left).offset().top
+	var x = 100 * Math.cos(radian)
+	var y = 100 * Math.sin(radian)
+
+	$(dot_right).offset({
+		left: left + x,
+		top: top + y
+	})
+	//然后链接这个链接
+	connectLineDot(dot_left,dot_right,dot_inner,line_inner)
+}
+
+//右键Dot菜单选项事件2：删除选定的分支，通过点击端点或line或中点选中对应的分支线段，然后删除
+$("#line_dotInner_delete_branch").on("mouseenter",function(event){
+	event.stopPropagation()
+	//清空原本的menu
+	var menu = $(this).children(".menu")
+	$(menu).empty()
+	//获取focusing_dot的所有链接并填入菜单中
+	var dot = focusing_dot
+	var list = $(dot).data("connected")
+
+	for(i in list){
+		var div = $("<div>",{
+			"id":i,
+			"class":"delete_branch_option"
+		})
+		$(div).text(i)
+		$(menu).append(div)
+	}
+	showChildMenu(this,"right")
+})
+//点击选项删除对应的分支，但是最少会保留两个链接
+$("#line_dotInner_delete_branch > .menu").on("click",".delete_branch_option",function(event){
+	var dot = focusing_dot
+	var list = $(dot).data("connected")
+	var connect_id = $(this).text()
+	//若连接数超过2
+	if(Object.keys(list).length > 2){
+		deleteBranch(dot,connect_id)
+		list = $(dot).data("connected")
+		$(this).remove()
+	}
+})
+//css样式
+$("#line_dotInner_delete_branch > .menu").on("mouseenter",".delete_branch_option",function(event){
+	event.stopPropagation()
+	var dot = focusing_dot
+	var list = $(dot).data("connected")
+	var connect_id = $(this).text()
+	var connect = list[connect_id]
+	var old_color = $(connect["line_inner"]).css("background-color")
+	//将这个链接下的line_inner变成红色
+	$(connect["line_inner"]).css({
+		"background-color":"red"
+	})
+	//如果移出去了就变回来
+	$(this).on("mouseleave",function(event){
+		$(connect["line_inner"]).css({
+			"background-color":old_color
+		})
+		$(this).off(event)
+	})
+})
+//删除分支，删除指定dot的指定连接构成的分支以及该分支的所有链接
+//要求这个Dot必须是分支的一个端点而非inner
+function deleteBranch(dot,connect_id){
+	var connect = $(dot).data("connected")[connect_id]
+	if($(dot).is(connect["dot_inner"])){
+		return false
+	}
+
+	var dot_left = connect["dot_left"]
+	var dot_right = connect["dot_right"]
+	var dot_inner = connect["dot_inner"]
+	var line_inner = connect["line_inner"]
+
+	//如果是左端点则删除右端点及其后面的箭头,反之同理
+	if($(dot).is(dot_left)){
+		var another_dot = dot_right
+	}
+	else{
+		var another_dot = dot_left
+	}
+
+	//如果另一个Dot还有其他的链接，则遍历这些连接，递归执行本函数，直到全部删除
+	var another_list = $(another_dot).data("connected")
+	for(i in another_list){
+		if( i != connect_id){
+			deleteBranch(another_dot,i)
+		}
+	}
+
+	$(another_dot).next(".line_arrow").remove()
+	$(another_dot).remove()
+
+	$(dot_inner).remove()
+	$(line_inner).remove("")
+
+	//最后从dot的list中删除这个connect
+	delete $(dot).data("connected")[connect_id]
+}
+

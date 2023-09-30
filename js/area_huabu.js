@@ -38,7 +38,7 @@ let addHuabu = function() {
 //创建新画布
 function createHuabu(name,width,height) {
 
-//对画布名称，画布长宽的默认定义
+	//对画布名称，画布长宽的默认定义
 	if (name == "") {
 		name = "画布" + default_huabu_num
 		default_huabu_num += 1
@@ -76,7 +76,7 @@ function createHuabu(name,width,height) {
 		height += "px"
 	}
 
-//创建画布，内含一个放置tile的tile_container,一个防止tile_text的textblock
+	//创建画布，内含一个放置tile的tile_container,一个放置tile_text的textblock
 	let huabu = $("<div></div>", {
 		"class": "huabu",
 		"id": "huabu_" + huabu_id,
@@ -97,14 +97,19 @@ function createHuabu(name,width,height) {
 	focusing_huabu = huabu;
 	$("#huabu_container").append(huabu);
 
+	//创建画布的tile_container，这里是放置一切画布内的对象的地方
+	var tile_container = $("<div></div>", {
+        "class": "tile_container"
+    });
+    $(huabu).append(tile_container);
+
 	createHuabuButton(huabu) //创建对应画布的button
-	createTileContainer(huabu)//创建对应画布的磁贴container
 	createTextBlock(huabu)
 
-//画布id递增
+	//画布id递增
 	huabu_id++;
 
-//返回一个生成的画布id，可能会有用
+	//返回一个生成的画布id，可能会有用
 	return "huabu_" + (huabu_id-1)
 }
 
@@ -186,34 +191,34 @@ function changeHuabu() {
 }
 
 //画布右键拖动实现
-	var huabu_dragging = false
-	var lastX, lastY
-	$("#huabu_container").on("mousedown", function(event) {
-		if (event.button === 2) {
-			huabu_dragging = true;
-			lastX = event.clientX;
-			lastY = event.clientY;
-		}
-	})
+var huabu_dragging = false
+var lastX, lastY
+$("#huabu_container").on("mousedown", function(event) {
+	if (event.button === 2) {
+		huabu_dragging = true;
+		lastX = event.clientX;
+		lastY = event.clientY;
+	}
+})
 
-	$("#huabu_container").on("mousemove", function(event) {
-		if (huabu_dragging) {
+$("#huabu_container").on("mousemove", function(event) {
+	if (huabu_dragging) {
 
-			var huabu_left = getLeft(focusing_huabu)
-			var huabu_top  = getTop(focusing_huabu)
+		var huabu_left = getLeft(focusing_huabu)
+		var huabu_top  = getTop(focusing_huabu)
 
-			$(focusing_huabu).css({
-				"left": huabu_left + (event.clientX - lastX),
-				"top" : huabu_top  + (event.clientY - lastY)
-			})
-			lastX = event.clientX;
-			lastY = event.clientY;
-		}
-	})
+		$(focusing_huabu).css({
+			"left": huabu_left + (event.clientX - lastX),
+			"top" : huabu_top  + (event.clientY - lastY)
+		})
+		lastX = event.clientX;
+		lastY = event.clientY;
+	}
+})
 
-	$("#huabu_container").on("mouseup", function(event) {
-		huabu_dragging = false
-	})
+$("#huabu_container").on("mouseup", function(event) {
+	huabu_dragging = false
+})
 
 //创建画布时，同时创建对应的画布切换按钮,将画布的id置入button中
 function createHuabuButton(huabu) {
@@ -247,6 +252,11 @@ function changeHuabuButton(event,button){
 		buttonAlert(event, button); //右键事件，调用功能栏
 	}
 }
+
+//画布切换按钮的拖动事件，可以在这条栏位内拖动按钮以改变其顺序
+$("#huabu_changeBar").sortable({ containment: "parent",tolerance: "pointer" });
+    
+$("#huabu_changeBar").disableSelection()
 
 //画布按钮的右键功能选项框
 function buttonAlert(event, button) {
@@ -343,13 +353,7 @@ function deleteHuabu() {
 	$(button).remove()
 }
 
-//创建画布时，同时为其创建不同的磁贴container
-function createTileContainer(huabu) {
-    var tile_container = $("<div></div>", {
-        "class": "tile_container"
-    });
-    $(huabu).append(tile_container);
-}
+
 
 
 //放大当前聚焦的画布
@@ -474,7 +478,7 @@ $(".resize_block").on("mousedown",function(event){
 	}
 })
 
-//画布内拖动时，对元素进行位置的修正
+//画布内拖动时，对元素进行位置的scale修正
 function dragFix(event, ui) {
 	var scale = $(focusing_huabu).attr("scale")
     ui.position.left = ui.position.left / scale;

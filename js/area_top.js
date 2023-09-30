@@ -3,17 +3,8 @@
 //点击在下方弹出子级菜单
 $("#top_ability").on("click",".down_menu",function(event){
 	event.stopPropagation();
-	//如果这个菜单已经被弹出了，则将其关闭
-	var display = $(this).children(".menu").css("display")
-	if(display == "block"){
-		hideMenu(this,"me")
-	}
-	else{
-		//先将所有同级别菜单隐藏
-		hideMenu(this,"all")
-		//再弹出Dom对应的菜单
-		showMenu(this,"down")
-	}
+	//再弹出Dom对应的菜单
+	showChildMenu(this,"down","dblclick")
 })
 
 //滑动在下方弹出子级菜单,但只有在已经点击弹出了菜单后才能启用
@@ -28,22 +19,14 @@ $("#top_ability").on("mouseenter",".down_menu",function(event){
 	})
 	if(slideable){
 		hideMenu(this,"all")
-		showMenu(this,"down")
+		showChildMenu(this,"down")
 	}
 })
 
 //点击在右侧弹出子级菜单,但是不会使得其他菜单被屏蔽
 $(".side_menu").on("click",function(event){
 	event.stopPropagation();
-	//如果这个菜单已经被弹出了，则将其关闭
-	var display = $(this).children(".menu").css("display")
-	if(display == "block"){
-		hideMenu(this,"me")
-	}
-	else{
-		hideMenu(this,"other")
-		showMenu(this,"right")
-	}
+	showChildMenu(this,"right","dblclick")
 })
 
 //文件按钮
