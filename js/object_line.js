@@ -10,8 +10,8 @@ function createLineStyle(){
 	var line = createLine(width,height,color,style,style_width)
 
 	$($(return_focusing_huabu()).children(".tile_container")).append(line)
-		creatArrow(line,"right","arrow_1")
-		creatArrow(line,"left","arrow_1")
+		// creatArrow(line,"right","arrow_1")
+		// creatArrow(line,"left","arrow_1")
 }
 //线条的生成
 var focusing_line
@@ -110,7 +110,7 @@ function createArrowLeft(){
 	creatArrow(line,"left","arrow_1")
 }
 
-//线条line的移动
+//移动line：所有dot都为非连接状态下，左键按住并拖动鼠标可以移动line
 $("#huabu_container").on("mouseenter", ".line:not(.ui-draggable-handle)", function() {
 	$(this).draggable({
     	drag: dragFix,
@@ -132,7 +132,7 @@ $("#huabu_container").on("mousedown",".line",function(){
 		},100)
 	})
 	//点击其他地方时修改透明度隐藏dot，失去聚焦的line
-	$("#huabu_container").on("click",function(event){
+	$("#huabu_container").on("mousedown",function(event){
 		event.stopPropagation()
 		if(!$(line).find("div").is(event.target) ){
 			focusing_line = undefined
@@ -151,7 +151,7 @@ $("#huabu_container").on("mousedown",".line",function(){
 	})	
 });
 
-//拖拽dot
+//拖拽移动dot
 $("#huabu_container").on("mouseenter",".line > .line_dot:not(.ui-draggable-handle)",function(){
 	if($(this).is(".line_dotMidway")){
 		$(this).draggable({handle: $(this).children(".line_dotMidway_inner")})
@@ -161,9 +161,18 @@ $("#huabu_container").on("mouseenter",".line > .line_dot:not(.ui-draggable-handl
 	}
 
 	$(this).draggable({
+		refreshPositions:true,
 		drag: function(event,ui) {
 			dragFix(event,ui)
-			dragLineDot(this)
+			if(return_snap_tile() != false){
+
+				dragLineDot(this)
+			}
+			else{
+
+				return 0;
+			}
+
 	    },
 	    stop: function(){
 	    	dragLineDot(this,"stop")
@@ -179,7 +188,7 @@ function dragLineDot(dot,time){
 	var thisIsInner = false
 	var thisIsMidway = false
 	var list = $(dot).data("connected")
-	for(i in list){
+	for(var i in list){
 		var data = list[i]
 		var left  = data["dot_left"]
 		var right = data["dot_right"]
@@ -202,15 +211,14 @@ function dragLineDot(dot,time){
 				return 0
 			}
 		}
-		
 		connectLineDot(left,right,inner,line)
 	}
 	//遍历line_list，依次对比两两线段之间的角度，如果存在某两条线段持平，则令这个midway转化为inner
 	//删去其前方的line_inner和前后两个dot_Inner再把后线条连接到前后两个点上
 	//如果这个midway不是任何一个链接中的中继点并且也没有分支的话，才进行这个操作
 	if(thisIsMidway  && !thisIsInner && time == "stop" && line_list.length == 2){
-		for(i=0; i < line_list.length-1; i++){
-			for(j = i+1; j <line_list.length; j++){
+		for(var i=0; i < line_list.length-1; i++){
+			for(var j = i+1; j <line_list.length; j++){
 				var angle_1 = line_list[i][1] - line_list[j][1]
 				var angle_2 = line_list[i][1] + line_list[j][1]
 				//如果这两个线段的角度匹配，则令这个链接消失，同时将midway转化为inner
@@ -241,6 +249,8 @@ function connectLineDot(dot_left,dot_right,dot_inner,line_inner){
 	//获取dot的半径，这个数值等于dot的宽度的一半
 	var radius_left = $(dot_left).width()/2
 	var radius_right = $(dot_right).width()/2
+	console.log(dot_left)
+	console.log($(dot_left).offset())
 	//找到两个dot的圆心的位置,是分别的offset+radius,并求出距离差
 	var distant_x = ($(dot_left).offset().left + radius_left) - 
 					($(dot_right).offset().left + radius_right)
@@ -371,7 +381,7 @@ function changeArrow(arrow){
 
 	//获取圆心的位置
 	var huabu_scale = return_scale()
-	var radius = (parseInt($(dot).css("width"))/2)*huabu_scale
+	var radius = $(dot).width()/2*huabu_scale
 	var x = $(dot).offset().left + radius
 	var y = $(dot).offset().top + radius
 
@@ -606,10 +616,39 @@ function backToMidway(line_inner,dot_midway){
 
 
 
-//当dot移入tile中，使其与tile绑定
-function DotIntoTile(event,ui,tile){
-	//把这个dot将其加入list中
-	var dot = ui.draggable
+//当line_dot移入tile中，使其与tile绑定，一个line_dot只能绑定一个tile
+//总是更优先地绑定z-index更好的，或者说更新的（这个元素会比其他元素更上层）的tile
+//为其增加一个类connected_dot
+var old_priority = 0
+var old_z_index = 0
+var old_tile = undefined
+function DotIntoTile(dot,tile){
+	//检测这个点是否已经链接上了一个tile，如果是，则判断优先级
+	if($(dot).is(".connected_dot")){
+		var new_priority = $(tile).index()
+		var new_z_index = $(tile).css("z-index")
+		console.log(old_priority,new_priority)
+		//优先判断z-index,如果旧的优先级更大，则直接结束
+		if(old_z_index > new_z_index){
+			console.log("z_index")
+			return 0 
+		}
+		//如果z-index相同，则判定index的优先级
+		else if(old_z_index = new_z_index){
+			//若旧的优先级更大，则直接结束
+			if(old_priority > new_priority){
+				console.log("index")
+				return 0
+			}
+		}
+		//否则将dot与旧的tile解绑
+		DotOutTile(dot,old_tile)
+	}
+	//存储tile和他的优先级
+	old_priority = $(tile).index()
+	old_z_index = $(tile).css("z-index")
+	old_tile = $(tile)
+	//获得tile的list
 	var list = $(tile).data("connected")
 	if(list == undefined){
 		list = []
@@ -618,27 +657,30 @@ function DotIntoTile(event,ui,tile){
 	if($.inArray(dot,list) == -1){
 		list[list.length] = dot
 	}
-	//随后改变Dot的颜色表示其已经连接上了
-	$(dot).css("background","#00F93EFF")
+	//随后改变Dot的类表示其已经连接上了
+	$(dot).addClass('connected_dot')
 	//将修改后的list返还给tile
 	$(tile).data("connected",list)
 	//禁用该线条的移动功能
-	$(dot).parent(".line").draggable("disable")
+	//若line中有一个dot为连接状态，则无法直接移动line
+	$(dot).parent(".line").draggable("disable")	
 }
 
 //dot离开tile后，将其与tile解绑
-function DotOutTile(event,ui,tile){
-	var dot = ui.draggable
-		var list = $(tile).data("connected")
-		var index = $.inArray(dot,list)
-		//如果dot存在list，则将其删除
-		if($.inArray(dot,list) != -1){
-			list.splice(index,1)
-			//颜色变回来
-			$(dot).css("background","#00D0FFFF")
-			//线条的移动功能启用
-			$(dot).parent(".line").draggable("enable")
-		}
+function DotOutTile(dot,tile){
+
+	$(dot).removeClass('connected_dot')
+
+	var list = $(tile).data("connected")
+	var index = $.inArray(dot,list)
+	//如果dot存在在list中，则将其删除
+	if($.inArray(dot,list) != -1){
+		list.splice(index,1)
+		//颜色变回来
+		$(dot).css("background","#00D0FFFF")
+		//线条的移动功能启用
+		$(dot).parent(".line").draggable("enable")
+	}
 }
 
 //tile的拖拽函数的补充，使其带动绑定的line_dot一起移动
@@ -653,8 +695,8 @@ function dragTileConnect(event,ui,tile,click_dot){
 		var y = event.clientY - click_dot.y
 		click_dot.x = event.clientX;
 		click_dot.y = event.clientY;
-		//在tile移动的同时也会移动connected中的内容
-		for(i = 0 ; i < list.length ; i++){
+		//在tile移动的同时也会移动connected中绑定的元素
+		for(var i = 0 ; i < list.length ; i++){
 			var dot = list[i]
 			//获取dot的位置和移动量
 			var old_position = $(dot).offset()
@@ -742,7 +784,6 @@ function createBranch(dot){
 	$(dot_left).data("connected",left_list)
 	//另外两个是新创建的dot，直接加入list便可
 	$(dot_right).data("connected",right_list)
-	console.log()
 	$(dot_inner).data("connected",right_list)
 
 	//创建三个dot，分别以line_inner,dot_inner,dot_right,arrow的顺序放在dot_left之后

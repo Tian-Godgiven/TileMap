@@ -18,9 +18,13 @@
 
 	position:absolute;
 	border-radius: 50%;
-	z-index: 2;
+	z-index: 100000;
 	box-sizing: border-box;
 	opacity:1;
+}
+
+.line_dot.connected_dot{
+	background:#00F93EFF !important;
 }
 
 	.line_dotMidway{
@@ -60,6 +64,7 @@
 	}
 
 	.line_arrow{
+		user-select: none;
 		width:0px;
 		height:0px;
 		position:absolute;

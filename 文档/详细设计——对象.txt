@@ -28,18 +28,18 @@ tiletext_container是tiletext存储的地方，以使得在不同的画布内，
 线条：
 1.内容：由 line_dotRight/Left，line_dotInner，line_dotMidway与 line_Inner 构成的线条，可以含有arrow（箭头元素），用户可自定义其样式和模式
 	(1)line：只是一个作为承载体的对象，高度为0，线条部分由line_inner显示
-		✔①所有dot都为非连接状态下，左键按住并拖动鼠标可以移动line
-			若有一个dot为连接状态，则无法移动line
-		✔②鼠标点击line上的元素时显示line_dot，点击其他地方时令line_dot消失
+		✔①移动line：所有dot都为非连接状态下，左键按住并拖动鼠标可以移动line 
+		✔	若line中有一个dot为连接状态，则无法直接移动line
+		✔②鼠标点击在画布中的line上时显示其中的dot，将其聚焦
 
 ​	(2)line_dotRight/Left：分布在line两端点状对象
-​		左键按住并拖动可以移动line_dotR/L
-​		①.将line_dotR/L移入tile边缘时，**tile上会显示出连接点，将dot与连接点重叠可以使其与该tile相关联**，该dot将进入连接状态，其变为亮绿色，当该tile移动时，也会带动与其绑定的dot移动，随即带动该线条移动
+​		✔左键按住并拖动可以移动line_dotR/L
+​		✔①.将line_dotR/L移入tile边缘时，tile上会显示出连接点，将dot与连接点重叠可以使其与该tile相关联，该dot将进入连接状态，其变为亮绿色，当该tile移动时，也会带动与其绑定的dot移动，随即带动该线条移动
 ​		✔②.连接状态的dot从连接点上移出后，其变为浅蓝色，并解除与该tile的绑定，不再随着其移动
 
 ​	(3).line_dotInner：分布在line上任意两线段中间的点状对象
-​		①.左键按住并拖动可以移动line_dotInner，其会将所处的线段拉伸出来，借而形成新的线段，新的线段中又会有一个新的dotInner。例如，可以将一个横线段从中间向外拉伸，形成一个突出的角		
-​		②.链接状态下，左键按住并拖动line上非dot的实心位置，可以将该线段沿水平或垂直方向平移（若该平移使得dotR/L移出tile该怎么办？）
+​		✔①.左键按住并拖动可以移动line_dotInner，其会将所处的线段拉伸出来，借而形成新的线段，新的线段中各有一个新的dotInner。例如，可以将一个横线段从中间向外拉伸，形成一个突出的角		
+​		❌：该功能难以实现，是否制作有待考量！②.链接状态下，左键按住并拖动line上非dot的实心位置，可以将该线段沿水平或垂直方向平移（若该平移使得dotR/L移出tile该怎么办？）
 
 ​	(4).line_dotMidway：连接两个线段的点状对象，由dotInner拖拽形成，移动这个对象可以同时改变其两边线段的长度和角度
 ​		其本身由两部分组成，本体则是一个用于定位的点
@@ -77,4 +77,8 @@ textblock:
 
 
 
+
+[^1]: //线条line的移动 $("#huabu_container").on("mouseenter",……
+[^2]://禁用该线条的移动功能 $(dot).parent(".line").draggable("disable")……
+[^3]://鼠标点击在画布中的line上时显示其中的dot，将其聚焦
 

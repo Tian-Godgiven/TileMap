@@ -186,3 +186,21 @@ Object.keys(字典对象).length
 
 20.拖动排序功能：sortable
 	 拉框选择功能：selectable
+
+---
+
+21.父元素和子元素都有droppable的情况下，为父元素增加greedy:true属性可以防止子元素recall其自身的的drop事件
+
+	$(this).droppable({
+		greedy:true,
+	})
+
+---
+
+22.禁止用户通过拖动选中这个元素：
+
+```
+$().disableSelection()
+```
+
+与之配套的是css：user-select: none;

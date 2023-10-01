@@ -5,19 +5,13 @@
 
 ------
 
-
-
 2.对屏幕整体的绑定事件一定要在使用完后解绑！
 
 ------
 
-
-
 3.载入外界来的新画布时，对新画布的id进行重分配，对这个画布内的tile的id也进行重分配！
 
 ------
-
-
 
 4.*加载画布loadHuabu()功能只做了对画布名称，大小的调整，后续的背景颜色等设置还没有做哦！！！！！
 
@@ -127,4 +121,14 @@ ___
 22.增加线条粗细时，角度？也要增加！
 
 ------------
+
+23.我修改了jquery-ui.js中的：			
+		给他乘以了一个scale，这样才能适配变化后的大小！之后使用jquery-ui的时候要注意！
+
+```
+m[ i ].proportions( {
+				width: m[ i ].element[ 0 ].offsetWidth * return_scale(),
+				height: m[ i ].element[ 0 ].offsetHeight * return_scale()
+			} );
+```
 

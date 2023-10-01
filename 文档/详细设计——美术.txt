@@ -6,3 +6,15 @@
 	一个与该画布对象背景颜色相同的长方形 + 该画布对象的名称
 
 3.点击选项删除对应的分支deleteBranch()函数，但是最少会保留两个链接，此时的两个链接会显示为灰色，无法触发
+
+
+
+待修改的美术内容：
+	line_dot:
+		非链接状态的line_dot 
+		链接状态的line_dot
+		转化为midway_的line_dotInner
+		line_dot的消失动画
+
+​	tile：
+​		line_dot移入tile时，在tile边缘上显示的tile_snap_dot

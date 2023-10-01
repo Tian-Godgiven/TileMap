@@ -65,7 +65,7 @@ function loadTile(old_tile){
 	return new_tile
 }
 
-//磁贴的拖动，缩放功能
+//磁贴的拖动，缩放，放置功能
 $("#huabu_container").on("mouseenter", ".tile:not(.ui-draggable-handle)", function() {
  	var click = { x:0, y:0};
  	var click_dot = { x:0, y:0}
@@ -95,6 +95,7 @@ $("#huabu_container").on("mouseenter", ".tile:not(.ui-draggable-handle)", functi
         	dragTileConnect(event,ui,this,click_dot)
     	}
 	});
+
     //修改大小
     $(this).resizable({
     	autoHide:true,
@@ -103,16 +104,32 @@ $("#huabu_container").on("mouseenter", ".tile:not(.ui-draggable-handle)", functi
     	handles:"n,e,s,w,se,sw,ne,nw",
     	autoHide:true
     });
+
     //放置line_dot
 	$(this).droppable({
+		tolerance:"touch",
+		greedy:true,
 		accept:".line_dot",
-		//当dot放置在Tile上时，令其与tile绑定
+		//当dot放置在Tile上时，会在tile的边框上显示出tile的吸附点
+		over:function(event,ui){
+			showTileSnapDot(this)
+		},
 		drop:function(event,ui){
-			DotIntoTile(event,ui,this)
+			hideTileSnapDot(this)
+			DotIntoTile(ui.draggable,this)
 		},
 		//当dot移出Tile时，将其与tile解绑
 		out:function(event,ui){
-			DotOutTile(event,ui,this)
+			hideTileSnapDot(this)
+			DotOutTile(ui.draggable,this)
+			//令drag事件重启
+			return_snap_tile(true)
+			//将对象移动到鼠标的位置来
+			var huabu_scale = return_scale();
+			$(ui.helper).offset({
+				left: event.clientX / huabu_scale,
+				top:event.clientY / huabu_scale
+			})
 		}
 	})
 });
@@ -149,7 +166,7 @@ $("#huabu_container").on(
 )
 
 //tile的单击事件    待重做：要求获取当前画布中的所有tile，而不是修改所有的tile
- //tile的点击事件，点击后修改当前的focusing_tile，并显示到当前聚焦的简介
+//tile的点击事件，点击后修改当前的focusing_tile，并显示到当前聚焦的简介
 function tileClick(event,tile){
 	focusing_tile = tile;
 	$(".tile").css("z-index","1")
@@ -187,6 +204,159 @@ function tileDoubleClick(event,tile){
 			}
 		})
 	}
+}
+
+//snap_dot的droppable创建函数
+function droppableSnapDot(){
+	var snap_position = {x:0 , y:0}
+	$(".tile_snap_dot").droppable({
+		tolerance: "pointer",
+		accept:".line_dot",
+		over:function(event,ui){
+			event.stopPropagation()
+			console.log("进入了")
+			//令drag事件停止
+			return_snap_tile(false)
+			var huabu_scale = return_scale()
+			//获取snap_dot的圆心
+			var radius = $(this).width()/2 * huabu_scale
+			snap_position.x = $(this).offset().left + radius
+			snap_position.y = $(this).offset().top + radius
+			//将对象的圆心移动到这里来
+			var draggable_radius = $(ui.draggable).width()/2 * huabu_scale
+			$(ui.draggable).offset({
+				left: snap_position.x - draggable_radius,
+				top: snap_position.y - draggable_radius
+			})
+			console.log($(ui.draggable).offset())
+			dragLineDot(ui.draggable)
+
+		},
+		// drop:function(event,ui){
+		// 	//将对象的圆心移动到snap_dot的圆心
+		// 	var huabu_scale = return_scale()
+		// 	$(ui.draggable).offset({
+		// 		left: snap_position.x - $(ui.draggable).width()/ 2 /huabu_scale,
+		// 		top: snap_position.y - $(ui.draggable).width()/ 2 /huabu_scale
+		// 	})
+		// 	dragLineDot(ui.draggable)
+		// 	//恢复drag事件
+		// 	return_snap_tile(true)
+		// },
+		// out:function(event,ui){
+		// 	var huabu_scale = return_scale()
+		// 	event.stopPropagation()
+		// 	//令drag事件重启
+		// 	return_snap_tile(true)
+		// 	//将对象移动到鼠标的位置来
+		// 	$(ui.helper).offset({
+		// 		left: event.clientX /huabu_scale,
+		// 		top:event.clientY /huabu_scale
+		// 	})
+		// }
+	})
+}
+
+//line_dot的drag控制事件
+var snap_bool = true
+function return_snap_tile(bool){
+	if(bool == undefined){
+		return snap_bool
+	}
+	else{
+		snap_bool = bool
+		return snap_bool
+	}
+}
+
+//tile的line_dot移入事件，在这个tile上显示出吸附点(snap_dot)
+function showTileSnapDot(tile){
+	//创建四个角的吸附点
+	var snap_dot_1 = snap_dot = $("<div>",{"class":"tile_snap_dot"})
+	var snap_dot_2 = $(snap_dot_1).clone(true,true)
+	var snap_dot_3 = $(snap_dot_1).clone(false)
+	var snap_dot_4 = $(snap_dot_1).clone(false)
+
+	//dot的半径大小
+	var radius = 10
+	//获取tile的宽度和高度位置
+	var height = $(tile).height()
+	var width = $(tile).width()
+	//放在这个tile的四个角落上
+	$(tile).append(snap_dot_1)
+	$(tile).append(snap_dot_2)
+	$(tile).append(snap_dot_3)
+	$(tile).append(snap_dot_4)
+
+	$(snap_dot_1).css({
+		"top": -radius,
+		"left": -radius
+	})
+	$(snap_dot_2).css({
+		"top": height - radius,
+		"left": -radius
+	})
+	$(snap_dot_3).css({
+		"top": -radius,
+		"left": width - radius
+	})
+	$(snap_dot_4).css({
+		"top": height - radius,
+		"left": width - radius
+	})
+
+	//先做上下两边
+		//创建四条边的吸附点，0-50px一个，50-100px两个依次类推
+		var snap_dot_width_num = Math.ceil(width/100)
+		//每个dot之间的间隔距离
+		var snap_dot_width_distant = width / (snap_dot_width_num+1)
+		var snap_dot_width = snap_dot_width_distant
+		for(var i = 0;i < snap_dot_width_num;i++){
+			//创建两个snap_dot，两边各一个
+			var snap_dot_width_1 = $(snap_dot_1).clone(false)
+			var snap_dot_width_2 = $(snap_dot_1).clone(false)
+			$(tile).append(snap_dot_width_1)
+			$(tile).append(snap_dot_width_2)
+			//以间隔距离放置，随后令这个间隔距离自加一倍
+			$(snap_dot_width_1).css({
+				"top": - radius,
+				"left": snap_dot_width - radius
+			})
+			$(snap_dot_width_2).css({
+				"top": height - radius,
+				"left": snap_dot_width - radius
+			})
+			snap_dot_width += snap_dot_width_distant
+		}
+	//然后是左右两边
+		var snap_dot_height_num = Math.ceil(height/100)
+		//每个dot之间的间隔距离
+		var snap_dot_height_distant = height / (snap_dot_height_num+1)
+		var snap_dot_height = snap_dot_height_distant
+		for(var i = 0;i < snap_dot_height_num;i++){
+			//创建两个snap_dot，两边各一个
+			var snap_dot_height_1 = $(snap_dot_1).clone(false)
+			var snap_dot_height_2 = $(snap_dot_1).clone(false)
+			$(tile).append(snap_dot_height_1)
+			$(tile).append(snap_dot_height_2)
+			//以间隔距离放置，随后令这个间隔距离自加一倍
+			$(snap_dot_height_1).css({
+				"top": snap_dot_height - radius,
+				"left":  - radius
+			})
+			$(snap_dot_height_2).css({
+				"top": snap_dot_height - radius,
+				"left": width - radius
+			})
+			snap_dot_height += snap_dot_height_distant
+		}
+	 droppableSnapDot()
+}
+
+//tile的line_dot移出事件，令这个tile上的吸附点消失（删除）
+function hideTileSnapDot(tile){
+	$(tile).children('.tile_snap_dot').droppable("destroy");
+	$(tile).children('.tile_snap_dot').remove()
 }
 
 //修改tile的title后修改tile的显示内容

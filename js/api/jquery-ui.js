@@ -13476,8 +13476,8 @@ $.ui.ddmanager = {
 
 			m[ i ].offset = m[ i ].element.offset();
 			m[ i ].proportions( {
-				width: m[ i ].element[ 0 ].offsetWidth,
-				height: m[ i ].element[ 0 ].offsetHeight
+				width: m[ i ].element[ 0 ].offsetWidth * return_scale(),
+				height: m[ i ].element[ 0 ].offsetHeight * return_scale()
 			} );
 
 		}

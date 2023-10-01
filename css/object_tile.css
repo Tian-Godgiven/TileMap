@@ -1,7 +1,6 @@
 /*磁贴CSS*/
 .tile{
   position:absolute;
-  overflow: hidden;
 	cursor: default;
   font-size: 30px;
 	width: 90px;
@@ -12,6 +11,7 @@
 }
 
 .tile .tile_input{
+  position:absolute;
   width: 100%;
   height: 100%;
   font-size: 100%;
@@ -28,10 +28,19 @@
 }
 
 .tile .tile_title{
+  position:absolute;
   height:100%;
   width:100%;
   display:flex;
   text-align: center;
   justify-content: center;
   align-items:center;
+}
+
+.tile .tile_snap_dot{
+  height:20px;
+  width:20px;
+  background-color:#5DFFFFFF;
+  position:absolute;
+  border-radius:50%
 }
