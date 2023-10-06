@@ -35,7 +35,7 @@ function createTile(){
 		"tiletext": "<div></div>"
 	});
 	$(tile).append("<div class='tile_title'></div>")
-	var wrapper = $("<div></div>", {"class":"wrapper"})
+	var wrapper = $("<div></div>", {"class":"tile_wrapper wrapper"})
 
 	$(wrapper).append(tile)
 
@@ -70,10 +70,10 @@ function loadTile(old_tile){
 }
 
 //磁贴的拖动，缩放，放置功能
-$("#huabu_container").on("mouseenter", ".tile:not(.ui-draggable-handle)", function() {
+$("#huabu_container").on("mouseenter", ".tile:not(.ui-resizable)", function() {
 	var click_dot = { x:0, y:0}
 	//移动
-	var wrapper = $(this).parent(".wrapper")
+	var wrapper = $(this).parent(".tile_wrapper")
 	$(wrapper).draggable({
 		snapTolerance:7,
 		addClasses:false,

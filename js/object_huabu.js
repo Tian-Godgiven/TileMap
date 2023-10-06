@@ -39,7 +39,7 @@ function return_huabu_centerOffset(){
 	//将相对坐标加上中心点的坐标，得到旋转后的左上角顶点的坐标
 	var new_x = center.left + new_delta_x
 	var new_y = center.top + new_delta_y
-
+	
 	return {left:new_x,top:new_y}
 }
 //返回当前的聚焦画布，预计整合时删除
@@ -150,6 +150,14 @@ function createHuabu(name,width,height) {
 $(document).on("mouseenter", ".huabu:not(.ui-resizable)", function() {
 	$(this).resizable({
 		stop: function(event, ui) {
+
+			$(this).children('.center').css({
+				"left": $(this).width()/2,
+				"top": $(this).height()/2
+			})
+
+
+
 			var oldleft = ui.originalPosition.left;
 			var newleft = ui.position.left
 			var tile_container = $(this).children(".tile_container")

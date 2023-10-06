@@ -10,6 +10,13 @@
 	color: black;
 }
 
+.tile_wrapper{
+    width:0px;
+    height:0px;
+    position:absolute;
+}
+
+
 .tile .tile_input{
   position:absolute;
   width: 100%;

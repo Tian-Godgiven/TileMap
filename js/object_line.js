@@ -555,26 +555,24 @@ function backToCenter(dot_left,dot_right,dot_inner,line_inner){
 	if(angle == undefined){
 		angle = 0
 	}
-
 	//获取半径
-	var huabu_scale = return_huabu_scale()
-	var radius = parseInt($(dot_inner).css("width"))/2 * huabu_scale
+	var radius = parseInt($(dot_inner).css("width"))/2
 	//转化角度为弧度
 	var radian = Math.PI * angle /180
 	//得到dotLeft的圆心所在的位置,圆心相较于div起始点各有一个半径的差距，所以要+radius
-	var radius_1 = parseInt($(dot_left).css("width"))/2  * huabu_scale
-	var x_1 = $(dot_left).offset().left + radius_1
-	var y_1 = $(dot_left).offset().top + radius_1
+	var radius_1 = parseInt($(dot_left).css("width"))/2
+	var x_1 = parseInt($(dot_left).css("left")) + radius_1
+	var y_1 = parseInt($(dot_left).css("top")) + radius_1
 	//得到dotRight的圆心所在的位置
-	var radius_2 = parseInt($(dot_right).css("width"))/2  * huabu_scale
-	var x_2 = $(dot_right).offset().left + radius_2
-	var y_2 = $(dot_right).offset().top + radius_2
+	var radius_2 = parseInt($(dot_right).css("width"))/2
+	var x_2 = parseInt($(dot_right).css("left")) + radius_2
+	var y_2 = parseInt($(dot_right).css("top")) + radius_2
 
 	//移动dotInner的圆心到两点间距的中心
 	//圆心相较于offset有着left和top + radius的偏移量，所以这里要减去自身的radius
-	$(dot_inner).offset({
-		left: (x_1 + x_2)/2 - radius,
-		top: (y_1 + y_2)/2 - radius,
+	$(dot_inner).css({
+		"left": (x_1 + x_2)/2 - radius,
+		"top": (y_1 + y_2)/2 - radius,
 	})
 }
 

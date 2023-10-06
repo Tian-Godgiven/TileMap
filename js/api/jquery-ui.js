@@ -10014,19 +10014,20 @@ $.widget( "ui.draggable", $.ui.mouse, {
 
 		var radian = return_huabu_angle() * Math.PI / 180
 
-		console.log(radian)
-
 		var old_left = event.pageX - this.offset.left
 		var old_top = event.pageY - this.offset.top
 
 		var new_top = old_top * Math.cos(radian) - old_left * Math.sin(radian) 
-		var new_left = old_top * Math.sin(radian) + old_left * Math.cos(radian) 
+		var new_left = old_top * Math.sin(radian) + old_left * Math.cos(radian)
 
 		//console
-		this.offset.click = {
-			top: new_top,
-			left: new_left
-		};
+
+			this.offset.click = {
+				left: new_left,
+				top: new_top
+			};
+			
+		
 	},
 
 	_mouseDrag: function( event, noPropagation ) {
@@ -10398,7 +10399,6 @@ $.widget( "ui.draggable", $.ui.mouse, {
 			pageX = event.pageX,
 			pageY = event.pageY;
 
-
 		// Cache the scroll
 		if ( !scrollIsRootNode || !this.offset.scroll ) {
 			this.offset.scroll = {
@@ -10472,37 +10472,32 @@ $.widget( "ui.draggable", $.ui.mouse, {
 			}
 		}
 
-		var radian = return_huabu_angle() * Math.PI / 180
 
-		var wrapper_offset = return_huabu_centerOffset()
+			var radian = return_huabu_angle() * Math.PI / 180
 
-		var old_top = pageY - wrapper_offset.top
-		var old_left = pageX - wrapper_offset.left
+			if($(this.bindings).is(".wrapper")){
+				var parent_offset = return_huabu_centerOffset()
+			}
+			else if($(this.bindings).is(".line_dot")){
+				var line = this.bindings.parent(".line")
+				var parent_offset = $(line).offset()
+			}
 
-		// var old_top = pageY-
-		// 			  this.offset.click.top -
-		// 			  this.offset.relative.top -
-		// 			  this.offset.parent.top +
-		// 			  (this.cssPosition === "fixed" ?
-		// 			  	  -this.offset.scroll.top :
-		// 				  (scrollIsRootNode ? 0 : this.offset.scroll.top ))
-		// var old_left = pageX-
-		// 			   this.offset.click.left -
-		// 			   this.offset.relative.left -
-		// 			   this.offset.parent.left +
-		// 			   (this.cssPosition === "fixed" ?
-		// 				  -this.offset.scroll.left :
-		// 			      (scrollIsRootNode ? 0 : this.offset.scroll.left ))
+			var old_top = pageY - parent_offset.top
+			var old_left = pageX - parent_offset.left
 
-		var new_left = old_left * Math.cos(radian) + old_top * Math.sin(radian)
-						- this.offset.click.left
-		var new_top =  - old_left * Math.sin(radian) + old_top * Math.cos(radian)
-						- this.offset.click.top
+			var new_left = old_left * Math.cos(radian) + old_top * Math.sin(radian)
+							- this.offset.click.left
+			var new_top =  - old_left * Math.sin(radian) + old_top * Math.cos(radian)
+							- this.offset.click.top
 
-		return {
-			top: new_top ,
-			left: new_left 
-		};
+			return {
+				top: new_top ,
+				left: new_left 
+			};
+
+	
+
 
 	},
 
@@ -11437,8 +11432,8 @@ $.widget( "ui.resizable", $.ui.mouse, {
 		var data, props,
 			smp = this.originalMousePosition,
 			a = this.axis,
-			dx = ( event.pageX - smp.left ) / return_huabu_scale() || 0,
-			dy = ( event.pageY - smp.top ) / return_huabu_scale() || 0,
+			dx = ( event.pageX - smp.left )|| 0,
+			dy = ( event.pageY - smp.top )|| 0,
 			trigger = this._change[ a ];
 
 		this._updatePrevProperties();
@@ -15895,10 +15890,10 @@ var widgetsSortable = $.widget( "ui.sortable", $.ui.mouse, {
 
 		//Set the helper position
 		if ( !this.options.axis || this.options.axis !== "y" ) {
-			this.helper[ 0 ].style.left = this.position.left / return_huabu_scale() + "px";
+			this.helper[ 0 ].style.left = this.position.left + "px";
 		}
 		if ( !this.options.axis || this.options.axis !== "x" ) {
-			this.helper[ 0 ].style.top = this.position.top / return_huabu_scale() + "px";
+			this.helper[ 0 ].style.top = this.position.top + "px";
 		}
 
 		//Do scrolling
