@@ -103,8 +103,6 @@ function createHuabu(name,width,height) {
 	$(huabu).css({
 		"width": width,
 		"height": height,
-		"left":-width/2,
-		"top":-height/2,
 		"position": "absolute",
 		"background-color": "white",
 		"transform":"rotate(0deg) scale(1)",

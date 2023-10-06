@@ -10014,6 +10014,8 @@ $.widget( "ui.draggable", $.ui.mouse, {
 
 		var radian = return_huabu_angle() * Math.PI / 180
 
+		console.log(radian)
+
 		var old_left = event.pageX - this.offset.left
 		var old_top = event.pageY - this.offset.top
 
