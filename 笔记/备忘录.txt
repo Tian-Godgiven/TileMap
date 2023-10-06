@@ -127,8 +127,8 @@ ___
 
 ```
 m[ i ].proportions( {
-				width: m[ i ].element[ 0 ].offsetWidth * return_scale(),
-				height: m[ i ].element[ 0 ].offsetHeight * return_scale()
+				width: m[ i ].element[ 0 ].offsetWidth * return_huabu_scale(),
+				height: m[ i ].element[ 0 ].offsetHeight * return_huabu_scale()
 			} );
 ```
 

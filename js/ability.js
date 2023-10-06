@@ -1,11 +1,13 @@
-//获取元素相较于父元素的left与top的值
-function getLeft(the_dom){
-	var the_Left=parseInt($(the_dom).css("left").substring(0, $(the_dom).css("left").length - 2));
-	return the_Left
-}
-function getTop(the_dom){
-	var the_Top=parseInt($(the_dom).css("top").substring(0, $(the_dom).css("top").length - 2));
-	return the_Top
+//返回某个画布内元素与当前聚焦画布左上角的距离
+function distantWithHuabu(dom){
+	var huabu = return_focusing_huabu()
+	var scale = $(huabu).attr("scale")
+	//因为元素在画布内部所以left和top都更大，所以要取负
+	var left_distance = - ($(huabu).offset().left - $(dom).offset().left) / scale
+	var top_distance = - ($(huabu).offset().top - $(dom).offset().top) / scale
+    
+    var distance = {left:left_distance,top:top_distance}
+	return distance
 }
 
 //显示其子级菜单函数

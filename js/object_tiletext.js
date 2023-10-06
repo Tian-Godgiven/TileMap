@@ -45,9 +45,9 @@ function showTileTextBlock(tile){
         $(textblock).find(".textblock_content").html(tiletext)
 
         //获取当前tile的位置与宽度，在它旁边显示textblock
-        var tile_left = getLeft(tile);
+        var tile_left = parseInt($(tile).css("left"));
+        var tile_top = parseInt($(tile).css("top"));
         var tile_width = $(tile).width();
-        var tile_top = getTop(tile);
 
         $(textblock).css({
             "z-index":"100",

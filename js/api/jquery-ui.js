@@ -10012,9 +10012,18 @@ $.widget( "ui.draggable", $.ui.mouse, {
 			relative: this._getRelativeOffset()
 		};
 
+		var radian = return_huabu_angle() * Math.PI / 180
+
+		var old_left = event.pageX - this.offset.left
+		var old_top = event.pageY - this.offset.top
+
+		var new_top = old_top * Math.cos(radian) - old_left * Math.sin(radian) 
+		var new_left = old_top * Math.sin(radian) + old_left * Math.cos(radian) 
+
+		//console
 		this.offset.click = {
-			left: event.pageX - this.offset.left,
-			top: event.pageY - this.offset.top
+			top: new_top,
+			left: new_left
 		};
 	},
 
@@ -10039,8 +10048,8 @@ $.widget( "ui.draggable", $.ui.mouse, {
 			this.position = ui.position;
 		}
 
-		this.helper[ 0 ].style.left = this.position.left + "px";
-		this.helper[ 0 ].style.top = this.position.top + "px";
+		this.helper[ 0 ].style.left = this.position.left / return_huabu_scale() + "px";
+		this.helper[ 0 ].style.top = this.position.top / return_huabu_scale() + "px";
 
 		if ( $.ui.ddmanager ) {
 			$.ui.ddmanager.drag( this, event );
@@ -10387,6 +10396,7 @@ $.widget( "ui.draggable", $.ui.mouse, {
 			pageX = event.pageX,
 			pageY = event.pageY;
 
+
 		// Cache the scroll
 		if ( !scrollIsRootNode || !this.offset.scroll ) {
 			this.offset.scroll = {
@@ -10460,41 +10470,36 @@ $.widget( "ui.draggable", $.ui.mouse, {
 			}
 		}
 
+		var radian = return_huabu_angle() * Math.PI / 180
+
+		var wrapper_offset = return_huabu_centerOffset()
+
+		var old_top = pageY - wrapper_offset.top
+		var old_left = pageX - wrapper_offset.left
+
+		// var old_top = pageY-
+		// 			  this.offset.click.top -
+		// 			  this.offset.relative.top -
+		// 			  this.offset.parent.top +
+		// 			  (this.cssPosition === "fixed" ?
+		// 			  	  -this.offset.scroll.top :
+		// 				  (scrollIsRootNode ? 0 : this.offset.scroll.top ))
+		// var old_left = pageX-
+		// 			   this.offset.click.left -
+		// 			   this.offset.relative.left -
+		// 			   this.offset.parent.left +
+		// 			   (this.cssPosition === "fixed" ?
+		// 				  -this.offset.scroll.left :
+		// 			      (scrollIsRootNode ? 0 : this.offset.scroll.left ))
+
+		var new_left = old_left * Math.cos(radian) + old_top * Math.sin(radian)
+						- this.offset.click.left
+		var new_top =  - old_left * Math.sin(radian) + old_top * Math.cos(radian)
+						- this.offset.click.top
+
 		return {
-			top: (
-
-				// The absolute mouse position
-				pageY -
-
-				// Click offset (relative to the element)
-				this.offset.click.top -
-
-				// Only for relative positioned nodes: Relative offset from element to offset parent
-				this.offset.relative.top -
-
-				// The offsetParent's offset without borders (offset + border)
-				this.offset.parent.top +
-				( this.cssPosition === "fixed" ?
-					-this.offset.scroll.top :
-					( scrollIsRootNode ? 0 : this.offset.scroll.top ) )
-			),
-			left: (
-
-				// The absolute mouse position
-				pageX -
-
-				// Click offset (relative to the element)
-				this.offset.click.left -
-
-				// Only for relative positioned nodes: Relative offset from element to offset parent
-				this.offset.relative.left -
-
-				// The offsetParent's offset without borders (offset + border)
-				this.offset.parent.left +
-				( this.cssPosition === "fixed" ?
-					-this.offset.scroll.left :
-					( scrollIsRootNode ? 0 : this.offset.scroll.left ) )
-			)
+			top: new_top ,
+			left: new_left 
 		};
 
 	},
@@ -11430,8 +11435,8 @@ $.widget( "ui.resizable", $.ui.mouse, {
 		var data, props,
 			smp = this.originalMousePosition,
 			a = this.axis,
-			dx = ( event.pageX - smp.left ) || 0,
-			dy = ( event.pageY - smp.top ) || 0,
+			dx = ( event.pageX - smp.left ) / return_huabu_scale() || 0,
+			dy = ( event.pageY - smp.top ) / return_huabu_scale() || 0,
 			trigger = this._change[ a ];
 
 		this._updatePrevProperties();
@@ -13476,8 +13481,8 @@ $.ui.ddmanager = {
 
 			m[ i ].offset = m[ i ].element.offset();
 			m[ i ].proportions( {
-				width: m[ i ].element[ 0 ].offsetWidth * return_scale(),
-				height: m[ i ].element[ 0 ].offsetHeight * return_scale()
+				width: m[ i ].element[ 0 ].offsetWidth * return_huabu_scale(),
+				height: m[ i ].element[ 0 ].offsetHeight * return_huabu_scale()
 			} );
 
 		}
@@ -15888,10 +15893,10 @@ var widgetsSortable = $.widget( "ui.sortable", $.ui.mouse, {
 
 		//Set the helper position
 		if ( !this.options.axis || this.options.axis !== "y" ) {
-			this.helper[ 0 ].style.left = this.position.left + "px";
+			this.helper[ 0 ].style.left = this.position.left / return_huabu_scale() + "px";
 		}
 		if ( !this.options.axis || this.options.axis !== "x" ) {
-			this.helper[ 0 ].style.top = this.position.top + "px";
+			this.helper[ 0 ].style.top = this.position.top / return_huabu_scale() + "px";
 		}
 
 		//Do scrolling

@@ -66,6 +66,21 @@ clone可以把旧的tile的内容记录下来吗？这样的话我还需要吧ti
 
 如果他已经绑定了一个元素old，那么当他绑定新的元素new时，如果满足了新的元素new的优先级更好，那么就要先解除原有的绑定，再绑定到new上去！
 
+不是连线函数的问题，能够正常连接到line_dot的中点
+不是snap_dot中点的问题，位置是正确的
+不是移动后中点的问题，位置也是正确的
+目前看来，问题出在将ui.draggable移动到点位后，使用函数将其连线有关，是否是dot的点位发生了变化？
+
+错位了！连接途中发生了什么变化？
+
+只有一种办法可以解决……那就是把line_inner塞进一个空的div里面
+
+求到原点的位置→求到偏移量→求到偏移后的位置→这个位置与pageX,Y的距离→用角度来换算→left和top的值
+
+怎么获取不对旋转后的元素的offsetttttttttttttttttttttttttttttttttttttttttttttttttttta !
+
+现在唯一的办法就是把它放进一个wrapper里面？？？
+
 
 
 

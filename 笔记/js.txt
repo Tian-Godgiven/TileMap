@@ -204,3 +204,40 @@ $().disableSelection()
 ```
 
 与之配套的是css：user-select: none;
+
+---
+
+23.jq ui 原生的 draggable 与scale变化不匹配问题：
+	修改源文件中的：
+		this.helper[ 0 ].style.left = this.position.left **/ return_huabu_scale()** + "px"
+		this.helper[ 0 ].style.top = this.position.top **/ return_huabu_scale()** + "px";
+
+		_mouseDrag: function( event, noPropagation ) {
+		// reset any necessary cached properties (see #5009)
+		if ( this.hasFixedAncestor ) {
+			this.offset.parent = this._getParentOffset();
+		}
+	
+		//Compute the helpers position
+		this.position = this._generatePosition( event, true );
+		this.positionAbs = this._convertPositionTo( "absolute" );
+	
+		//Call plugins and callbacks and use the resulting position if something is returned
+		if ( !noPropagation ) {
+			var ui = this._uiHash();
+			if ( this._trigger( "drag", event, ui ) === false ) {
+				this._mouseUp( new $.Event( "mouseup", event ) );
+				return false;
+			}
+			this.position = ui.position;
+		}
+	
+		this.helper[ 0 ].style.left = this.position.left / return_huabu_scale() + "px";
+		this.helper[ 0 ].style.top = this.position.top / return_huabu_scale() + "px";
+	
+		if ( $.ui.ddmanager ) {
+			$.ui.ddmanager.drag( this, event );
+		}
+	
+		return false;
+	},

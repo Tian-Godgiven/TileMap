@@ -3,8 +3,8 @@
   position:absolute;
 	cursor: default;
   font-size: 30px;
-	width: 90px;
-  height: 90px;
+	width: 100px;
+  height: 100px;
   border: 2px solid;
 	position: absolute;
 	color: black;
@@ -38,8 +38,8 @@
 }
 
 .tile .tile_snap_dot{
-  height:20px;
-  width:20px;
+  height:16px;
+  width:16px;
   background-color:#5DFFFFFF;
   position:absolute;
   border-radius:50%

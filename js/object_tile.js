@@ -35,15 +35,19 @@ function createTile(){
 		"tiletext": "<div></div>"
 	});
 	$(tile).append("<div class='tile_title'></div>")
+	var wrapper = $("<div></div>", {"class":"wrapper"})
+
+	$(wrapper).append(tile)
 
 	// 创建后，默认将当前tile作为聚焦Tile
 	focusing_tile = tile;
 
-	var huabu = return_focusing_huabu(); // 获取当前聚焦的画布
+	// 获取当前聚焦的画布
+	var huabu = return_focusing_huabu(); 
 	// 磁贴生成的地方，是每个画布的tileContainer
 	let tile_container = $(huabu).find('.tile_container')[0];//转换为Dom对象
 	// 将磁贴放进去
-	tile_container.appendChild(tile[0]); 
+	$(tile_container).append(wrapper); 
 	tile_id++;
 
 
@@ -67,55 +71,51 @@ function loadTile(old_tile){
 
 //磁贴的拖动，缩放，放置功能
 $("#huabu_container").on("mouseenter", ".tile:not(.ui-draggable-handle)", function() {
- 	var click = { x:0, y:0};
- 	var click_dot = { x:0, y:0}
- 	//移动
-    $(this).draggable({
-    	snapTolerance:7,
-    	addClasses:false,
-    	disabled: false,
-    	snap: true,
-    	scroll: false,
-    	zIndex:100,
-    	containment:$(return_focusing_huabu()).find('.tile_container')[0],//转换为Dom对象
-    	start: function(event) {
-        	click.x = event.clientX;
-        	click_dot.x = event.clientX;
-        	click.y = event.clientY;
-        	click_dot.y = event.clientY;
-        	hideTextBlock(return_focusing_huabu())
-    	},
-    	drag: function(event, ui) {
-        	var huabu_scale = return_scale();
-        	var original = ui.originalPosition;
-        	ui.position = {
-            	left: (event.clientX - click.x + original.left) / huabu_scale,
-            	top:  (event.clientY - click.y + original.top ) / huabu_scale
-        	};
-        	dragTileConnect(event,ui,this,click_dot)
-    	}
+	var click_dot = { x:0, y:0}
+	//移动
+	var wrapper = $(this).parent(".wrapper")
+	$(wrapper).draggable({
+		snapTolerance:7,
+		addClasses:false,
+		disabled: false,
+		snap: ".tile",
+		scroll: false,
+		zIndex:100,
+		//containment:$(return_focusing_huabu()),
+		start: function(event) {
+			click_dot.x = event.clientX;
+			click_dot.y = event.clientY;
+			hideTextBlock(return_focusing_huabu())
+		},
+		drag: function(event, ui) {
+			dragTileConnect(event,ui,this,click_dot)
+		}
 	});
 
-    //修改大小
-    $(this).resizable({
-    	autoHide:true,
-    	animate: false,
-    	animateEasing:"swing",
-    	handles:"n,e,s,w,se,sw,ne,nw",
-    	autoHide:true
-    });
+	//修改大小
+	$(this).resizable({
+		autoHide:true,
+		animate: false,
+		animateEasing:"swing",
+		handles:"n,e,s,w,se,sw,ne,nw",
+		autoHide:true,
+		start:function(){
+			console.log("!23")
+		}
+	});
 
-    //放置line_dot
+	//放置line_dot
 	$(this).droppable({
 		tolerance:"touch",
-		greedy:true,
 		accept:".line_dot",
 		//当dot放置在Tile上时，会在tile的边框上显示出tile的吸附点
 		over:function(event,ui){
 			showTileSnapDot(this)
 		},
 		drop:function(event,ui){
-			hideTileSnapDot(this)
+				hideTileSnapDot(this)
+
+			
 			DotIntoTile(ui.draggable,this)
 		},
 		//当dot移出Tile时，将其与tile解绑
@@ -125,10 +125,9 @@ $("#huabu_container").on("mouseenter", ".tile:not(.ui-draggable-handle)", functi
 			//令drag事件重启
 			return_snap_tile(true)
 			//将对象移动到鼠标的位置来
-			var huabu_scale = return_scale();
 			$(ui.helper).offset({
-				left: event.clientX / huabu_scale,
-				top:event.clientY / huabu_scale
+				left: event.clientX,
+				top: event.clientY
 			})
 		}
 	})
@@ -137,23 +136,23 @@ $("#huabu_container").on("mouseenter", ".tile:not(.ui-draggable-handle)", functi
 //监听tile大小变化修改字体
 $("#huabu_container").on( "resize", ".tile" , function() {
 	var newwidth = $(this).outerWidth();
-    var newheight = $(this).outerHeight();
-    if( newheight > newwidth){
-  		var newfontsize = newwidth/3;
+	var newheight = $(this).outerHeight();
+	if( newheight > newwidth){
+		var newfontsize = newwidth/3;
 		if (newfontsize > 5) {
-    		$(this).css({
-    			"font-size": newfontsize
-    		})
-    	}
-    }
-    else{
-    	var newfontsize = newheight/3;
-   		if (newfontsize > 5) {
-    		$(this).css({
-    			"font-size": newfontsize
-    		})
-    	}
-  	}
+			$(this).css({
+				"font-size": newfontsize
+			})
+		}
+	}
+	else{
+		var newfontsize = newheight/3;
+		if (newfontsize > 5) {
+			$(this).css({
+				"font-size": newfontsize
+			})
+		}
+	}
 });
 
 //磁贴的单击，双击，右键功能
@@ -208,52 +207,61 @@ function tileDoubleClick(event,tile){
 
 //snap_dot的droppable创建函数
 function droppableSnapDot(){
-	var snap_position = {x:0 , y:0}
+	var snap_position
 	$(".tile_snap_dot").droppable({
 		tolerance: "pointer",
 		accept:".line_dot",
 		over:function(event,ui){
 			event.stopPropagation()
-			console.log("进入了")
 			//令drag事件停止
 			return_snap_tile(false)
-			var huabu_scale = return_scale()
-			//获取snap_dot的圆心
-			var radius = $(this).width()/2 * huabu_scale
-			snap_position.x = $(this).offset().left + radius
-			snap_position.y = $(this).offset().top + radius
-			//将对象的圆心移动到这里来
-			var draggable_radius = $(ui.draggable).width()/2 * huabu_scale
-			$(ui.draggable).offset({
-				left: snap_position.x - draggable_radius,
-				top: snap_position.y - draggable_radius
+			//获取修改信息
+			var old_position = distantWithHuabu($(ui.draggable))
+				snap_position = distantWithHuabu($(this))
+			var x = snap_position.left - old_position.left
+			var y = snap_position.top - old_position.top
+			//原本line_dot的位置
+			var old_left = parseInt($(ui.draggable).css("left"))
+			var old_top = parseInt($(ui.draggable).css("top"))
+			//修改line_dot的css以改变其位置
+			$(ui.draggable).css({
+				"left": old_left + x,
+				"top": old_top + y
 			})
-			console.log($(ui.draggable).offset())
-			dragLineDot(ui.draggable)
 
+			dragLineDot(ui.draggable)
 		},
-		// drop:function(event,ui){
-		// 	//将对象的圆心移动到snap_dot的圆心
-		// 	var huabu_scale = return_scale()
-		// 	$(ui.draggable).offset({
-		// 		left: snap_position.x - $(ui.draggable).width()/ 2 /huabu_scale,
-		// 		top: snap_position.y - $(ui.draggable).width()/ 2 /huabu_scale
-		// 	})
-		// 	dragLineDot(ui.draggable)
-		// 	//恢复drag事件
-		// 	return_snap_tile(true)
-		// },
-		// out:function(event,ui){
-		// 	var huabu_scale = return_scale()
-		// 	event.stopPropagation()
-		// 	//令drag事件重启
-		// 	return_snap_tile(true)
-		// 	//将对象移动到鼠标的位置来
-		// 	$(ui.helper).offset({
-		// 		left: event.clientX /huabu_scale,
-		// 		top:event.clientY /huabu_scale
-		// 	})
-		// }
+		drop:function(event,ui){
+			event.stopPropagation()
+			//获取修改信息，因为此时tile不应该移动所以使用之前的snap_postion就行
+			var old_position = distantWithHuabu($(ui.draggable))
+			var x = snap_position.left - old_position.left
+			var y = snap_position.top - old_position.top
+			//原本line_dot的位置
+			var old_left = parseInt($(ui.draggable).css("left"))
+			var old_top = parseInt($(ui.draggable).css("top"))
+			//修改line_dot的css以改变其位置
+			$(ui.draggable).css({
+				"left": old_left + x,
+				"top": old_top + y
+			})
+
+			dragLineDot(ui.draggable)
+			//恢复drag事件
+			return_snap_tile(true)
+			//绑定dot与磁贴
+			DotIntoTile(ui.draggable,this)
+		},
+		out:function(event,ui){
+			event.stopPropagation()
+			//令drag事件重启
+			return_snap_tile(true)
+			//将对象移动到鼠标的位置来
+			$(ui.helper).offset({
+				left: event.clientX,
+				top: event.clientY
+			})
+		}
 	})
 }
 
@@ -368,7 +376,7 @@ function changeTileTitle(tile,type){
 
 //监听resize修改字体大小
 	$("#div").resize(function(){
-    });
+	});
 		(function($, h, c) {
 			var a = $([]), e = $.resize = $.extend($.resize, {}), i, k = "setTimeout", j = "resize", d = j
 					+ "-special-event", b = "delay", f = "throttleWindow";
@@ -486,7 +494,7 @@ var delete_size_array=[];//待删除队列中的tile的size属性记录
 //删除函数
 function delete_confirm(a){
 
- 	//获取tile
+	//获取tile
 	var tileid="tileid_"+a.children()[0].id.substr(a.children()[0].id.lastIndexOf("_")+1);
 	let the_tile = document.getElementById(tileid);
 	//获取tile对应的简介

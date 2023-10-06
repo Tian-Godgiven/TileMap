@@ -38,7 +38,7 @@ $("#draw_ability_ScaleUp").on("click",function(){
 })
 
 //显示画布当前的缩放大小，在画布切换，放大缩小时调用
-function ScaleShow(huabu){
+function showScale(huabu){
 	var scale = Math.round($(huabu).attr("scale") * 100) +"%"
 	$("#draw_ability_ScaleShow").children().text(scale)
 }
