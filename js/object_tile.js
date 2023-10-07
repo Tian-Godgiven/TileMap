@@ -13,6 +13,7 @@ document.addEventListener("contextmenu", function(e) {
 //全局变量
 var tile_id=1;//用于提供tileid初值，以防止tile重名
 var focusing_tile;//当前选中的tile
+var tile_center = { }//用于存储tile的中心点坐标和宽高
 
 //返回当前聚焦的tile，预计整合时删除
 function return_focusing_tile() {
@@ -23,6 +24,19 @@ function return_tile_id(){
 	var old_tile_id = tile_id;
 	tile_id++
 	return old_tile_id
+}
+//返回当前的tile_center
+function return_tile_center(){
+	return tile_center
+}
+
+//更新tile_center
+function updateTileCenter(tile){
+	var id = $(tile).attr("id")
+	tile_center[id] = {
+		center: $(tile).children('.tile_center'),
+		size: {width:$(tile).width() , height:$(tile).height()}
+	}
 }
 
 //创建tile，其本质上是一个div元素
@@ -35,20 +49,15 @@ function createTile(){
 		"tiletext": "<div></div>"
 	});
 	$(tile).append("<div class='tile_title'></div>")
-	var wrapper = $("<div></div>", {"class":"tile_wrapper wrapper"})
 
-	$(wrapper).append(tile)
+	// 磁贴生成的地方，是每个画布的tileContainer
+	var huabu = return_focusing_huabu(); 
+	let tile_container = $(huabu).find('.tile_container');//转换为Dom对象
+	$(tile_container).append(tile); 
+	tile_id++;
 
 	// 创建后，默认将当前tile作为聚焦Tile
 	focusing_tile = tile;
-
-	// 获取当前聚焦的画布
-	var huabu = return_focusing_huabu(); 
-	// 磁贴生成的地方，是每个画布的tileContainer
-	let tile_container = $(huabu).find('.tile_container')[0];//转换为Dom对象
-	// 将磁贴放进去
-	$(tile_container).append(wrapper); 
-	tile_id++;
 
 
 	//给tile随机的初始背景颜色
@@ -73,8 +82,7 @@ function loadTile(old_tile){
 $("#huabu_container").on("mouseenter", ".tile:not(.ui-resizable)", function() {
 	var click_dot = { x:0, y:0}
 	//移动
-	var wrapper = $(this).parent(".tile_wrapper")
-	$(wrapper).draggable({
+	$(this).draggable({
 		snapTolerance:7,
 		addClasses:false,
 		disabled: false,
@@ -99,9 +107,6 @@ $("#huabu_container").on("mouseenter", ".tile:not(.ui-resizable)", function() {
 		animateEasing:"swing",
 		handles:"n,e,s,w,se,sw,ne,nw",
 		autoHide:true,
-		start:function(){
-			console.log("!23")
-		}
 	});
 
 	//放置line_dot
@@ -113,14 +118,12 @@ $("#huabu_container").on("mouseenter", ".tile:not(.ui-resizable)", function() {
 			showTileSnapDot(this)
 		},
 		drop:function(event,ui){
-				hideTileSnapDot(this)
-
-			
+			//hideTileSnapDot(this)
 			DotIntoTile(ui.draggable,this)
 		},
 		//当dot移出Tile时，将其与tile解绑
 		out:function(event,ui){
-			hideTileSnapDot(this)
+			//hideTileSnapDot(this)
 			DotOutTile(ui.draggable,this)
 			//令drag事件重启
 			return_snap_tile(true)
@@ -279,6 +282,7 @@ function return_snap_tile(bool){
 
 //tile的line_dot移入事件，在这个tile上显示出吸附点(snap_dot)
 function showTileSnapDot(tile){
+	console.log("移入了")
 	//创建四个角的吸附点
 	var snap_dot_1 = snap_dot = $("<div>",{"class":"tile_snap_dot"})
 	var snap_dot_2 = $(snap_dot_1).clone(true,true)

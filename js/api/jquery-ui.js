@@ -10012,22 +10012,25 @@ $.widget( "ui.draggable", $.ui.mouse, {
 			relative: this._getRelativeOffset()
 		};
 
-		var radian = return_huabu_angle() * Math.PI / 180
-
-		var old_left = event.pageX - this.offset.left
-		var old_top = event.pageY - this.offset.top
-
-		var new_top = old_top * Math.cos(radian) - old_left * Math.sin(radian) 
-		var new_left = old_top * Math.sin(radian) + old_left * Math.cos(radian)
-
-		//console
-
-			this.offset.click = {
-				left: new_left,
-				top: new_top
-			};
-			
+		//求两点之间的距离
+		var distant_x = this.offset.left - event.pageX
+		var distant_y  = this.offset.top - event.pageY
+		//求得对角线长度和角度
+		var width = (Math.sqrt(Math.pow(distant_x,2) + Math.pow(distant_y,2)))
+		var angle = getAngle(distant_x,distant_y) 
+		//这个角度减去画布偏转的角度
+		if($(this.bindings).is(".wrapper")){
+			var new_angle = angle - return_huabu_angle()
+		}
+		else{
+			var new_angle = angle
+		}
 		
+		this.offset.click = {
+			left: event.pageX - this.offset.left,
+			top: event.pageY - this.offset.top
+		};
+			
 	},
 
 	_mouseDrag: function( event, noPropagation ) {
@@ -10472,29 +10475,43 @@ $.widget( "ui.draggable", $.ui.mouse, {
 			}
 		}
 
-
-			var radian = return_huabu_angle() * Math.PI / 180
-
-			if($(this.bindings).is(".wrapper")){
-				var parent_offset = return_huabu_centerOffset()
-			}
-			else if($(this.bindings).is(".line_dot")){
-				var line = this.bindings.parent(".line")
-				var parent_offset = $(line).offset()
-			}
-
-			var old_top = pageY - parent_offset.top
-			var old_left = pageX - parent_offset.left
-
-			var new_left = old_left * Math.cos(radian) + old_top * Math.sin(radian)
-							- this.offset.click.left
-			var new_top =  - old_left * Math.sin(radian) + old_top * Math.cos(radian)
-							- this.offset.click.top
-
 			return {
-				top: new_top ,
-				left: new_left 
-			};
+			top: (
+
+				// The absolute mouse position
+				pageY -
+
+				// Click offset (relative to the element)
+				this.offset.click.top -
+
+				// Only for relative positioned nodes: Relative offset from element to offset parent
+				this.offset.relative.top -
+
+				// The offsetParent's offset without borders (offset + border)
+				this.offset.parent.top +
+				( this.cssPosition === "fixed" ?
+					-this.offset.scroll.top :
+					( scrollIsRootNode ? 0 : this.offset.scroll.top ) )
+			),
+			left: (
+
+				// The absolute mouse position
+				pageX -
+
+				// Click offset (relative to the element)
+				this.offset.click.left -
+
+				// Only for relative positioned nodes: Relative offset from element to offset parent
+				this.offset.relative.left -
+
+				// The offsetParent's offset without borders (offset + border)
+				this.offset.parent.left +
+				( this.cssPosition === "fixed" ?
+					-this.offset.scroll.left :
+					( scrollIsRootNode ? 0 : this.offset.scroll.left ) )
+			)
+		};
+
 
 	
 
@@ -11432,8 +11449,8 @@ $.widget( "ui.resizable", $.ui.mouse, {
 		var data, props,
 			smp = this.originalMousePosition,
 			a = this.axis,
-			dx = ( event.pageX - smp.left )|| 0,
-			dy = ( event.pageY - smp.top )|| 0,
+			dx = ( event.pageX - smp.left ) / return_huabu_scale()|| 0,
+			dy = ( event.pageY - smp.top ) / return_huabu_scale()|| 0,
 			trigger = this._change[ a ];
 
 		this._updatePrevProperties();
@@ -13146,7 +13163,6 @@ if ( $.uiBackCompat !== false ) {
 
 var widgetsDialog = $.ui.dialog;
 
-
 /*!
  * jQuery UI Droppable 1.13.2
  * http://jqueryui.com
@@ -13277,7 +13293,6 @@ $.widget( "ui.droppable", {
 	_over: function( event ) {
 
 		var draggable = $.ui.ddmanager.current;
-
 		// Bail if draggable and droppable are same element
 		if ( !draggable || ( draggable.currentItem ||
 				draggable.element )[ 0 ] === this.element[ 0 ] ) {

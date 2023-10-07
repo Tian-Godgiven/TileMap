@@ -41,7 +41,7 @@ function createLine(width,height,color,style,style_width){
 	var top = (radius - parseInt(height)/2)+ "px"
 	var left = radius + "px"
 
-	var line = $("<div>",{"id":"line_" + line_id, "class":"line wrapper"})
+	var line = $("<div>",{"id":"line_" + line_id, "class":"line"})
 	line_id +=1
 
 	var line_dotLeft = $("<div>",{ "class":"line_dot line_dotLeft"})
@@ -55,10 +55,6 @@ function createLine(width,height,color,style,style_width){
 	var connect = createConnect(line_dotLeft,line_dotRight,line_dotInner,line_inner)
 	connect_list[connect[0]] = connect[1]
 
-
-	//对line的修饰
-	$(line).css("width",width)
-
 	//对line_dotLeft的修饰，将对应的信息存储进dot中
 	$(line_dotLeft).data('connected',connect_list) 
 
@@ -70,6 +66,7 @@ function createLine(width,height,color,style,style_width){
 
 	//对line_dotRight的修饰，将对应的信息存储进dot中
 	$(line_dotRight).data('connected',connect_list) 
+	$(line_dotRight).css('left',width_inner) 
 
 	//对line_inner的修饰
 	$(line_inner).css({
@@ -79,6 +76,7 @@ function createLine(width,height,color,style,style_width){
 		"left":left,
 		"top":top
 	})
+	$(line_inner).attr("angle","0")
 
 	if(style == "dash"){
 		$(line_inner).css({
@@ -166,7 +164,6 @@ $("#huabu_container").on("mouseenter",".line > .line_dot:not(.ui-draggable-handl
 				dragLineDot(this)
 			}
 			else{
-
 				return 0;
 			}
 	    },
@@ -234,50 +231,32 @@ function dragLineDot(dot,time){
 //同时还会把其中点dot_inner移到线段中心
 function connectLineDot(dot_left,dot_right,dot_inner,line_inner){
 
-	//如果是midway的话，需要先转换对象
-	if($(dot_left).is(".line_dotMidway")){
-		dot_left = $(dot_left).children(".line_dotMidway_inner")
-	}
-	if($(dot_right).is(".line_dotMidway")){
-		dot_right = $(dot_right).children(".line_dotMidway_inner")
-	}
+	var huabu_scale = return_huabu_scale()
+
 	//获取dot的半径，这个数值等于dot的宽度的一半
 	var radius_left = $(dot_left).width()/2
 	var radius_right = $(dot_right).width()/2
 
 	//找到两个dot的圆心的位置,是分别的offset+radius,并求出距离差
-	var distant_x = ($(dot_left).offset().left + radius_left) - 
-					($(dot_right).offset().left + radius_right)
-	var distant_y = ($(dot_left).offset().top + radius_left) - 
-					($(dot_right).offset().top + radius_right)
+	var distant_x = (parseInt($(dot_left).css("left")) + radius_left) - 
+					(parseInt($(dot_right).css("left")) + radius_right)
+	var distant_y = (parseInt($(dot_left).css("top")) + radius_left) - 
+					(parseInt($(dot_right).css("top")) + radius_right)
 
 	//获取两点之间的间距和角度
-	var huabu_scale = return_huabu_scale()
-	var width = Math.sqrt(Math.pow(distant_x,2) + Math.pow(distant_y,2)) / huabu_scale
+	var width = Math.sqrt(Math.pow(distant_x,2) + Math.pow(distant_y,2))
 	var angle = getAngle(distant_x,distant_y)
 	var radian = Math.PI * angle /180
 
-	//如果画布发生了偏转，那么angle要减少相当于画布部分的angle
-	var huabu_angle = return_huabu_angle()
-	angle = angle - huabu_angle
-
 	//获取dot_left圆心的位置，这里是line_inner的起点
-	//如果这个dot是midway_inner，那么起点则要改成它的父元素的位置,由于其父元素本身就在圆心的位置，所以不用加上radius_left
-	if($(dot_left).is(".line_dotMidway_inner")){
-		dot_left = $(dot_left).parent(".line_dotMidway")
-		var left = parseInt($(dot_left).css("left"))
-		var top = parseInt($(dot_left).css("top"))
-	}
-	else{
-		var left = parseInt($(dot_left).css("left")) + radius_left
-		var top = parseInt($(dot_left).css("top")) + radius_left
-	}
+	var left = parseInt($(dot_left).css("left")) + radius_left
+	var top = parseInt($(dot_left).css("top")) + radius_left
 
 	//获取线条的粗度，也就是高度
 	var height_line = $(line_inner).height() * huabu_scale
 
-	var line = $(line_inner).parent(".line")
 	//获取箭头的粗度，同样也是高度
+	var line = $(line_inner).parent(".line")
 	var height_arrow = 0
 	if($(line).find(".line_arrow:first").length > 0){
 		var arrow_inner = $(line).find(".line_arrow:first").children(".line_arrow_inner")
@@ -287,7 +266,6 @@ function connectLineDot(dot_left,dot_right,dot_inner,line_inner){
 	//如果dot_right就连着右箭头（也就是说dot_right是右端点）
 	//那么只需要减去Line_inner的长度（宽度）= 线条的粗度
 	var width_arrow = 0
-	var temp_right = false
 	if($(dot_right).next().is(".line_arrow_right")){
 		temp_right = true
 		width_arrow += height_arrow
@@ -297,7 +275,6 @@ function connectLineDot(dot_left,dot_right,dot_inner,line_inner){
 	//就要移动线条与dot_left的位置,在基础的移动后还要再减少一次Line_inner的粗度
 	var x_arrow = 0
 	var y_arrow = 0
-	var temp_left = false
 	if($(dot_left).next().is(".line_arrow_left")){
 		x_arrow = height_arrow * Math.cos(radian)
 		y_arrow = height_arrow * Math.sin(radian)
@@ -316,8 +293,8 @@ function connectLineDot(dot_left,dot_right,dot_inner,line_inner){
 		"width":width - width_arrow + "px",
 		"transform":"rotate(" + angle + "deg)",
 	})
-	//使dot_inner回到line中间
-	backToCenter(dot_left,dot_right,dot_inner,line_inner)
+	//使dot_inner回到dot_left和dot_right中间
+	backToCenter(dot_left,dot_right,dot_inner)
 	//修改箭头的位置和旋转的角度
 	$($(line_inner).parent()).find(".line_arrow").each(function(){
 		changeArrow(this)
@@ -435,68 +412,72 @@ function InnerTurnToMidway(dot_inner,connect_id){
 
 	//将inner变为midway,修改Dot的class
 	$(dot_inner).attr("class",'line_dot line_dotMidway')
+	var dot_midway = dot_inner
 	//生成midway_inner和midway_border
-	var midway_inner = $("<div>",{
-		"class":"line_dotMidway_inner line_dot",
-	})
-	var midway_border = $("<div>",{
-		"class":"line_dotMidway_border"
-	})
-	//修改border的颜色，半径
-	var color = $(line_right).css('background-color')
-	var height = parseInt($(line_right).css('height'))
-	$(midway_border).css({
-		"width":height + "px",
-		"height":height + "px",
-		"background":color
-	})
-	//把inner和Border放进dot
-	$(dot_inner).append(midway_border)
-	$(dot_inner).append(midway_inner)
+		var midway_inner = $("<div>",{
+			"class":"line_dotMidway_inner line_dot",
+		})
+		var midway_border = $("<div>",{
+			"class":"line_dotMidway_border"
+		})
+		//修改border的颜色，半径
+		var color = $(line_right).css('background-color')
+		var height = parseInt($(line_right).css('height'))
+		$(midway_border).css({
+			"width":height + "px",
+			"height":height + "px",
+			"background":color
+		})
+		//把inner和Border放进dot
+		$(dot_midway).append(midway_border)
+		$(dot_midway).append(midway_inner)
 
 	//变大之后位置也发生了变化，所以这里使其回到原本的位置，也就是中点
-	backToCenter(line_left,dot_inner)
+	backToCenter(dot_left,dot_right,dot_midway)
 
 	//随后在两边各创建一个dot_Inner，放在各自的line_inner前面
-	var dot_inner_left = $("<div>",{"class":"line_dot line_dotInner"})
-	var dot_inner_right = $("<div>",{"class":"line_dot line_dotInner"})
-	//把这个dot_inner放在Line的前面
-	$(line_left).before(dot_inner_left)
-	$(line_right).before(dot_inner_right)
+		var dot_inner_left = $("<div>",{"class":"line_dot line_dotInner"})
+		var dot_inner_right = $("<div>",{"class":"line_dot line_dotInner"})
+		//把这个dot_inner放在Line的前面
+		$(line_left).before(dot_inner_left)
+		$(line_right).before(dot_inner_right)
 
-	//修改connect_left
+	//修改原本的connect_left
 	var connected_left = {
 		"dot_left":dot_left,
-		"dot_right":$(dot_inner),
+		"dot_right":$(dot_midway),
 		"line_inner":line_left,
 		"dot_inner":dot_inner_left}
-	//创建connect_right
-	var connect_right = createConnect($(dot_inner),dot_right,dot_inner_right,line_right)
+	var left_id = connect_id
+	//创建新的connect_right
+	var connect_right = createConnect($(dot_midway),dot_right,dot_inner_right,line_right)
+	var right_id = connect_right[0]
 
 	//修改left一侧的点的list
-	$(dot_inner).data("connected")[connect_id] = connected_left//覆盖旧的链接
-	$(dot_left).data("connected")[connect_id] = connected_left
-	//给新创建dot_inner放入list
+	$(dot_midway).data("connected")[left_id] = connected_left//覆盖旧的链接
+	$(dot_left).data("connected")[left_id] = connected_left
+	//给新创建dot_inner_left放入list
 	var list_left = {}
-	list_left[connect_id] = connected_left
+	list_left[left_id] = connected_left
 	$(dot_inner_left).data("connected",list_left)
 
-	//修改Dot的list，先复制一份旧的list，然后将这个connect_right加入进去
-	var dot_list = $.extend(true, {}, $(dot_inner).data("connected"));
-	dot_list[connect_right[0]] = connect_right[1]
+	//先复制一份midway的旧的list，然后将这个connect_right加入进去
+	var dot_list = $.extend(true, {}, $(dot_midway).data("connected"));
+	dot_list[right_id] = connect_right[1]
 	$(dot_inner).data("connected",dot_list)
-	//修改right的list，
+
+	//修改right的list,先复制一份旧的list，删去其中的旧链接，再装入新链接
 	var new_list = $.extend(true, {}, $(dot_right).data("connected"));
-	delete new_list[i]//删除旧的链接
-	new_list[connect_right[0]] = connect_right[1]
+	delete new_list[left_id]//删除旧的left的链接
+	new_list[right_id] = connect_right[1]
 	$(dot_right).data("connected",new_list)
 	//同样给新的dot_inner放入list
 	var list_right = {}
-	list_right[connect_right[0]] = connect_right[1]
+	list_right[right_id] = connect_right[1]
 	$(dot_inner_right).data("connected",list_right)
 
-	connectLineDot(dot_left,midway_inner,dot_inner_left,line_left)
-	connectLineDot(midway_inner,dot_right,dot_inner_right,line_right)
+	connectLineDot(dot_left,dot_midway,dot_inner_left,line_left)
+	connectLineDot(dot_midway,dot_right,dot_inner_right,line_right)
 }
 
 //将一个dot_midway转化为一个dot_inner
@@ -550,15 +531,9 @@ function MidwayTurnToInner(connect_1,connect_2,dot_midway){
 
 //将线条中点line_dotInner放到他的前后两个有效点的中间
 //angle是line_inner的偏转角度，难以通过jq方式获取
-function backToCenter(dot_left,dot_right,dot_inner,line_inner){
-	var angle = $(line_inner).attr("angle")
-	if(angle == undefined){
-		angle = 0
-	}
+function backToCenter(dot_left,dot_right,dot_inner){
 	//获取半径
 	var radius = parseInt($(dot_inner).css("width"))/2
-	//转化角度为弧度
-	var radian = Math.PI * angle /180
 	//得到dotLeft的圆心所在的位置,圆心相较于div起始点各有一个半径的差距，所以要+radius
 	var radius_1 = parseInt($(dot_left).css("width"))/2
 	var x_1 = parseInt($(dot_left).css("left")) + radius_1

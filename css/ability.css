@@ -6,15 +6,6 @@
 	z-index: 100;
 }
 
-.center{
-	width:0px;
-    height:0px;
-    position:absolute;
-}
-
-
-
-
 /*滑块标题样式*/
     .slide_title{
         background-color: #0BFFFFFF;

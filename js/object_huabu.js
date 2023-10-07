@@ -12,42 +12,11 @@ function return_huabu_scale(huabu) {
 	}
 	return $(huabu).attr("scale")
 }
-//返回当前画布的角度
-function return_huabu_angle(huabu){
-	if(huabu == undefined){
-		huabu = focusing_huabu
-	}
-	return $(huabu).attr("angle")
-}
-//返回当前画布的旋转后左上角的位置，提供给jq-ui函数
-function return_huabu_centerOffset(){
-	//center的坐标就是画布中心的位置：
-	var huabu = focusing_huabu
-	var center = $(huabu).find(".center").offset()
 
-	//顶点相对于中心点的偏移量
-	var delta_x = - $(huabu).width()/2 * return_huabu_scale()
-	var delta_y = - $(huabu).height()/2 * return_huabu_scale()
-
-	//旋转弧度
-	var radian = - $(huabu).attr("angle") * Math.PI / 180
-
-	//计算旋转后的相对坐标
-	var new_delta_x = delta_x * Math.cos(radian) + delta_y * Math.sin(radian)
-	var new_delta_y = - delta_x * Math.sin(radian) + delta_y * Math.cos(radian)
-
-	//将相对坐标加上中心点的坐标，得到旋转后的左上角顶点的坐标
-	var new_x = center.left + new_delta_x
-	var new_y = center.top + new_delta_y
-	
-	return {left:new_x,top:new_y}
-}
 //返回当前的聚焦画布，预计整合时删除
 function return_focusing_huabu() {
 	return focusing_huabu
 }
-
-
 
 
 //创建新画布
@@ -110,18 +79,10 @@ function createHuabu(name,width,height) {
 	})
 
 	$(huabu).attr({
-		"angle": "0",
 		"scale": "1",
 		"name": name
 	})
 
-	var huabu_center = $("<div>",{"class":"center"})
-	$(huabu_center).css({
-		"left":width/2,
-		"top":height/2
-	})
-
-	$(huabu).append(huabu_center)
 	$("#huabu_container").append(huabu);
 
 	//使得huabu的中心位于container的中心
@@ -150,14 +111,6 @@ function createHuabu(name,width,height) {
 $(document).on("mouseenter", ".huabu:not(.ui-resizable)", function() {
 	$(this).resizable({
 		stop: function(event, ui) {
-
-			$(this).children('.center').css({
-				"left": $(this).width()/2,
-				"top": $(this).height()/2
-			})
-
-
-
 			var oldleft = ui.originalPosition.left;
 			var newleft = ui.position.left
 			var tile_container = $(this).children(".tile_container")
@@ -263,35 +216,6 @@ $("#huabu_container").on("mouseup", function(event) {
 	huabu_dragging = false
 })
 
-//顺时针旋转当前聚焦的画布
-function rotateHuabu(angle){
-	var old_angle = parseInt($(focusing_huabu).attr("angle"))
-	var new_angle = old_angle + angle
-
-	//将其角度转化为大于0小于360的整数
-	while(new_angle >= 360){
-		new_angle -= 360
-	}
-	while(new_angle < 0){
-		new_angle += 360
-	}
-
-	//如果这个角度不为0，则禁用huabu的resizable功能，否则启用
-	if(new_angle != 0){
-		$(focusing_huabu).resizable("disable")
-	}
-	else{
-		$(focusing_huabu).resizable("enable")
-	}
-
-	//同步修改画布的属性
-	$(focusing_huabu).attr("angle",new_angle)
-	//获取放大/缩小倍数
-	var scale = return_huabu_scale()
-	var transform = "rotate("+new_angle+"deg) scale("+scale+")"
-	//修改angle进行旋转
-	$(focusing_huabu).css('transform',transform);
-}
 
 //放大当前聚焦的画布
 function enlargePage() {
@@ -299,15 +223,10 @@ function enlargePage() {
 		//变成浮点数,提高精确性
 		var huabu_scale = parseFloat($(focusing_huabu).attr("scale"))
 		huabu_scale = Math.round((huabu_scale + 0.05)*100)/100
-
-		console.log
 		//把修改后的值同步
 		$(focusing_huabu).attr("scale", huabu_scale) 
-		//获取角度
-		var angle = return_huabu_angle()
-		var transform = "rotate("+angle+"deg) scale("+huabu_scale+")"
 		//修改scale
-		$(focusing_huabu).css('transform',transform);
+		$(focusing_huabu).css('transform',"scale("+huabu_scale+")");
 		//同步显示到屏幕上
 		showScale(focusing_huabu)
 	}
@@ -318,10 +237,8 @@ function narrowPage() {
 		var huabu_scale = parseFloat($(focusing_huabu).attr("scale"))
 		huabu_scale = Math.round((huabu_scale - 0.05)*100)/100
 		$(focusing_huabu).attr("scale", huabu_scale)
-		var angle = return_huabu_angle()
-		var transform = "rotate("+angle+"deg) scale("+huabu_scale+")"
 		//修改scale
-		$(focusing_huabu).css('transform',transform);
+		$(focusing_huabu).css('transform',"scale("+huabu_scale+")");
 		showScale(focusing_huabu)
 	}
 }
