@@ -11,6 +11,7 @@
 
 待修改的美术内容：
 	line_dot:
+		聚焦时的样式focusingLine→line_selected类
 		非链接状态的line_dot 
 		链接状态的line_dot
 		转化为midway_的line_dotInner
@@ -18,3 +19,7 @@
 
 ​	tile：
 ​		line_dot移入tile时，在tile边缘上显示的tile_snap_dot
+​		聚焦时的box-shadow样式focusingTile→tile_selected类
+
+​	composite:
+​		聚焦时的边框样式focusingComposite→composite_selected类

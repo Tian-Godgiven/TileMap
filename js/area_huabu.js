@@ -19,6 +19,37 @@ let addHuabu = function() {
 	})
 }
 
+//画布区域的选择功能，创建画布区域的套索并对选择的目标进行判定
+$("#huabu_container").selectable({
+	distance:1,
+	filter:".tile , .line , .line_dot",
+	selecting:function(event,ui){
+		dom = ui.selecting
+		if($(dom).is(".line_dot")){
+			$(dom).removeClass('ui-selecting')//参与组合的不是dot对象而是Line对象
+			dom = $(dom).parent(".line")
+			$(dom).addClass('ui-selected')
+		}
+		focusingDom(dom)
+	},
+	unselecting:function(event,ui){
+		dom = ui.unselecting
+		unfocusingDom(dom)
+	},
+	start:function(){
+		//消除之前的选中体
+		destroyComposite($(this).find(".select_composite"))
+	},
+	stop:function(){
+		//将选中的对象变成一个临时组合体
+		createComposite($(this).find('.ui-selected'),"select")
+	}
+})
+
+
+
+
+
 
 //创建画布时，同时创建对应的画布切换按钮,将画布的id置入button中
 function createHuabuButton(huabu) {
@@ -47,8 +78,9 @@ function changeHuabuButton(event,button){
 	var huabu = $("#" + $(button).attr("huabu"))
 	//切换到当前画布
 	changeHuabu(huabu); 
+	//右键事件，打开对应的子菜单
 	if (event.button === 2) {
-		buttonAlert(event, button); //右键事件，调用功能栏
+		showHuabuMenu(event,"huabu_button_menu");
 	}
 }
 
@@ -56,25 +88,6 @@ function changeHuabuButton(event,button){
 $("#huabu_changeBar").sortable({ containment: "parent",tolerance: "pointer" });
     
 $("#huabu_changeBar").disableSelection()
-
-//画布按钮的右键功能选项框
-function buttonAlert(event, button) {
-
-	let alert = $("#huabu_button_alert")
-	var huabu_id = $(button).attr("huabu")
-
-	alert.css({
-		"left": event.clientX,
-		"top": event.clientY - 120,
-	})
-	alert.show()
-
-	$("*").click(function(event) {
-		if(!alert.is(event.target)) {
-			alert.hide()
-		}
-	})
-}
 
 //创建画布拷贝，本质上是加载/读取一个已经存在的画布，创建新的画布
 $("#copy_huabu").mousedown(function() {

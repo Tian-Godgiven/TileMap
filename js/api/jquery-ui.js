@@ -10012,19 +10012,19 @@ $.widget( "ui.draggable", $.ui.mouse, {
 			relative: this._getRelativeOffset()
 		};
 
-		//求两点之间的距离
-		var distant_x = this.offset.left - event.pageX
-		var distant_y  = this.offset.top - event.pageY
-		//求得对角线长度和角度
-		var width = (Math.sqrt(Math.pow(distant_x,2) + Math.pow(distant_y,2)))
-		var angle = getAngle(distant_x,distant_y) 
-		//这个角度减去画布偏转的角度
-		if($(this.bindings).is(".wrapper")){
-			var new_angle = angle - return_huabu_angle()
-		}
-		else{
-			var new_angle = angle
-		}
+		// //求两点之间的距离
+		// var distant_x = this.offset.left - event.pageX
+		// var distant_y  = this.offset.top - event.pageY
+		// //求得对角线长度和角度
+		// var width = (Math.sqrt(Math.pow(distant_x,2) + Math.pow(distant_y,2)))
+		// var angle = getAngle(distant_x,distant_y) 
+		// //这个角度减去画布偏转的角度
+		// if($(this.bindings).is(".wrapper")){
+		// 	var new_angle = angle - return_huabu_angle()
+		// }
+		// else{
+		// 	var new_angle = angle
+		// }
 		
 		this.offset.click = {
 			left: event.pageX - this.offset.left,
@@ -10034,11 +10034,12 @@ $.widget( "ui.draggable", $.ui.mouse, {
 	},
 
 	_mouseDrag: function( event, noPropagation ) {
-
 		// reset any necessary cached properties (see #5009)
 		if ( this.hasFixedAncestor ) {
 			this.offset.parent = this._getParentOffset();
 		}
+			//修改1：实际使用的parentOffset
+			this.offset.parent = this.helper.offsetParent().offset()
 
 		//Compute the helpers position
 		this.position = this._generatePosition( event, true );
@@ -10054,8 +10055,10 @@ $.widget( "ui.draggable", $.ui.mouse, {
 			this.position = ui.position;
 		}
 
+		//修改2：移动距离受到画布缩放的影响
 		this.helper[ 0 ].style.left = this.position.left / return_huabu_scale() + "px";
 		this.helper[ 0 ].style.top = this.position.top / return_huabu_scale() + "px";
+		
 
 		if ( $.ui.ddmanager ) {
 			$.ui.ddmanager.drag( this, event );
@@ -11449,8 +11452,8 @@ $.widget( "ui.resizable", $.ui.mouse, {
 		var data, props,
 			smp = this.originalMousePosition,
 			a = this.axis,
-			dx = ( event.pageX - smp.left ) / return_huabu_scale()|| 0,
-			dy = ( event.pageY - smp.top ) / return_huabu_scale()|| 0,
+			dx = ( event.pageX - smp.left ) / return_huabu_scale() || 0,
+			dy = ( event.pageY - smp.top ) / return_huabu_scale() || 0,
 			trigger = this._change[ a ];
 
 		this._updatePrevProperties();
@@ -12237,6 +12240,7 @@ $.ui.plugin.add( "resizable", "grid", {
 } );
 
 var widgetsResizable = $.ui.resizable;
+
 
 
 /*!

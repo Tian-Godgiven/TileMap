@@ -132,3 +132,10 @@ m[ i ].proportions( {
 			} );
 ```
 
+---
+
+24.huabu_container的套索selectable功能会影响到其上的click/dblclick事件，目前采用distance=1的方法来解决但是其似乎并不够完善，如果之后有问题可以参考https://blog.csdn.net/kittaaron/article/details/9195655
+
+---
+
+25.关于draggable等功能的启用，若在之后涉及到了lock等操作，建议搜索enable和disable

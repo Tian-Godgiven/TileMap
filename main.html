@@ -17,6 +17,8 @@
     <link rel="stylesheet" href="./css/object_tile.css">
     <link rel="stylesheet" href="./css/object_line.css">
     <link rel="stylesheet" href="./css/object_tiletext.css">
+    <link rel="stylesheet" href="./css/object_composite.css">
+
 
     <link rel="stylesheet" href="./css/area_top.css">
     <link rel="stylesheet" href="./css/area_huabu.css">
@@ -240,6 +242,28 @@
 
         <!-- 显示在画布内的子菜单 -->
 
+        <div id="huabu_menu" class="menu">
+            <div id="huabu_paste_here">粘贴到此处</div>
+            <div id="huabu_undo">撤回</div>
+            <div id="huabu_redo">重做</div>
+            <div id="huabu_insert">插入
+                <div class="menu">
+                    <div id="huabu_insert_table">表格</div>
+                    <div id="huabu_insert_picture">图片</div>
+                    <div id="huabu_insert_link">链接</div>
+                </div>
+            </div>
+            <div id="huabu_return_before_Huabu">返回上一层画布</div>
+            <div id="huabu_select_all">全选</div>
+            <div id="huabu_delete_all">清空</div>     
+        </div>
+
+        <div id="huabu_button_menu">
+            <div id="copy_huabu" class="hoverbar"  >创建副本</div>
+            <div id="rename_huabu" class="hoverbar">重命名</div>
+            <div id="delete_huabu"class="hoverbar" >删除</div>
+        </div>
+
 
         <div id="line_dotInner_menu" class="menu">
             <div id="line_dotInner_create_branch">衍生出一条分支</div>
@@ -247,6 +271,8 @@
                 <div class="menu"></div>
             </div>
         </div>
+
+
 
 
 
@@ -282,7 +308,6 @@
                             <div>背景颜色</div>
                             <div>网格画布</div>
                             <div>插入图片</div>
-                            <div>水平/垂直翻转画布</div>
                         </div>  
                     </div>
 
@@ -302,131 +327,144 @@
             <div class="rightArea_inner_block slide_title" mode="expanding">磁贴
                 <div class="slide_inner">
 
-                    <div class="rightArea_inner_ability">
-                        <div class="rightArea_inner_ability_title">-背景-</div>
-                        <div class="rightArea_inner_ability_inner"> 
-                            <div>背景颜色</div>
-                            <div>填充类型(可以不是纯色)</div>
-                            <div>插入图片</div>
-                        </div>  
-                    </div>
+                <div class="slide_title" mode="expanding">图形
+                    <div class="slide_inner">
+                        <div class="rightArea_inner_ability">
+                            <div class="rightArea_inner_ability_title">-背景-</div>
+                            <div class="rightArea_inner_ability_inner"> 
+                                <div>背景颜色</div>
+                                <div>填充类型(可以不是纯色)</div>
+                                <div>插入图片</div>
+                            </div>  
+                        </div>
 
-                    <div class="rightArea_inner_ability">
-                        <div class="rightArea_inner_ability_title">-位置-</div>
-                        <div class="rightArea_inner_ability_inner"> 
-                            <div>top X left</div>
-                            <div>角度</div>
-                            <div>翻转</div>
-                        </div>  
-                    </div>
+                        <div class="rightArea_inner_ability">
+                            <div class="rightArea_inner_ability_title">-位置-</div>
+                            <div class="rightArea_inner_ability_inner"> 
+                                <div>top X left</div>
+                                <div>角度</div>
+                            </div>  
+                        </div>
 
-                    <div class="rightArea_inner_ability">
-                        <div class="rightArea_inner_ability_title">-形状-</div>
-                        <div class="rightArea_inner_ability_inner"> 
-                            <div>高度 X 宽度</div>
-                            <div>比例限制(增加或减少的值比例同步)</div>
-                            <div>改变形状</div>
-                        </div>  
-                    </div>
+                        <div class="rightArea_inner_ability">
+                            <div class="rightArea_inner_ability_title">-形状-</div>
+                            <div class="rightArea_inner_ability_inner"> 
+                                <div>高度 X 宽度</div>
+                                <div>比例限制选项(增加或减少的值比例同步)</div>
+                                <div>改变形状</div>
+                            </div>  
+                        </div>
 
-                    <div class="rightArea_inner_ability">
-                        <div class="rightArea_inner_ability_title">-边框-</div>
-                        <div class="rightArea_inner_ability_inner"> 
-                            <div>类型</div>
-                            <div>宽度/粗细</div>
-                            <div>颜色</div>
-                            <div>弧度(圆润度)</div>
-                        </div>  
-                    </div>
+                        <div class="rightArea_inner_ability">
+                            <div class="rightArea_inner_ability_title">-边框-</div>
+                            <div class="rightArea_inner_ability_inner"> 
+                                <div>类型</div>
+                                <div>宽度/粗细</div>
+                                <div>颜色</div>
+                                <div>弧度(圆润度)</div>
+                            </div>  
+                        </div>
 
-                    <div class="rightArea_inner_ability">
-                        <div class="rightArea_inner_ability_title">-层叠-</div>
-                        <div class="rightArea_inner_ability_inner"> 
-                            <div>显示和修改层叠优先级</div>
-                            <div>调整层叠优先级</div>
-                        </div>  
-                    </div>
+                        <div class="rightArea_inner_ability">
+                            <div class="rightArea_inner_ability_title">-层叠-</div>
+                            <div class="rightArea_inner_ability_inner"> 
+                                <div>显示和修改层叠优先级</div>
+                                <div>调整层叠优先级</div>
+                            </div>  
+                        </div>
 
-                    <div class="rightArea_inner_ability">
-                        <div class="rightArea_inner_ability_title">-样式设置-</div>
-                        <div class="rightArea_inner_ability_inner"> 
-                            <div>复制该样式</div>
-                            <div>粘贴该样式</div>
-                            <div>加入：记忆面包（或者选择其他的自定义分类）</div>
+                        <div class="rightArea_inner_ability">
+                            <div class="rightArea_inner_ability_title">-样式设置-</div>
+                            <div class="rightArea_inner_ability_inner"> 
+                                <div>锁定/解锁</div>
+                                <div>复制该样式</div>
+                                <div>粘贴该样式</div>
+                                <div>加入：记忆面包（或者选择其他的自定义分类）</div>
+                            </div>
                         </div>
                     </div>
+                </div>
+
+                <div class="slide_title" mode="expanding">文字
+                    <div class="slide_inner">
+
+                        <div class="rightArea_inner_ability">
+                            <div class="rightArea_inner_ability_title">-显示-</div>
+                            <div class="rightArea_inner_ability_inner"> 
+                                <div>是否显示标题</div>
+                                <div>标题显示的位置</div>
+                                <div>换行</div>
+                            </div>  
+                        </div>
+
+                        <div class="rightArea_inner_ability">
+                            <div class="rightArea_inner_ability_title">-字体-</div>
+                            <div class="rightArea_inner_ability_inner"> 
+                                <div>字体大小</div>
+                                <div>字体类型</div>
+                                <div>字体颜色（透明度）</div>
+                            </div>  
+                        </div>
+
+                        <div class="rightArea_inner_ability">
+                            <div class="rightArea_inner_ability_title">-修饰-</div>
+                            <div class="rightArea_inner_ability_inner"> 
+                                <div>加粗</div>
+                                <div>斜体</div>
+                                <div>阴影</div>
+                                <div>上中下三种下划线</div>
+                                <div>对齐方式</div>
+                            </div>  
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="slide_title" mode="expanding">高级
+                    <div class="slide_inner">
+                        <div class="rightArea_inner_ability">
+                            <div class="rightArea_inner_ability_title">-插入-</div>
+                            <div class="rightArea_inner_ability_inner"> 
+                                <div>连接</div>
+                                <div>注释</div>
+                                <div>嵌套画布
+                                    <div>新建画布</div>
+                                    <div>选择画布，可以选择已经打开的，或者文件形式的画布</div>
+                                    <div>相关设置比如如何进入嵌套的画布之类的</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="rightArea_inner_ability">
+                            <div class="rightArea_inner_ability_title">-tiletext设置-</div>
+                            <div class="rightArea_inner_ability_inner"> 
+                                <div>脱离当前tile</div>
+                                <div>保持显示</div>
+                                <div>不显示该tile的textblock</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                    
 
                 </div>
             </div>
 
-            <div class="rightArea_inner_block slide_title" mode="expanding">磁贴标题
+            <div class="rightArea_inner_block slide_title" mode="expanding">线条
                 <div class="slide_inner">
-
-                    <div class="rightArea_inner_ability">
-                        <div class="rightArea_inner_ability_title">-显示-</div>
-                        <div class="rightArea_inner_ability_inner"> 
-                            <div>是否显示标题</div>
-                            <div>标题显示的位置</div>
-                            <div>换行</div>
-                        </div>  
-                    </div>
-
-                    <div class="rightArea_inner_ability">
-                        <div class="rightArea_inner_ability_title">-字体-</div>
-                        <div class="rightArea_inner_ability_inner"> 
-                            <div>字体大小</div>
-                            <div>字体类型</div>
-                            <div>字体颜色（透明度）</div>
-                        </div>  
-                    </div>
-
-                    <div class="rightArea_inner_ability">
-                        <div class="rightArea_inner_ability_title">-修饰-</div>
-                        <div class="rightArea_inner_ability_inner"> 
-                            <div>加粗</div>
-                            <div>斜体</div>
-                            <div>阴影</div>
-                            <div>上中下三种下划线</div>
-                            <div>对齐方式</div>
-                        </div>  
-                    </div>
-
-
+                    <div>111</div>
                 </div>
             </div>
 
-            <div class="rightArea_inner_block slide_title" mode="expanding">高级
+            <div class="rightArea_inner_block slide_title" mode="expanding">组合
                 <div class="slide_inner">
-
-                    <div class="rightArea_inner_ability">
-                        <div class="rightArea_inner_ability_title">嵌套画布</div>
-                        <div class="rightArea_inner_ability_inner"> 
-                            <div>新建画布</div>
-                            <div>选择画布，可以选择已经打开的，或者文件形式的画布</div>
-                            <div>相关设置比如如何进入嵌套的画布之类的</div>
-                        </div>  
-                    </div>
-
-                    <div class="rightArea_inner_ability">
-                        <div class="rightArea_inner_ability_title">-textblock设置-</div>
-                        <div class="rightArea_inner_ability_inner"> 
-                            <div>脱离当前tile</div>
-                            <div>保持显示</div>
-                            <div>不显示该tile的textblock</div>
-                        </div>
-                    </div>
-
-                    <div class="rightArea_inner_ability">
-                        <div class="rightArea_inner_ability_title">-组合-</div>
-                        <div class="rightArea_inner_ability_inner"> 
-                            <div>选中磁贴进行组合</div>
-                            <div>参与组合的磁贴（可以选择从组合中解除）</div>
-                            <div>解除该组合</div>
-                            <div>将该组合保存为模板</div>
-                        </div>
-                    </div>
+                    <div>111</div>
                 </div>
             </div>
+
+            
+
 
         </div>
 
@@ -525,17 +563,18 @@
     <div id="undelete_dialog" title="错误！">
         <p>无法继续回溯，之前的内容已经删除！</p></div>
 
-    <div id="huabu_button_alert">
-        <div id="copy_huabu" class="hoverbar"  >创建副本</div>
-        <div id="rename_huabu" class="hoverbar">重命名</div>
-        <div id="delete_huabu"class="hoverbar" >删除</div>
-    </div>
+
 
 </body>
 
     <script src="./js/api/jquery.js"></script>
     <script src="./js/api/jquery-ui.js"></script>
+    <script src="./js/api/jquery-contentMenu.js"></script>
     <script src="./js/api/iro.js"></script>
+    <script src="./js/api/jquery.transform2d.js"></script>
+    <script src="./js/api/jquery.transform3d.js"></script>
+    <script src="./js/api/sweetalert2.min.js"></script>
+
 
     <script src="./js/ability.js"></script>
 
@@ -544,6 +583,7 @@
     <script src="./js/object_line.js"></script>
     <script src="./js/object_line_ability.js"></script>
     <script src="./js/object_tiletext.js"></script>
+    <script src="./js/object_composite.js"></script>
 
     <script src="./js/area_huabu.js"></script>
     <script src="./js/area_huabu_ability.js"></script>
@@ -552,9 +592,5 @@
     <script src="./js/area_right.js"></script>
         <script src="./js/area_right_huabu.js"></script>
     <script src="./js/area_top.js"></script>
-
-    <script src="./js/api/jquery.transform2d.js"></script>
-    <script src="./js/api/jquery.transform3d.js"></script>
-    <script src="./js/api/sweetalert2.min.js"></script>
 
 </html>

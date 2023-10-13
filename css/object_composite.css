@@ -1,0 +1,8 @@
+
+.composite{
+	position:absolute;
+}
+
+.composite_selected{
+	border:2px blue dashed;
+}

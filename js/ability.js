@@ -1,3 +1,8 @@
+//禁用右键网页功能
+document.addEventListener("contextmenu", function(e) {
+  	e.preventDefault();
+});
+
 //返回某个画布内元素与当前聚焦画布左上角的距离
 function distantWithHuabu(dom){
 	var huabu = return_focusing_huabu()
@@ -10,19 +15,40 @@ function distantWithHuabu(dom){
 	return distance
 }
 
+function offsetWithHuabu(dom){
+	//循环遍历这个元素直到找到huabu对象，期间其所有父元素的left/top加上自身的left/top就是相较于huabu的left/top
+	var parent = $(dom).parent()
+	var left = parseInt($(dom).css("left"))
+	var top  = parseInt($(dom).css("top"))
+	while(!$(parent).is(".tile_container")){
+		left += parseInt($(parent).css("left"))
+		top  += parseInt($(parent).css("top"))
+		parent = $(parent).parent()
+	}
+	return {left:left,top:top}
+}
+
 //显示其子级菜单函数
-function showChildMenu(dom,position,type){
+function showChildMenu(dom,position,type1,type2){
 	//dom：函数触发者,菜单会其周围弹出
 	//position：菜单弹出位置，包含“down”和“right”两种
-	//type:若为dblclick则在第二次点击时将其隐藏，否则不隐藏
+	//type1:若为dblclick则在第二次点击时将其子菜单隐藏，否则不隐藏
+	//type2:若为mouseleave则在鼠标移出该元素时令其子菜单隐藏
 	var menu = $(dom).children(".menu");
-	if(type == "dblclick"){
+	if(type1 == "dblclick"){
 		//如果这个菜单已经被弹出了，则将其关闭
 		var display = $(menu).css("display")
 		if(display == "block"){
 			hideMenu(dom,"me")
 			return 0
 		}
+	}
+
+	if(type2 == "mouseleave"){
+		$(dom).on("mouseleave",function(event){
+			hideMenu(dom,"me")
+			$(this).off(event)
+		})
 	}
 	
 	//先将所有同级别菜单隐藏
@@ -51,8 +77,10 @@ function showChildMenu(dom,position,type){
 
 	//点击到屏幕外则隐藏所有菜单
 	$(document).on("click",function(event) {
-	    hideMenu(dom,"all")
-	    $(this).off(event)
+		if(!$(dom).is(event.target)){
+			hideMenu(dom,"all")
+	    	$(this).off(event)
+		}
 	});
 }
 
@@ -76,11 +104,12 @@ function hideMenu(dom,type){
 
 
 //滑块函数
-$(".slide_title").on("mousedown",function() {
-	 if ($(event.target).closest(".slide_inner").length > 0) {
-	    return; // 如果点击到了子元素，不执行后续操作
+$(".slide_title").on("mousedown",function(event) {
+	event.stopPropagation()
+	 if ($(event.target).is(".slide_title")) {
+	    $(this).children(".slide_inner:first").slideToggle(500)
 	  }
-	$(this).find(".slide_inner").slideToggle(500)
+	
 })
 
 
@@ -95,10 +124,29 @@ function createRandomId() {
   return id;
 }
 
+//聚焦该dom，根据不同对象调用不同的聚焦函数
+function focusingDom(dom){
+	if($(dom).is(".tile")){
+		focusingTile(dom)
+	}
+	else if($(dom).is(".line")){
+		focusingLine(dom)
+	}
+}
+
+//取消该dom的聚焦，根据不同对象调用不同的聚焦函数
+function unfocusingDom(dom){
+	if($(dom).is(".tile")){
+		unfocusingTile(dom)
+	}
+	else if($(dom).is(".line")){
+		unfocusingLine(dom)
+	}
+}
+
 
 //html转义函数
-function toHTML(myString)
-{
+function toHTML(myString){
     htmlString = myString.split("&lt;").join("<");
     htmlString = htmlString.split("&gt;").join(">");
     htmlString = htmlString.split("&quot;").join("\"");

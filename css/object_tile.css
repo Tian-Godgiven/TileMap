@@ -6,14 +6,12 @@
 	width: 100px;
   height: 100px;
   border: 2px solid;
-	position: absolute;
 	color: black;
 }
 
-.tile_wrapper{
-    width:0px;
-    height:0px;
-    position:absolute;
+/*被选中的磁贴样式*/
+.tile_selected{
+  box-shadow:0 0 3px 3px #3385FFBB;
 }
 
 

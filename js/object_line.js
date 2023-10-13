@@ -9,7 +9,6 @@ function createLineStyle(){
 
 	var line = createLine(width,height,color,style,style_width)
 
-	$($(return_focusing_huabu()).children(".tile_container")).append(line)
 		// creatArrow(line,"right","arrow_1")
 		// creatArrow(line,"left","arrow_1")
 }
@@ -87,7 +86,13 @@ function createLine(width,height,color,style,style_width){
 	}
 
 	$(line).append(line_dotLeft,line_dotInner,line_inner,line_dotRight)
-	return line
+	//放进画布里
+	$($(return_focusing_huabu()).children(".tile_container")).append(line)
+	//启用Draggable功能
+	$(line).draggable()
+	abilityLineDot(line_dotLeft)
+	abilityLineDot(line_dotInner)
+	abilityLineDot(line_dotRight)
 } 
 
 //为选中的线条增添一个不同方向的Arrow
@@ -108,71 +113,121 @@ function createArrowLeft(){
 	creatArrow(line,"left","arrow_1")
 }
 
-//移动line：所有dot都为非连接状态下，左键按住并拖动鼠标可以移动line
-$("#huabu_container").on("mouseenter", ".line:not(.ui-draggable-handle)", function() {
-	$(this).draggable({
-    })
-})
 
 //鼠标点击在画布中的line上时显示其中的dot，将其聚焦
-$("#huabu_container").on("mousedown",".line",function(){
-	focusing_line = this
-	var line = this
+$("#huabu_container").on("click",".line",function(event){
+	event.stopPropagation()
+	focusingLine(this,"click")
+});
+
+
+//聚焦line
+function focusingLine(line,type){
+	focusing_line = line
+	if($(line).is(".line_selected")){
+		return false
+	}
+
 	$(line).find(".line_dot").each(function(){
-		var dot = this
-		if($(dot).is(".line_dotMidway")){
-			dot = $(dot).children(".line_dotMidway_inner")
+		var $dot = $(this)
+		if($dot.is(".line_dotMidway")){
+			$dot = $dot.children(".line_dotMidway_inner")
 		}
-		$(dot).stop()
-		$(dot).animate({
+		$dot.stop()
+		$dot.animate({
 			opacity:"1"
 		},100)
 	})
-	//点击其他地方时修改透明度隐藏dot，失去聚焦的line
-	$("#huabu_container").on("mousedown",function(event){
-		event.stopPropagation()
-		if(!$(line).find("div").is(event.target) ){
-			focusing_line = undefined
-			$(line).find(".line_dot").each(function(){
-				var dot = this
-				if($(dot).is(".line_dotMidway")){
-					dot = $(dot).children(".line_dotMidway_inner")
-				}
-				$(dot).stop()
-				$(dot).animate({
-					opacity:"0"
-				},500)
-			})
-			$(this).off(event)
+	//line的connecting_dot也能享受这种待遇
+	var list = $(line).data("connecting_dot")
+	if(list != undefined && list.length > 0 ){
+		for(var i=0;i<list.length;i++){
+			var $dot = $(list[i])
+			if($dot.is(".line_dotMidway")){
+				$dot = $dot.children(".line_dotMidway_inner")
+			}
+			$dot.stop()
+			$dot.animate({
+				opacity:"1"
+			},100)
 		}
-	})	
-});
+	}
 
-//拖拽移动dot
-$("#huabu_container").on("mouseenter",".line > .line_dot:not(.ui-draggable-handle)",function(){
-	if($(this).is(".line_dotMidway")){
-		$(this).draggable({handle: $(this).children(".line_dotMidway_inner")})
+	if(type == "click"){
+		//点击其他地方时失去聚焦
+		$("#huabu_container").on("mousedown",function(event){
+			event.stopPropagation()
+			if($(line).has(event.target).length == 0){//如果点击到的对象不是line的子元素则失去聚焦
+				unfocusingLine(line)
+				$(this).off(event)
+			}
+		})	
+	}
+
+}
+
+//取消Line的聚焦
+function unfocusingLine(line){
+	focusing_line = undefined
+	$(line).find(".line_dot").each(function(){
+		var $dot = $(this)
+		if($dot.is(".line_dotMidway")){
+			$dot = $dot.children(".line_dotMidway_inner")
+		}
+		$dot.stop()
+		$dot.animate({
+			opacity:"0"
+		},500)
+	})
+	//line的connecting_dot也能享受这种待遇
+	var list = $(line).data("connecting_dot")
+	if(list == undefined || list.length == 0 ){
+		return 0
+	}
+	for(var i=0;i<list.length;i++){
+		var $dot = $(list[i])
+		if($dot.is(".line_dotMidway")){
+			$dot = $dot.children(".line_dotMidway_inner")
+		}
+		$dot.stop()
+		$dot.animate({
+			opacity:"0"
+		},500)
+	}
+}
+
+
+
+//dot的拖拽功能
+function abilityLineDot(dot){
+	if($(dot).is(".line_dotMidway")){
+		$(dot).draggable({handle: $(dot).children(".line_dotMidway_inner")})
 	}
 	else{
-		$(this).draggable({handle: false,})
+		$(dot).draggable({handle: false,})
 	}
 
-	$(this).draggable({
+	$(dot).draggable({
 		refreshPositions:true,
+		start:function(event){
+			event.stopPropagation()
+			focusingLine($(dot).parent(".line"),"click")
+		},
 		drag: function(event,ui) {
 			if(return_snap_tile() != false){
-				dragLineDot(this)
+				dragLineDot(dot)
 			}
 			else{
 				return 0;
 			}
 	    },
 	    stop: function(event,ui){
-	    	dragLineDot(this,"stop")
+	    	dragLineDot(dot,"stop")
 	    }
 	})
-})
+}
 
+var num = 0
 //拖拽line_dot的分辨函数
 function dragLineDot(dot,time){
 	//用于记录这个点所链接的所有线段的角度
@@ -205,6 +260,7 @@ function dragLineDot(dot,time){
 			}
 		}
 		connectLineDot(left,right,inner,line)
+
 	}
 	//遍历line_list，依次对比两两线段之间的角度，如果存在某两条线段持平，则令这个midway转化为inner
 	//删去其前方的line_inner和前后两个dot_Inner再把后线条连接到前后两个点上
@@ -232,25 +288,45 @@ function dragLineDot(dot,time){
 function connectLineDot(dot_left,dot_right,dot_inner,line_inner){
 
 	var huabu_scale = return_huabu_scale()
+	//大量使用的dom元素储存为变量
+	var $dot_left = $(dot_left);
+	var $dot_right = $(dot_right);
+	var $line = $(dot_inner).parent(".line")
 
-	//获取dot的半径，这个数值等于dot的宽度的一半
-	var radius_left = $(dot_left).width()/2
-	var radius_right = $(dot_right).width()/2
+	//分别求得其圆心的位置
+	var radius_left = $dot_left.width() / 2;
+	var dot_left_x = parseInt($dot_left.css("left")) + radius_left;
+	var dot_left_y = parseInt($dot_left.css("top")) + radius_left;
+	//如果已经和其他元素链接，则还要加上父元素的偏移量并减去line相对于画布的偏移量，以此得到dot相较于Line的偏移量
+	if ($dot_left.is(".connected_dot")) {
+		var parent_offset = offsetWithHuabu($dot_left.parent())
+		var line_offset = offsetWithHuabu($line)
+		
+		dot_left_x += parent_offset.left - line_offset.left
+		dot_left_y += parent_offset.top - line_offset.top
+	}
+	//同上
+	var radius_right = $dot_right.width() / 2;
+	var dot_right_x = parseInt($dot_right.css("left")) + radius_right;
+	var dot_right_y = parseInt($dot_right.css("top")) + radius_right;
+	if ($dot_right.is(".connected_dot")) {
+	  	var parent_offset = offsetWithHuabu($dot_right.parent())
+	 	var line_offset = offsetWithHuabu($line)
 
-	//找到两个dot的圆心的位置,是分别的offset+radius,并求出距离差
-	var distant_x = (parseInt($(dot_left).css("left")) + radius_left) - 
-					(parseInt($(dot_right).css("left")) + radius_right)
-	var distant_y = (parseInt($(dot_left).css("top")) + radius_left) - 
-					(parseInt($(dot_right).css("top")) + radius_right)
+	  	dot_right_x += parent_offset.left - line_offset.left
+	  	dot_right_y += parent_offset.top - line_offset.top
+	}
 
-	//获取两点之间的间距和角度
-	var width = Math.sqrt(Math.pow(distant_x,2) + Math.pow(distant_y,2))
-	var angle = getAngle(distant_x,distant_y)
-	var radian = Math.PI * angle /180
+	//获取两点距离和角度弧度
+	var distant_x = dot_left_x - dot_right_x;
+	var distant_y = dot_left_y - dot_right_y;
+	var width = Math.hypot(distant_x, distant_y);
+	var angle = getAngle(distant_x, distant_y);
+	var radian = Math.round(Math.PI * angle / 180);
 
-	//获取dot_left圆心的位置，这里是line_inner的起点
-	var left = parseInt($(dot_left).css("left")) + radius_left
-	var top = parseInt($(dot_left).css("top")) + radius_left
+	var left = dot_left_x;
+	var top = dot_left_y;
+
 
 	//获取线条的粗度，也就是高度
 	var height_line = $(line_inner).height() * huabu_scale
@@ -441,6 +517,8 @@ function InnerTurnToMidway(dot_inner,connect_id){
 		//把这个dot_inner放在Line的前面
 		$(line_left).before(dot_inner_left)
 		$(line_right).before(dot_inner_right)
+		abilityLineDot(dot_inner_left)
+		abilityLineDot(dot_inner_right)
 
 	//修改原本的connect_left
 	var connected_left = {
@@ -532,16 +610,35 @@ function MidwayTurnToInner(connect_1,connect_2,dot_midway){
 //将线条中点line_dotInner放到他的前后两个有效点的中间
 //angle是line_inner的偏转角度，难以通过jq方式获取
 function backToCenter(dot_left,dot_right,dot_inner){
+
+	var $dot_left = $(dot_left);
+	var $dot_right = $(dot_right);
+	var $line = $(dot_inner).parent(".line")
+
+	//分别求得其圆心的位置
+	var radius_left = $dot_left.width() / 2;
+	var x_1 = parseInt($dot_left.css("left")) + radius_left;
+	var y_1 = parseInt($dot_left.css("top")) + radius_left;
+	//如果已经和其他元素链接，则还要加上父元素的偏移量
+	if ($dot_left.is(".connected_dot")) {
+	  var parent_offset = offsetWithHuabu($dot_left.parent())
+	  var line_offset = offsetWithHuabu($line)
+	  x_1 += parent_offset.left - line_offset.left
+	  y_1 += parent_offset.top - line_offset.top
+	}
+	//同上
+	var radius_right = $dot_right.width() / 2;
+	var x_2 = parseInt($dot_right.css("left")) + radius_right;
+	var y_2 = parseInt($dot_right.css("top")) + radius_right;
+	if ($dot_right.is(".connected_dot")) {
+	  var parent_offset = offsetWithHuabu($dot_right.parent())
+	  var line_offset = offsetWithHuabu($line)
+	  x_2 += parent_offset.left - line_offset.left
+	  y_2 += parent_offset.top - line_offset.top
+	}
+
 	//获取半径
 	var radius = parseInt($(dot_inner).css("width"))/2
-	//得到dotLeft的圆心所在的位置,圆心相较于div起始点各有一个半径的差距，所以要+radius
-	var radius_1 = parseInt($(dot_left).css("width"))/2
-	var x_1 = parseInt($(dot_left).css("left")) + radius_1
-	var y_1 = parseInt($(dot_left).css("top")) + radius_1
-	//得到dotRight的圆心所在的位置
-	var radius_2 = parseInt($(dot_right).css("width"))/2
-	var x_2 = parseInt($(dot_right).css("left")) + radius_2
-	var y_2 = parseInt($(dot_right).css("top")) + radius_2
 
 	//移动dotInner的圆心到两点间距的中心
 	//圆心相较于offset有着left和top + radius的偏移量，所以这里要减去自身的radius
@@ -614,64 +711,64 @@ function DotIntoTile(dot,tile){
 	old_priority = $(tile).index()
 	old_z_index = $(tile).css("z-index")
 	old_tile = $(tile)
-	//获得tile的list
-	var list = $(tile).data("connected")
+	//获得line的list
+	var line = $(dot).parent(".line")
+	var list = $(line).data("connecting_dot")
 	if(list == undefined){
 		list = []
 	}
-	//如果这个dot不存在list中，则加入
+	//如果这个dot不存在于list中，则加入
 	if($.inArray(dot,list) == -1){
-		list[list.length] = dot
+		list.push(dot)
 	}
-	//随后改变Dot的类表示其已经连接上了
+	//随后改变Dot的类表示其已经连接上了,并将其原本所处的line存储在data里面
 	$(dot).addClass('connected_dot')
-	//将修改后的list返还给tile
-	$(tile).data("connected",list)
-	//禁用该线条的移动功能
+	$(dot).data("line",line)
+	//将修改后的list返还给line
+	$(line).data("connecting_dot",list)
 	//若line中有一个dot为连接状态，则无法直接移动line
-	$(dot).parent(".line").draggable("disable")	
+	$(line).draggable("disable")
+	//调整dot的css使其位置不变并与tile成比例，使其可以自然贴附到tile上随之变化
+	var line_offset = offsetWithHuabu(line)
+	var width = $(tile).width()
+	var height = $(tile).height()
+	var new_left = (parseInt($(dot).css("left")) + line_offset.left - parseInt($(tile).css("left"))) / width * 100 +"%"
+	var new_top  = (parseInt($(dot).css("top"))  + line_offset.top  - parseInt($(tile).css("top"))) / height * 100 +"%"
+	$(dot).css({
+		"left":new_left,
+		"top":new_top
+	})
+	console.log($(dot).css("left"))
+	//将dot放进tile中作为子元素
+	$(tile).append(dot)
 }
 
 //dot离开tile后，将其与tile解绑
 function DotOutTile(dot,tile){
-
-	$(dot).removeClass('connected_dot')
-
-	var list = $(tile).data("connected")
+	
+	//获取dot原本的line对象和line的链接list
+	var line = $(dot).data("line")
+	var list = $(line).data("connecting_dot")
 	var index = $.inArray(dot,list)
 	//如果dot存在在list中，则将其删除
-	if($.inArray(dot,list) != -1){
+	if(index != -1){
+		//从connecting_dot列表中删除这个dot
 		list.splice(index,1)
 		//颜色变回来
 		$(dot).css("background","#00D0FFFF")
-		//线条的移动功能启用
+		//线条的移动功能重新启用
 		$(dot).parent(".line").draggable("enable")
-	}
-}
+		//修改dot的位置使其可以从始至终对上
+		var line_offset = offsetWithHuabu(line)
+		var new_left = line_offset.left - (parseInt($(dot).css("left")) + parseInt($(tile).css("left")))
+		var new_top  = line_offset.top - (parseInt($(dot).css("top"))  +  parseInt($(tile).css("top")))
+		$(dot).css({
+			"left": - new_left,
+			"top": - new_top
+		})
+		$(line).append(dot)
+		$(dot).removeClass('connected_dot')
 
-//tile的拖拽函数的补充，使其带动绑定的line_dot一起移动
-function dragTileConnect(event,ui,tile,click_dot){
-	var list = ($(tile).data("connected"))
-	//移动dot
-	if(list != undefined){
-		var original = ui.originalPosition;
-		//获取移动量
-		var x = event.clientX - click_dot.x
-		var y = event.clientY - click_dot.y
-		click_dot.x = event.clientX;
-		click_dot.y = event.clientY;
-		//在tile移动的同时也会移动connected中绑定的元素
-		for(var i = 0 ; i < list.length ; i++){
-			var dot = list[i]
-			//获取dot的位置和移动量
-			var old_position = $(dot).offset()
-    		//修改dot的位置，使其【增加】tile的移动量
-    		$(dot).offset({
-    			left: old_position.left + x,
-    			top: old_position.top + y
-    		})
-    		dragLineDot(dot)
-		}
 	}
 }
 
@@ -682,19 +779,26 @@ function dragTileConnect(event,ui,tile,click_dot){
 
 //右键dot_inner和dot_midway事件，弹出一个选项框
 var focusing_dot
+var statrX,startY
 $("#huabu_container").on("mousedown",".line_dot:not(.line_dotLeft , .line_dotRight)",function(event){
 	event.stopPropagation()
 	//判断是否为右键
-	if(event.which == 3){
+	if(event.button == 2){
+		startX = event.clientX;
+		startY = event.clientY;
+	}
+})
+$("#huabu_container").on("mouseup",".line_dot:not(.line_dotLeft , .line_dotRight)",function(event){
+	if(startX == event.clientX && startY == event.clientY){
 		//显示该菜单，并将这个dot作为focusing_dot
-		var dot
 		if($(this).is(".line_dotMidway_inner")){
 			focusing_dot = $(this).parent(".line_dotMidway")
 		}
 		else{
 			focusing_dot = this
 		}
-		showHuabuMenu("line_dotInner_menu")
+		event.stopPropagation()
+		showHuabuMenu(event,"line_dotInner_menu")
 	}
 })
 
@@ -751,11 +855,14 @@ function createBranch(dot){
 	$(dot_right).data("connected",right_list)
 	$(dot_inner).data("connected",right_list)
 
-	//创建三个dot，分别以line_inner,dot_inner,dot_right,arrow的顺序放在dot_left之后
+	//创建线条，分别以line_inner,dot_inner,dot_right,arrow的顺序放在dot_left之后
 	$(dot_left).after(line_inner)
 	$(line_inner).after(dot_inner)
 	$(dot_inner).after(dot_right)
 	$(dot_right).after(arrow)
+		abilityLineDot(dot_inner)
+		abilityLineDot(dot_right)
+
 
 	//如果这个dot是一个dot_inner则将该dot变为Midway使其成为一个分支点
 	if($(dot).is(".line_dotInner")){
@@ -778,7 +885,7 @@ function createBranch(dot){
 }
 
 //右键Dot菜单选项事件2：删除选定的分支，通过点击端点或line或中点选中对应的分支线段，然后删除
-$("#line_dotInner_delete_branch").on("mouseenter",function(event){
+$("#line_dotInner_delete_branch").on("mouseenter click",function(event){
 	event.stopPropagation()
 	//清空原本的menu
 	var menu = $(this).children(".menu")
@@ -795,7 +902,7 @@ $("#line_dotInner_delete_branch").on("mouseenter",function(event){
 		$(div).text(i)
 		$(menu).append(div)
 	}
-	showChildMenu(this,"right")
+	showChildMenu(this,"right","dblclick","mouseleave")
 })
 //点击选项删除对应的分支，但是最少会保留两个链接
 $("#line_dotInner_delete_branch > .menu").on("click",".delete_branch_option",function(event){

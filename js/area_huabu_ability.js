@@ -1,32 +1,41 @@
 //本文件是画布区域顶部功能栏的功能实现，与画布对象有关的功能函数请参见"area_huabu.js"
 
 //令对应菜单显示在鼠标右键位置，在画布区域内专用的函数
-function showHuabuMenu(menu_name){
+function showHuabuMenu(event,menu_name){
 	//参数即为选中的菜单的id
 	var menu = $("#" + menu_name)
 	//获取鼠标位置
 	var x = event.clientX
 	var y = event.clientY
+	//如果这个位置太低了，会让菜单的下方被覆盖，就让菜单显示在上方
+	if(y + menu.height() >= $(window).height()){
+		y = y - menu.height()
+	}
 	//将对应菜单显示出来
 	$(menu).css({
 		"display":"block",
 	})
-	//移到鼠标位置旁边
+	//移到对应位置旁
 	$(menu).offset({
 		left:x+10,
 		top:y+10
 	})
-
 	//监听事件,在点击非该菜单时令其隐藏
 	$("#huabu_container").on("mousedown",function(event){
 		event.stopPropagation()
-		if(!$(menu).is(event.target)){
-			$(menu).css({
-				"display":"none",
-			})
+		if(!$(menu).is(event.target) && event.which == 1){
+			hideHuabuMenu(menu_name)
 			$(this).off(event)
 		}
 	})
+}
+//令对应菜单隐藏
+function hideHuabuMenu(menu_name){
+	//令所有画布内的菜单都隐藏
+	if(menu_name == "all"){
+		$("#huabu_area .menu").hide()
+	}
+	$("#" + menu_name).hide()
 }
 
 

@@ -241,3 +241,23 @@ $().disableSelection()
 	
 		return false;
 	},
+
+---
+
+24.使用Math.min和Math.max时，不能向其传入数组变量eg var alist[]
+		需要将其展开后传入：
+					var left = Math.min(...left_list)
+					var top = Math.min(...top_list)
+
+---
+
+25.draggable一定要在加入网页后再设置！！！！！
+
+---
+
+26.求两点距离：Math.hypot(x,y)其中x,y分别是x轴上的差距和y轴上的差距，同理也可以用来求三角形斜边的长度
+
+---
+
+27.判断一个元素是否被remove掉了：
+	$(“元素”).parent().length == 0

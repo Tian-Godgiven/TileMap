@@ -64,11 +64,11 @@
 	    overflow:hidden;
     }
 
-    .tileContainer{
+    .tile_container{
 	    width:100%;
 	    height:100%;
 	    position:absolute;
-	    left::0px;
+	    left:0px;
 	    top:0px;
     }
 
@@ -92,7 +92,7 @@
 	    border-right: 2px solid;
     }
 
-    #huabu_button_alert{
+    #huabu_button_menu{
 		display:none;
 		border:2px solid;
 		width:200px;
@@ -148,11 +148,16 @@
     position:absolute;
     background-color:white;
     width:150px;
-    height:100px;
+    min-height:100px;
     display:none;
     border:2px solid black;
     z-index:100;
 }
+	/*未启用的菜单项目*/
+	#huabu_area .menu .disabled{
+		color:#9B9B9BFF;
+		background-color:#E0E0E0FF;;
+	}
 
 /*画布创建弹窗*/
 #addHuabu_alerttext{
