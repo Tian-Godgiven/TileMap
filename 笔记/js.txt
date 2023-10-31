@@ -33,7 +33,7 @@ $(input).val("").val(value)
 		})
 ```
 
-​	2.使用off解绑event事件：
+​	2.使用off解绑event事件：注意不要忽略了function内跟的event，会导致事件解绑不起效
 ```
 		$(return_focusing_huabu()).on("click",function(event){
 			event.stopPropagation();
@@ -261,3 +261,7 @@ $().disableSelection()
 
 27.判断一个元素是否被remove掉了：
 	$(“元素”).parent().length == 0
+
+---
+
+28.在函数内对修改全局变量的值的时候要注意全局变量名不能和函数内的变量名重合

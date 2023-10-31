@@ -1,0 +1,54 @@
+<html>
+    <div id="top_icon">图标</div>
+
+    <div id="top_user">
+        <div id="user_icon">用户头像</div>
+    </div>
+
+    <div id="top_filename">显示文件名</div>
+
+    <div id="top_ability"></div>
+</html>
+
+<script src="./js/area/area_top.js"></script>
+<script type="text/javascript">
+    $("#top_ability").load("./components/area_ability/top_ability.html")
+</script>
+
+<style type="text/css" scoped>
+    #top_icon{
+        color:white;
+        float:left;
+        background-color:black;
+        height:120px;
+        width:100px;
+    }
+
+    #top_user{
+        height:80px;
+        overflow:hidden;
+        background-color:#FB9103FF;
+        position:absolute;
+        right:0;
+    }
+
+    #user #user_icon{
+        height:60px;
+        width:100px;
+        border-radius:50%;
+        background-color:#EEC957FF;
+    }
+
+    #top_filename{
+        height:50px;
+        font-size:40px;
+        font-weight:bold;
+        padding-top:30px;
+    }
+
+    #top_ability{
+        width:100%;
+        height:40px;
+        font-size:20px;
+    }
+</style>

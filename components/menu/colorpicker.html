@@ -1,0 +1,165 @@
+<html>
+    <div id="colorpicker" class="huabu_menu">
+        <div id="colorpicker_ability">
+            <div id="colorpicker_input">
+                <input>
+                <div id="colorpicker_input_comfirm">
+                    <img src="./img/check.png">
+                </div>
+                <div id="colorpicker_input_copy">
+                    <img src="./img/copy.png">
+                </div>
+                <div id="colorpicker_input_menu" menu="down">
+                    <img src="./img/menu_up.png">
+                </div>
+            </div>
+            <div id="colorpicker_menu">
+                <div class="menu_line"></div>
+                <div id="colorpicker_memory">
+                    <div class="colorblock" id="delete">
+                        <img src="./img/delete.png">
+                    </div>
+                </div>
+                <div class="menu_line"></div>
+                <div id="colorpicker_select">
+                    <div id="transparent" class="colorblock">
+                        <img src="./img/colorblock_transparent.jpg">
+                    </div>
+                </div>
+            </div>
+            <div id="colorpicker_bottom">
+                <div id="colorpicker_bottom_confirm">应用</div>
+                <div id="colorpicker_bottom_cancel">关闭</div>
+            </div>
+        </div>
+    </div>
+</html>
+
+<script src="./js/menu/colorpicker.js"></script>
+<script type="text/javascript">
+    createColorpicker("#colorpicker")
+</script>
+
+<style type="text/css">
+    /*选色器本体*/
+    #colorpicker{
+        background-color:white;
+
+        position:absolute;
+        height:400px;
+        padding:4px;
+
+        border:2px solid black;
+        
+        display:none;
+
+        z-index:100;
+    }
+
+    #colorpicker_ability{
+        position:absolute;
+        top:160px;
+        height:250px;
+        width:calc(100% - 8px);
+    }
+
+        #colorpicker #colorpicker_input{
+            display:flex;
+            align-items:center;
+
+            height:25px;
+            width:100%;
+        }
+
+            #colorpicker #colorpicker_input input{
+                box-sizing: border-box;
+                height:24px;
+                width:68%;
+                margin:0 2px;
+            }
+
+            #colorpicker #colorpicker_input div{
+                margin:1.2px;
+                height:20px;
+                width:20px;
+                border:1px solid black;
+                display:flex;
+                align-items: center;
+                justify-content:center;
+            }
+
+            #colorpicker #colorpicker_input div img{
+                width:80%;
+                height:80%;
+            }
+
+
+        #colorpicker_menu{
+            width:100%;
+            height:172px;
+        }
+
+        #colorpicker #colorpicker_memory{
+            height:22px;
+            width:calc(100% - 6px);
+            margin-left:3px;
+        }
+
+        #colorpicker #colorpicker_memory #delete{
+            float: right;
+            display:flex;
+            align-items: center;
+            justify-content:center;
+        }
+
+        #colorpicker #colorpicker_memory #delete img{
+            box-sizing:border-box;
+            width:80%;
+            height:80%;
+        }
+
+        #colorpicker #colorpicker_select{
+            height:140px;
+            width:calc(100% - 6px);
+            margin-left:3px;
+        }
+
+        #colorpicker #colorpicker_select #transparent img{
+            box-sizing:border-box;
+            border:1px solid black;
+            width:100%;
+            height:100%;
+        }
+
+        #colorpicker #colorpicker_bottom{
+            height:25px;
+            width:100%;
+            margin-top:12px;
+        }
+
+        #colorpicker #colorpicker_bottom div{
+            height:25px;
+            width:50px;
+
+            border:1px solid black;
+
+            float:right;
+
+            margin-right:4px;
+
+            display:flex;
+            align-items: center;
+            justify-content:center;
+        }
+        #colorpicker #colorpicker_bottom #colorpicker_bottom_confirm{
+            color:white;
+            background-color:lightgreen;
+        }
+
+
+        #colorpicker .colorblock{
+            height:20px;
+            width:20px;
+            float:left;
+        }
+</style>

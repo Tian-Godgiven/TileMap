@@ -1,0 +1,139 @@
+<html>
+    <div id="top_ability_left">
+        <div id="file" class="topAbility_block down_menu">文件
+            <div id="file_menu" class="menu">
+                <div>新建</div>
+                <div>打开</div>
+
+                <div  class="side_menu" >打开最近使用的文件
+                    <div class="menu">
+                        最近使用的10个文件
+                    </div>
+                </div>
+
+                <div>保存</div>
+                <div>另存为</div>
+                <div>导入</div>
+                <div>导出</div>
+                <div>关闭当前文件</div>
+            </div></div>
+        <div id="edit" class="topAbility_block down_menu">编辑
+            <div id="edit_menu" class="menu">
+                <div>撤销</div>
+                <div>重做</div>
+                <div>剪切</div>
+                <div>复制</div>
+                <div>粘贴</div>
+                <div>删除</div>
+            </div></div>
+        <div id="display"        class="topAbility_block down_menu">界面
+            <div id="display_menu" class="menu">
+                <div id="display_show" class="side_menu" >界面显示
+                    <div id="display_show_menus" class="menu">
+                        <div>显示左侧功能栏</div>
+                        <div>显示右侧工具栏</div>
+                        <div>显示顶部工具栏</div>
+                    </div></div>
+                <div id="display_divide" class="side_menu" >界面分离
+                    <div id="display_show_menus" class="menu">
+                        <div>分离左侧功能栏</div>
+                        <div>分离记忆面包</div>
+                        <div>分离右侧工具栏</div>
+                        <div>分离磁贴内容</div>
+                    </div></div>
+            </div></div>
+        <div id="other"          class="topAbility_block down_menu">其他
+            <div id="other_menu" class="menu">
+
+                <div class="side_menu" >语言
+                    <div class="menu">
+                        <div>自动</div>
+                        <div>中文</div>
+                        <div>英文</div>
+                    </div>
+                </div>
+
+                <div class="side_menu" >主题
+                    <div class="menu">
+                        <div>自动</div>
+                        <div>浅色</div>
+                        <div>深色</div>
+                    </div>
+                </div>
+
+                <div>自动备份</div>
+
+            </div></div>
+        <div id="about"          class="topAbility_block down_menu">关于
+            <div id="about_menu" class="menu">
+                <div>开发者工具</div>
+                <div>关于本软件</div>
+                <div>鸣谢</div>
+                <div>在此处显示版本号</div>
+            </div></div>
+
+        <div id="save_reminder" class="topAbility_block">提示是否已经保存</div>
+    </div>
+
+    <div id="top_ability_right">
+        <div id="textblock_able" class="topAbility_block">内容显示</div>
+        <div id="search"         class="topAbility_block">搜索</div>
+        <div id="night"          class="topAbility_block">夜间</div>
+        <div id="fullscreen"     class="topAbility_block">全屏</div>
+    </div>
+
+    <div id="bottom_line"></div>
+</html>
+
+<script src="./js/area_ability/top_ability.js"></script>
+<script type="text/javascript">
+    
+</script>
+
+<style type="text/css" scoped>
+    #top_ability_left{
+        height:100%;
+        float:left;
+    }
+
+    #top_ability_right{
+        height:100%;
+        float:right;
+    }
+
+        .topAbility_block{
+            text-align:center;
+            padding:0px 5px;
+            height:100%;
+            float:left;
+            background-color:white;
+            display: flex; 
+            align-items: center;
+        }
+
+        #top_ability .menu{
+            min-width:200px;
+            text-align:left;
+            background-color:white;
+            position:absolute;
+            display:none;
+            z-index:10;
+        }
+
+        #top_ability .menu > div{
+            white-space: nowrap;
+            padding:2px;
+        }
+
+    #save_reminder{
+        background-color: #F01818D4;
+    }
+
+    #bottom_line{
+        width:100%;
+        border-top:1px solid black;
+        position:absolute;
+        bottom:0;
+    }
+</style>
+

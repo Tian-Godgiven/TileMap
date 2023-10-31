@@ -10012,23 +10012,20 @@ $.widget( "ui.draggable", $.ui.mouse, {
 			relative: this._getRelativeOffset()
 		};
 
-		// //求两点之间的距离
-		// var distant_x = this.offset.left - event.pageX
-		// var distant_y  = this.offset.top - event.pageY
-		// //求得对角线长度和角度
-		// var width = (Math.sqrt(Math.pow(distant_x,2) + Math.pow(distant_y,2)))
-		// var angle = getAngle(distant_x,distant_y) 
-		// //这个角度减去画布偏转的角度
-		// if($(this.bindings).is(".wrapper")){
-		// 	var new_angle = angle - return_huabu_angle()
-		// }
-		// else{
-		// 	var new_angle = angle
-		// }
+		//修改3
+		if($(this.bindings).children(".center").length != 0){
+			var center_left = $(this.bindings).find(".center").offset().left
+			var center_top = $(this.bindings).find(".center").offset().top
+		}
+		else{
+			var center_left = this.offset.left
+			var center_top = this.offset.top
+		}
+
 		
 		this.offset.click = {
-			left: event.pageX - this.offset.left,
-			top: event.pageY - this.offset.top
+			left: event.pageX - center_left,
+			top: event.pageY - center_top
 		};
 			
 	},
@@ -10478,11 +10475,25 @@ $.widget( "ui.draggable", $.ui.mouse, {
 			}
 		}
 
+		//修改2
+
+		if($(this.bindings).children(".center").length != 0){
+			var scale = return_huabu_scale()
+			var center_left = $(this.bindings).width()/2 * scale;
+			var center_top = $(this.bindings).height()/2 * scale;
+		}
+		else{
+			var center_left = 0;
+			var center_top = 0
+		}
+
 			return {
 			top: (
 
 				// The absolute mouse position
 				pageY -
+
+				center_top - 
 
 				// Click offset (relative to the element)
 				this.offset.click.top -
@@ -10500,6 +10511,8 @@ $.widget( "ui.draggable", $.ui.mouse, {
 
 				// The absolute mouse position
 				pageX -
+
+				center_left -
 
 				// Click offset (relative to the element)
 				this.offset.click.left -
