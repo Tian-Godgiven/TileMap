@@ -27,7 +27,8 @@ function createTile(){
 		"class": "tile",
 		"id": "tile_" + tile_id,
 		"title": "",
-		"tiletext": "<div></div>"
+		"tiletext": "<div></div>",
+		"angle":0
 	});
 	//显示磁贴的标题
 	$(tile).append("<div class='tile_title'></div>")
@@ -251,12 +252,19 @@ function droppableSnapDot(){
 			event.stopPropagation()
 			//绑定dot与磁贴
 			DotIntoTile(ui.draggable,this)
-			//修改line_dot的css以改变其位置
-			var new_left = parseInt($(this).css("left")) / $(this).parent(".tile").width()  * 100 +"%"
-			var new_top = parseInt($(this).css("top")) / $(this).parent(".tile").height()  * 100 +"%"
+			//修改line_dot的css以改变其在tile上的位置，令其与snap_dot的位置重叠
+			var left = parseInt($(this).css("left"))
+			var top = parseInt($(this).css("top"))
+			if(left > 0){
+				left = left / $(this).parent(".tile").width()  * 100 +"%"
+			}
+			
+			if(top > 0){
+				top = top / $(this).parent(".tile").height()  * 100 +"%"
+			}
 			$(ui.draggable).css({
-				"left": new_left,
-				"top": new_top
+				"left": left,
+				"top": top
 			})
 			dragLineDot(ui.draggable)
 			//恢复drag事件

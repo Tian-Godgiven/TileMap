@@ -179,16 +179,14 @@ function rotateDom(dom,angle){
 	var old_angle = $(dom).attr("angle")
 	if(old_angle == undefined){
 		old_angle = 0
-
-		
 	}
 
 	var new_angle = parseInt(old_angle) + angle
-	//角度不大于360也不小于0
+	//角度不大于360也不小于0-360
 	if(new_angle >= 360){
 		new_angle -= 360
 	}
-	else if(old_angle <= -360){
+	else if(new_angle <= -360){
 		new_angle += 360
 	} 
 
@@ -226,6 +224,23 @@ function getAngle(x,y){
 		angle = 180 + angle
 	}
 	return angle;
+}
+
+// 计算div沿中心旋转a度后，左上角相对于原本位置的水平距离和垂直距离
+function rotatePositionChange(X, Y, a) {
+  var radians = (a * Math.PI) / 180;
+  var centerX = X / 2;
+  var centerY = Y / 2;
+
+  var topLeftX =
+    centerX - (X / 2) * Math.cos(radians) + (Y / 2) * Math.sin(radians);
+  var topLeftY =
+    centerY - (Y / 2) * Math.cos(radians) - (X / 2) * Math.sin(radians);
+
+  var horizontalDistance = topLeftX - centerX;
+  var verticalDistance = topLeftY - centerY;
+
+  return {left:horizontalDistance, top:verticalDistance};
 }
 
 

@@ -45,15 +45,50 @@ function createComposite(doms,type){
 			})
 		}
 		else{
-			const $this = $(this);
-			const left = parseInt($this.css("left"));
-			const top = parseInt($this.css("top"));
-			const right = left + $this.outerWidth();
-			const bottom = top + $this.outerHeight();
-			left_list.push(left);
-			top_list.push(top);
-			right_list.push(right);
-			bottom_list.push(bottom);
+			//如果这个元素是旋转的,则收集其旋转后的位置信息
+			if($(this).attr("angle") != 0 && $(this).attr("angle") != undefined){
+				const $this = $(this);
+				const left = parseInt($this.css("left"));
+				const top = parseInt($this.css("top"));
+				var width = $this.width();
+	        	var height = $this.height()
+				//中心点的位置
+		        var center_left = left + width/2
+		        var center_top = top + height/2
+		        var angle = parseInt($(this).attr("angle"))
+				left_angle = top_angle = angle
+	            while(left_angle > 90){
+	                left_angle -= 90
+	            }
+	            while(top_angle < 90){
+	                top_angle += 90
+	            }
+	            while(top_angle > 180){
+	                top_angle -= 90
+	            }
+	            var left_radians = (left_angle * Math.PI) / 180;
+	            var top_radians = (top_angle * Math.PI) / 180;
+	            var half_lenth = Math.sqrt(Math.pow(width / 2, 2) + Math.pow(height / 2, 2));
+	            var old_radians = Math.atan(height / width);
+	            var angle_left = half_lenth * Math.abs(Math.cos(old_radians - left_radians));
+	            var angle_top = half_lenth * Math.abs(Math.sin(old_radians - top_radians));
+	            left_list.push(center_left - angle_left - 4);
+				top_list.push(center_top - angle_top - 4);
+				right_list.push(center_left + angle_left + 4);
+				bottom_list.push(center_top + angle_top + 4);
+			}
+			//否则就正常收集信息
+			else{
+				const $this = $(this);
+				const left = parseInt($this.css("left"));
+				const top = parseInt($this.css("top"));
+				const right = left + $this.outerWidth();
+				const bottom = top + $this.outerHeight();
+				left_list.push(left);
+				top_list.push(top);
+				right_list.push(right);
+				bottom_list.push(bottom);
+			}
 		}
 	})
 	//composite的位置应该是最左的left和最上的top
@@ -77,12 +112,23 @@ function createComposite(doms,type){
 		var new_top = (parseInt($(this).css("top")) - top) / height * 100 +"%"
 		var new_wdith = $(this).width() / width * 100 +"%"
 		var new_height = $(this).height() / height * 100 +"%"
-		$(this).css({
-			left:new_left,
-			top:new_top,
-			height:new_height,
-			width:new_wdith
-		})
+		//如果这个元素是旋转的,则不做width和height的处理，旋转的对象不能随之变化大小
+		if($(this).attr("angle") != 0 && $(this).attr("angle") != undefined){
+			$(this).css({
+				left:new_left,
+				top:new_top,
+			})
+		}
+		else{
+			$(this).css({
+				left:new_left,
+				top:new_top,
+				height:new_height,
+				width:new_wdith
+			})
+		}
+		
+		//添加类，禁用功能
 		$(this).addClass('component')
 		$(this).draggable("disable")
 		if($(this).is(".tile , .composite")){

@@ -5,7 +5,7 @@
 
 */
 
-//创建textblock，用来放置tile_text，为了和画布同时缩进，每个画布都应该有一个textblock
+//创建textblock，在创建画布的同时为这个画布创建其对应的textblock
 function createTextBlock(huabu){
     var textblock = $("<div>\
                             <div class='textblock_bar'>\
@@ -45,14 +45,44 @@ function showTileTextBlock(tile){
         $(textblock).find(".textblock_content").html(tiletext)
 
         //获取当前tile的位置与宽度，在它旁边显示textblock
-        var tile_left = parseInt($(tile).css("left"));
-        var tile_top = parseInt($(tile).css("top"));
-        var tile_width = $(tile).width();
+        var left = parseInt($(tile).css("left"));
+        var top = parseInt($(tile).css("top"));
+        var width = $(tile).width();
+        var height = $(tile).height()
+        //中心点的位置
+        var center_left = left + width/2
+        var center_top = top + height/2
+        //textblock的位置
+        var block_left = center_left + width/2
+        var block_top = center_top - height/2
+
+        //如果这个tile旋转了，则调整textblock的位置
+        if($(tile).attr("angle") != 0 && $(tile).attr("angle") != undefined){
+            var angle = parseInt($(tile).attr("angle"))
+            left_angle = top_angle = angle
+            while(left_angle > 90){
+                left_angle -= 90
+            }
+            while(top_angle < 90){
+                top_angle += 90
+            }
+            while(top_angle > 180){
+                top_angle -= 90
+            }
+            var left_radians = (left_angle * Math.PI) / 180;
+            var top_radians = (top_angle * Math.PI) / 180;
+            var half_lenth = Math.sqrt(Math.pow(width / 2, 2) + Math.pow(height / 2, 2));
+            var old_radians = Math.atan(height / width);
+            var angle_left = half_lenth * Math.abs(Math.cos(old_radians - left_radians));
+            var angle_top = half_lenth * Math.abs(Math.sin(old_radians - top_radians));
+            var block_left = center_left + angle_left;
+            var block_top = center_top - angle_top
+        }
 
         $(textblock).css({
             "z-index":"100",
-            "left":tile_left+tile_width+2,
-            "top" :tile_top,
+            "left":block_left + 4,
+            "top" :block_top,
             "display":"block",})
 
         //点击到其他地方时隐藏textblock

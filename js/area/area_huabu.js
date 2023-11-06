@@ -53,9 +53,12 @@ $("#huabu_container").selectable({
 	}
 })
 
-//创建画布时，同时创建对应的画布切换按钮,将画布的id置入button中
-function createHuabuButton(huabu) {
 
+
+
+// 画布区域的changeBar功能
+//1.创建画布对应的切换按钮,将画布的id作为属性置入button中
+function createHuabuButton(huabu) {
 	let button = $("<div></div>", {
 		"class": "huabu_button",
 		"id": $(huabu).attr("id") + "_button",
@@ -75,7 +78,7 @@ function createHuabuButton(huabu) {
 	changeHuabu(huabu);
 }
 
-//画布切换按钮的点击事件
+//2.画布切换按钮的点击事件，点击即可切换到另一张画布
 function changeHuabuButton(event,button){
 	var huabu = $("#" + $(button).attr("huabu"))
 	//切换到当前画布
@@ -86,7 +89,7 @@ function changeHuabuButton(event,button){
 	}
 }
 
-//画布切换按钮的拖动事件，可以在这条栏位内拖动按钮以改变其顺序
+//3.画布切换按钮的拖动事件，可以在这条changeBar内拖动按钮以改变其顺序
 $("#huabu_changeBar").sortable({ containment: "parent",tolerance: "pointer" });
 $("#huabu_changeBar").disableSelection()
 

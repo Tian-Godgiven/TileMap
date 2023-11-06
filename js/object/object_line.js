@@ -208,6 +208,10 @@ function abilityLineDot(dot){
 		start:function(event){
 			event.stopPropagation()
 			focusingLine($(dot).parent(".line"),"click")
+			//如果dot此时在tile内部，则令其移出tile
+			if($(dot).parent().is(".tile")){
+				DotOutTile(dot)
+			}
 		},
 		drag: function(event,ui) {
 			if(return_snap_tile() != false){
@@ -716,10 +720,11 @@ var old_priority = 0
 var old_z_index = 0
 var old_tile = undefined
 function DotIntoTile(dot,tile){
+	$tile = $(tile)
 	//检测这个点是否已经链接上了一个tile，如果是，则判断优先级
 	if($(dot).is(".connected_dot")){
-		var new_priority = $(tile).index()
-		var new_z_index = $(tile).css("z-index")
+		var new_priority = $tile.index()
+		var new_z_index = $tile.css("z-index")
 		//优先判断z-index,如果旧的优先级更大，则直接结束
 		if(old_z_index > new_z_index){
 			return 0 
@@ -735,9 +740,9 @@ function DotIntoTile(dot,tile){
 		DotOutTile(dot,old_tile)
 	}
 	//存储tile和他的优先级
-	old_priority = $(tile).index()
-	old_z_index = $(tile).css("z-index")
-	old_tile = $(tile)
+	old_priority = $tile.index()
+	old_z_index = $tile.css("z-index")
+	old_tile = $tile
 	//获得line的list
 	var line = $(dot).parent(".line")
 	var list = $(line).data("connecting_dot")
@@ -757,28 +762,51 @@ function DotIntoTile(dot,tile){
 	$(line).draggable("disable")
 	//调整dot的css使其位置不变并与tile成比例，使其可以自然贴附到tile上随之变化
 	var line_offset = offsetWithHuabu(line)
-	var width = $(tile).width()
-	var height = $(tile).height()
-	var new_left = (parseInt($(dot).css("left")) + line_offset.left - parseInt($(tile).css("left"))) / width * 100 +"%"
-	var new_top  = (parseInt($(dot).css("top"))  + line_offset.top  - parseInt($(tile).css("top"))) / height * 100 +"%"
+	var width = $tile.width()
+	var height = $tile.height()
+	var tile_left = parseInt($tile.css("left"))
+	var tile_top = parseInt($tile.css("top"))
+	//如果这个tile旋转了，则需要再加上旋转导致的left和top的改变
+	var angle = $tile.attr("angle")
+	if(angle != 0){
+		var rotate_position = rotatePositionChange(width,height,angle)
+		tile_left += rotate_position.left
+		tile_top += rotate_position.left
+	}
+	//修改line_dot的css以改变其位置，当其未处于边缘时，令left或top为百分比，随着tile的大小变化而自然地移动
+	var left = (parseInt($(dot).css("left")) + line_offset.left - tile_left)
+	var top = (parseInt($(dot).css("top"))  + line_offset.top  - tile_top)
+	
+	if(left > 0){
+		left = Math.floor(left / width * 100 )+"%"
+	}
+	if(top > 0){
+		top = Math.floor(top / height * 100 )+"%"
+	}
 	$(dot).css({
-		"left":new_left,
-		"top":new_top
+		"left":left,
+		"top":top
 	})
-	console.log($(dot).css("left"))
 	//将dot放进tile中作为子元素
-	$(tile).append(dot)
+	$tile.append(dot)
 }
 
-//dot离开tile后，将其与tile解绑
+//dot离开tile后，将其与tile解绑，回到对应的line当中
 function DotOutTile(dot,tile){
-	
 	//获取dot原本的line对象和line的链接list
 	var line = $(dot).data("line")
 	var list = $(line).data("connecting_dot")
 	var index = $.inArray(dot,list)
-	//如果dot存在在list中，则将其删除
-	if(index != -1){
+	//查找dot是否存在在line当中
+	var found = false;
+	for (var i = 0; i < list.length; i++) {
+	  if ($(list[i]).is($(dot))) {
+	    found = true;
+	    break;
+	  }
+	}
+	//如果dot存在于list中，则将其移出tile
+	if(found == true){
 		//从connecting_dot列表中删除这个dot
 		list.splice(index,1)
 		//颜色变回来
@@ -795,6 +823,5 @@ function DotOutTile(dot,tile){
 		})
 		$(line).append(dot)
 		$(dot).removeClass('connected_dot')
-
 	}
 }
