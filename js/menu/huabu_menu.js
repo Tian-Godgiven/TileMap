@@ -1,22 +1,4 @@
-//右键画布子菜单相关功能
 
-//右键点击显示huabu_menu
-var startX, startY
-$("#huabu_container").on("mousedown",".huabu",function(event){
-	//判断是否为右键
-	if(event.button == 2){
-		startX = event.clientX;
-		startY = event.clientY;
-	}
-})
-$("#huabu_container").on("mouseup",".huabu",function(event){
-	if(startX == event.clientX && startY == event.clientY){
-		//显示子菜单
-		showHuabuMenu(event,"huabu_menu")
-		//修改这个子菜单上的内容
-		changeHuabuMenu()
-	}
-})
 
 /*修改子菜单的显示 ：
 	若剪贴板没有内容，则令“粘贴”键停用，
@@ -43,7 +25,7 @@ $("#huabu_menu #huabu_paste_here").on("click",function(event){
 	var temp = popClipboard()
 	//如果是一个div对象，则将其放在鼠标所在的位置
 	if($(temp).is("div")){
-		$(focusing_huabu).children(".tile_container").append(temp)
+		$(focusing_huabu).children(".object_container").append(temp)
 		$(temp).offset({
 			left:event.clientX - 20,
 			top:event.clientY - 20
@@ -86,7 +68,7 @@ $("#huabu_menu #huabu_insert_link").on("click",function(){
 //全选功能，将当前画布内的所有元素选中生成一个选中体
 $("#huabu_menu #huabu_select_all").on("click",function(){
 	var huabu = focusing_huabu
-	$(huabu).children(".tile_container").children().addClass('ui-selected')
+	$(huabu).children(".object_container").children().addClass('ui-selected')
 	createComposite($(huabu).find('.ui-selected'),"select")
 	hideHuabuMenu("huabu_menu")
 })
@@ -106,8 +88,8 @@ $("#huabu_menu #huabu_delete_all").on("click",function(){
 		cancelButtonText: '取消'
 	}).then((result) => {
 		if (result.isConfirmed) {
-			//清空huabu内的tile_container就行了
-			$(huabu).children(".tile_container").empty()
+			//清空huabu内的object_container就行了
+			$(huabu).children(".object_container").empty()
 			hideHuabuMenu("huabu_menu")
 		}
 	})

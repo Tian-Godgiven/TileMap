@@ -53,12 +53,8 @@
 	    overflow:hidden;
     }
 
-    .tile_container{
-	    width:100%;
-	    height:100%;
+    .huabu .container{
 	    position:absolute;
-	    left:0px;
-	    top:0px;
     }
 
 /*画布按键区域*/
@@ -142,11 +138,6 @@
     border:2px solid black;
     z-index:100;
 }
-	/*未启用的菜单项目*/
-	.huabu_menu .disabled{
-		color:#9B9B9BFF;
-		background-color:#E0E0E0FF;;
-	}
 	/*间隔线条的样式*/
 	.huabu_menu .menu_line{
 		width:98%;

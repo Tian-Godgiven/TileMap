@@ -1,0 +1,6 @@
+/*未启用的菜单项目*/
+.menu .disabled{
+	pointer-events:none;
+	color:#9B9B9BFF;
+	background-color:#E0E0E0FF;;
+}

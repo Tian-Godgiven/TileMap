@@ -6,8 +6,8 @@
    class：统一为huabu类
    scale：缩放幅度，基础值为1
    name：画布名称，显示在按钮上，也是画布文件的文件名
-2.组成：tile_container，tiletext_container
-其中tile_container是画布的本体，也就是Tile所放置的地方
+2.组成：object_container，tiletext_container
+其中object_container是画布的本体，也就是Tile所放置的地方
 tiletext_container是tiletext存储的地方，以使得在不同的画布内，可以选中不同的tiletext
 3.事件：
 	(1)左键画布边缘并拖拽：扩大或缩小画布的尺寸

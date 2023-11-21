@@ -9,11 +9,7 @@
     color: black;
 }
 
-/*被选中的磁贴样式*/
-.tile_selected{
-    box-shadow:0 0 3px 3px #3385FFBB;
-}
-
+.tile.focusing{box-shadow:0 0 3px 3px #3385FFBB;}
 
 .tile .tile_input{
     position:absolute;

@@ -60,10 +60,12 @@ function createHuabu(name,width,height) {
 			}
 		}
 
-	//创建画布，内含一个放置tile的tile_container,一个放置tile_text的textblock
+	//创建画布元素
 	let huabu = $("<div></div>", {
 		"class": "huabu",
 		"id": "huabu_" + huabu_id,
+		"scale": "1",
+		"name": name
 	})
 
 	$(huabu).css({
@@ -71,13 +73,8 @@ function createHuabu(name,width,height) {
 		"height": height,
 		"position": "absolute",
 		"background-color": "white",
-		"transform":"rotate(0deg) scale(1)",
+		"transform":"scale(1)",
 		"transform-origin":"center"
-	})
-
-	$(huabu).attr({
-		"scale": "1",
-		"name": name
 	})
 
 	$("#huabu_container").append(huabu);
@@ -91,11 +88,15 @@ function createHuabu(name,width,height) {
 	//为画布赋予功能
 	abilityHuabu(huabu)
 
-	//创建画布的tile_container，这里是放置一切画布内的对象的地方
-	var tile_container = $("<div></div>", {
-        "class": "tile_container"
-    });
-    $(huabu).append(tile_container);
+	//画布包含：一个放置object或dot的container
+	//　　　　　　　内部包含object_conatiner和dot_container
+	//		   一个放置tile_text的textblock
+	var container = $("<div>",{class:"container"})
+		var object_container = $("<div>", {"class": "object_container container"});
+		$(container).append(object_container);
+	    var dot_container = $("<div>", {"class": "dot_container container"});
+    	$(container).append(dot_container);
+    $(huabu).append(container)
 
 	createHuabuButton(huabu) //创建对应画布的button
 	createTextBlock(huabu)
@@ -114,19 +115,14 @@ function abilityHuabu(huabu) {
 		stop: function(event, ui) {
 			var oldleft = ui.originalPosition.left;
 			var newleft = ui.position.left
-			var tile_container = $(huabu).children(".tile_container")
+			var container = $(huabu).children(".container")
 			//当向左扩大时，画布的left移动了这样一个距离
 			var distantleft = parseInt(newleft - oldleft)
-			var oldleft = parseInt($(tile_container).css("left"))
+			var oldleft = parseInt($(container).css("left"))
 			//令画布内的Tile反向移动这样一个距离，这样当画布向左扩大时，tile的位置不会改变
 			var moveleft = oldleft - distantleft
-			if (distantleft < 0) {
-				$(tile_container).css({
-					"left": moveleft
-				})
-			}
-			if (distantleft > 0) {
-				$(tile_container).css({
+			if (distantleft != 0) {
+				$(container).css({
 					"left": moveleft
 				})
 			}
@@ -135,15 +131,10 @@ function abilityHuabu(huabu) {
 			var newtop = ui.position.top
 			//当向上扩大时，画布的top移动了这样一个距离
 			var distanttop = parseInt(newtop - oldtop)
-			var oldtop = parseInt($(tile_container).css("top"))
+			var oldtop = parseInt($(container).css("top"))
 			var movetop = oldtop - distanttop
-			if (distanttop < 0) {
-				$(tile_container).css({
-					"top": movetop
-				})
-			}
-			if (distanttop > 0) {
-				$(tile_container).css({
+			if (distanttop != 0) {
+				$(container).css({
 					"top": movetop
 				})
 			}
@@ -155,6 +146,28 @@ function abilityHuabu(huabu) {
 		handles: "n,e,s,w,ne,nw,se,sw",
 		autoHide: true
 	});
+
+	//右键点击显示huabu_menu
+	var startX, startY
+	$(huabu).on("mousedown",function(event){
+		//判断是否点到了画布对象，而不是点到其子元素
+		if(!$(event.target).is(".huabu")) {
+			return 0;
+		}
+		//判断是否为右键
+		if(event.button == 2){
+			startX = event.clientX;
+			startY = event.clientY;
+		}
+		hideHuabuMenu("all")
+	})
+	$(huabu).on("mouseup",function(event){
+		if(startX == event.clientX && startY == event.clientY && event.button == 2){
+			//显示子菜单
+			showHuabuMenu(event,"huabu_menu")
+			changeHuabuMenu()
+		}
+	})
 }
 
 //加载画布，会将画布对象内的tile依次生成，这个过程会为所有tile附加新的tile_id
@@ -168,7 +181,7 @@ function loadHuabu(huabu){
 
 	$(huabu).find(".tile").each(function(){
 		tile = loadTile(this)
-		$("#" + new_huabu_id + " .tile_container").append(tile)
+		$("#" + new_huabu_id + " .object_container").append(tile)
 	})
 }
 
@@ -186,9 +199,14 @@ function changeHuabu(huabu) {
 	showScale(focusing_huabu)//显示该画布的scale
 }
 
-//画布右键拖动实现原理是在container内的鼠标移动会改变huabu的left和top
+//画布右键拖动,原理是在container内的鼠标移动会改变huabu的left和top
 var huabu_dragging = false
 var lastX, lastY
+function changeHuabuDragging(temp){
+	if(temp == true || temp == false){
+		huabu_dragging = temp
+	}
+}
 $("#huabu_container").on("mousedown", function(event) {
 	if (event.button === 2) {
 		huabu_dragging = true;
@@ -201,7 +219,6 @@ $("#huabu_container").on("mousedown", function(event) {
 
 $("#huabu_container").on("mousemove", function(event) {
 	if (huabu_dragging) {
-
 		var huabu = focusing_huabu
 		var huabu_left = parseInt($(huabu).css("left"));
 		var huabu_top  = parseInt($(huabu).css("top"));

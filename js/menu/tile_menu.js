@@ -28,13 +28,13 @@ function copyTile(tile){
 $("#tile_menu #tile_cut").on("click",function(){
 	//先copy再delete
 	copyTile(focusing_tile)
-	deleteTile(focusing_tile)
+	deleteObject(focusing_tile)
 	hideHuabuMenu("tile_menu")
 })
 //删除该磁贴
 $("#tile_menu #tile_delete").on("click",function(){
 	//直接delete
-	deleteTile(focusing_tile)
+	deleteObject(focusing_tile)
 	hideHuabuMenu("tile_menu")
 })
 //显示与修改背景颜色
@@ -44,11 +44,11 @@ $("#tile_menu #tile_color .colorpicker").on("click",function(){
 })
 //顺时针旋转45度
 $("#tile_menu #tile_angle_shun").on("click",function(){
-	rotateDom(focusing_tile,45)
+	rotateDom(focusing_tile,45,"plus")
 })
 //逆时针旋转45度
 $("#tile_menu #tile_angle_ni").on("click",function(){
-	rotateDom(focusing_tile,-45)
+	rotateDom(focusing_tile,-45,"plus")
 })
 //上浮该磁贴
 $("#tile_menu #tile_up").on("click",function(){

@@ -78,7 +78,7 @@
 
 画布：存放磁贴的媒介
 -属性：画布名，画布id，画布内容，画布大小
--子元素：tile_container存放tile的主要场所，tiletext_container放置tiletext_container的场所
+-子元素：object_container存放tile的主要场所，tiletext_container放置tiletext_container的场所
 
 磁贴（tile) ：作图的模块
 -属性：id，标题(title，是磁贴显示的文字内容) ，磁贴样式(style)，对应的磁贴内容(以tile_inner的形式直接存储在tile内部）

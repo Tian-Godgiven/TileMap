@@ -138,7 +138,7 @@ function createComposite(doms,type){
 	})
 
 	//将composite加入画布中并聚焦
-	$(return_focusing_huabu()).children('.tile_container').append(composite)
+	$(return_focusing_huabu()).children('.object_container').append(composite)
 	focusingComposite(composite,"click")
 
 	//composite的功能
@@ -193,7 +193,7 @@ function destroyComposite(composite){
 		var new_height = $(this).height()
 		var new_width = $(this).width()
 		//放回画布中并修改其css
-		$(return_focusing_huabu()).children(".tile_container").append(this)
+		$(return_focusing_huabu()).children(".object_container").append(this)
 		$(this).css({
 			left:new_left,
 			top:new_top,

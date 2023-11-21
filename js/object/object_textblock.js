@@ -29,13 +29,14 @@ function createTextBlock(huabu){
         handles:"n,e,s,w,se,sw,ne,nw",
         autoHide:true
     });
-    $(huabu).append(textblock)
+    $(huabu).children('.container').append(textblock)
 }
 
 //将对应的text内容以textblock的形式显示在tile旁边
 function showTileTextBlock(tile){
 
     var huabu = return_focusing_huabu()
+    var object_container = $(huabu).find('.object_container')
     var textblock = $(huabu).find(".textblock")
 
     //如果没有被隐藏则显示
@@ -45,8 +46,8 @@ function showTileTextBlock(tile){
         $(textblock).find(".textblock_content").html(tiletext)
 
         //获取当前tile的位置与宽度，在它旁边显示textblock
-        var left = parseInt($(tile).css("left"));
-        var top = parseInt($(tile).css("top"));
+        var left = parseInt($(tile).css("left")) + parseInt($(object_container).css("left"));
+        var top = parseInt($(tile).css("top")) + parseInt($(object_container).css("top")) ;
         var width = $(tile).width();
         var height = $(tile).height()
         //中心点的位置

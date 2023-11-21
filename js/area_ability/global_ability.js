@@ -9,7 +9,7 @@ function import_menus(){
 	$("#global_ability").append($("<div>").load("./components/menu/huabu_menu.html"));
 	$("#global_ability").append($("<div>").load("./components/menu/huabu_button_menu.html"));
 	$("#global_ability").append($("<div>").load("./components/menu/tile_menu.html"));
-	$("#global_ability").append($("<div>").load("./components/menu/line_dotInner_menu.html"));
+	$("#global_ability").append($("<div>").load("./components/menu/MidwayDot_menu.html"));
 }
 
 //返回某个画布内元素与当前聚焦画布左上角的距离
@@ -29,7 +29,7 @@ function offsetWithHuabu(dom){
 	var parent = $(dom).parent()
 	var left = parseInt($(dom).css("left"))
 	var top  = parseInt($(dom).css("top"))
-	while(!$(parent).is(".tile_container")){
+	while(! $(parent).is(".huabu")){
 		left += parseInt($(parent).css("left"))
 		top  += parseInt($(parent).css("top"))
 		parent = $(parent).parent()
@@ -131,79 +131,6 @@ function createRandomId() {
     id += characters[randomIndex];
   }
   return id;
-}
-
-//聚焦该dom，根据不同对象调用不同的聚焦函数
-function focusingDom(dom){
-	var $dom = $(dom)
-	if($dom.is(".tile")){
-		focusingTile(dom)
-	}
-	else if($dom.is(".line")){
-		focusingLine(dom)
-	}
-	else if($dom.is(".composite")){
-		foucingComposite(dom)
-	}
-}
-//取消该dom的聚焦，根据不同对象调用不同的聚焦函数
-function unfocusingDom(dom){
-	var $dom = $(dom)
-	if($dom.is(".tile")){
-		unfocusingTile(dom)
-	}
-	else if($dom.is(".line")){
-		unfocusingLine(dom)
-	}
-	else if($dom.is(".composite")){
-		unfoucingComposite(dom)
-	}
-}
-
-//为该dom对象赋予功能，根据不同的对象调用不同的功能函数
-function abilityDom(dom){
-	var $dom = $(dom)
-	if($dom.is(".tile")){
-		abilityTile(dom)
-	}
-	else if($dom.is(".line")){
-		abilityLine(dom)
-	}
-	else if($dom.is(".composite")){
-		abilityComposite(dom)
-	}
-}
-
-//顺时针旋转angle度,旋转后的对象无法被resize
-function rotateDom(dom,angle){
-	var old_angle = $(dom).attr("angle")
-	if(old_angle == undefined){
-		old_angle = 0
-	}
-
-	var new_angle = parseInt(old_angle) + angle
-	//角度不大于360也不小于0-360
-	if(new_angle >= 360){
-		new_angle -= 360
-	}
-	else if(new_angle <= -360){
-		new_angle += 360
-	} 
-
-	//如果这个新角度不为0则禁用其拖拽功能
-	if(new_angle != 0){
-		$(dom).resizable("disable")
-	}
-	else if(new_angle == 0){
-		$(dom).resizable("enable")
-	}
-
-	//将其旋转对应的角度并将角度信息记录
-	$(dom).css({
-		transform:"rotate(" + new_angle + "deg)",
-		"transform-origin":"center center"
-	})
-	$(dom).attr("angle",new_angle)
 }
 
 

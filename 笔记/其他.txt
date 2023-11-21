@@ -1,5 +1,5 @@
 //点击在当前画布内生成一条线
-function createLineStyle(){
+function createStyleLine(){
 
 	var width = "300px"
 	var height = "3px"
@@ -9,7 +9,7 @@ function createLineStyle(){
 	
 	var line = createLine(width,height,color,style,style_width)
 	
-	$($(return_focusing_huabu()).children(".tile_container")).append(line)
+	$($(return_focusing_huabu()).children(".object_container")).append(line)
 		// creatArrow(line,"right","arrow_1")
 		// creatArrow(line,"left","arrow_1")
 }
@@ -728,7 +728,7 @@ $("#huabu_container").on("mousedown",".line_dot:not(.line_dotLeft , .line_dotRig
 		else{
 			focusing_dot = this
 		}
-		showHuabuMenu("line_dotInner_menu")
+		showHuabuMenu("MidwayDot_menu")
 	}
 })
 
