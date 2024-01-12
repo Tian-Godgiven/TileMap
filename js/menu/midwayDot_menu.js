@@ -66,6 +66,8 @@ function createBranch(){
 
 	hideLineDot(line)
 	showLineDot(line)
+
+	hideHuabuMenu("MidwayDot_menu")
 }
 
 //右键Dot菜单选项事件2：删除选定的分支，通过点击端点或line或中点选中对应的分支线段，然后删除
@@ -86,6 +88,7 @@ $("#MidwayDot_deleteBranch > .menu").on("click",".deleteBranch_option",function(
 		showLineDot(line)
 		//删除这个选项本身
 		$(this).remove()
+		hideHuabuMenu("MidwayDot_menu")
 	}
 })
 //鼠标移动到分支选项时，令对应的分支颜色变红

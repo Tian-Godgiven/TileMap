@@ -1,6 +1,10 @@
 /*LineDot对象*/
-.LineDot.connectedDot{
+.LineDot.connected{
 	background:#00F93EFF !important;
+}
+
+.LineDot.CenterDot{
+	background:#5BADFFB8 !important;
 }
 
 .MidwayDot{

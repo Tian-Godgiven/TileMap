@@ -36,13 +36,11 @@ function showDot(object,type){
 			//放在对象周围一圈
 			var y = top
 			for( i = 1; i <= row_num; i++){
-
 				//只对第一行和最后一行创建所有列
 				if( i == 1 || i == row_num){
 					var x = left
 					for(j = 1;j <= col_num;j++){
 						//创建一个dot对象并且放在这个位置
-						console.log(j)
 						var dot = createDot(object,[x,y])
 						x += col_width
 					}
@@ -61,7 +59,7 @@ function showDot(object,type){
 	}
 }
 
-//移出object关联的dot
+//移出/隐藏与object关联的dot
 function hideDot(object){
 	//将这个对象所关联的所有dot删除
 	var dots = $(object).data('dot')
@@ -102,12 +100,6 @@ function positionDot(dot,[x,y]){
 }
 
 
-
-//tile的line_dot移出事件，令这个tile上的吸附点消失（删除）
-function hideTileSnapDot(tile){
-	$(tile).children('.tile_snap_dot').droppable("destroy");
-	$(tile).children('.tile_snap_dot').remove()
-}
 
 //snap_dot的droppable创建函数
 function droppableSnapDot(){

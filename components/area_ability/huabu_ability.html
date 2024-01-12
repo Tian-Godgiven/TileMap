@@ -18,7 +18,7 @@
         <img class="huabu_ability_button" src="./img/redo.png">
     </div>
 
-    <div class="draw_block">删除</div>
+    <div class="draw_block" id="huabu_ability_Delete">删除</div>
     <div class="draw_block">上浮</div>
     <div class="draw_block">下沉</div>
     <div class="draw_block">颜色</div>
@@ -30,3 +30,45 @@
 </html>
 
 <script src="./js/area_ability/huabu_ability.js"></script>
+
+<style type="text/css">
+    
+
+    .draw_block{
+        text-align:center;
+        padding:0px 5px;
+        height:49px;
+        float:left;
+        background-color:#1F9098D2;
+        display: flex; 
+
+        justify-content:center;
+        align-items: center;
+    }
+
+    #huabu_ability #search{
+        width:200px;
+        height:49px;
+        right:100px;
+        position:absolute;
+    }
+
+    #huabu_ability #night{
+        right:0px;
+        position:absolute;
+    }
+    #huabu_ability #fullscreen{
+        right:50px;
+        position:absolute;
+    }
+
+    .huabu_ability_button{
+        max-width:25px;
+    }
+
+    #huabu_ability_ScaleShow{
+        justify-content:right;
+        text-align:right;
+        width:70px;
+    }
+</style>

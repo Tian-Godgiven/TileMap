@@ -67,19 +67,15 @@ function abilityTile(tile) {
 		addClasses:false,
 		scroll: false,
 		zIndex:100,
-		//containment:$(return_focusing_huabu()),
 		start: function(event) {
-			hideDot(tile)
+			hideConnectLineDot(tile)
 			hideTextBlock(return_focusing_huabu())
 		},
 		drag: function(event, ui) {
-			//同时令tile内的line_dot子元素进行链接
-			$(this).children('.connected_dot').each(function(){
-				dragLineDot(this)
-			})
+			dragConnectedLine(tile)
 		},
 		stop:function(){
-			showDot(tile)
+			showConnectLineDot(tile)
 		}
 	});
 
@@ -90,7 +86,6 @@ function abilityTile(tile) {
 		animateEasing:"swing",
 		handles:"n,e,s,w,se,sw,ne,nw",
 		resize:function(event,ui){
-			hideDot(tile)
 			//缩放的同时也会改变其上连接点的位置
 			$(this).find(".line_dot").each(function(){
 				dragLineDot(this)
@@ -116,26 +111,52 @@ function abilityTile(tile) {
 			}
 		},
 		stop:function(){
-			showDot(tile)
 		}
 	});
 
 	//放置line_dot
 	$(tile).droppable({
 		tolerance:"touch",
-		accept:".line_dot",
+		accept:".LineDot",
+		//当LineDot靠近tile时,令tile上显示dot
+		over:function(event,ui){
+			showDot(tile)
+		},
+		//当lineDot放置在tile上时，令lineInner与tile绑定
 		drop:function(event,ui){
 			event.stopPropagation()
-			hideTileSnapDot(tile)
-			DotIntoTile(ui.draggable,tile)
+			var $LineDot = $(ui.draggable)
+			var $tile = $(tile)
+			//只有在LineDot不为MidwayDot时（即为端点dot），并且没有与其他Tile链接时
+			//才将其对应的lineInner与tile绑定
+			if(!$LineDot.is(".MidwayDot") && !$LineDot.is(".connected")){
+				$LineDot.addClass("connected")
+				var $lineInner = $LineDot.data("lineInner")[0][0]
+				//确定这个lineInner与tile的绑定方向
+				if($lineInner.data("LeftDot").is($LineDot)){
+					var position = "left"
+				}
+				else if($lineInner.data("RightDot").is($LineDot)){
+					var position = "right"
+				}
+				var scale = return_huabu_scale()
+				//获取绑定位置相对于tile的百分比
+				var x = $LineDot.offset().left / scale + $LineDot.width()/2
+				var y = $LineDot.offset().top  / scale + $LineDot.width()/2
+				var left = Math.floor((( x - $tile.offset().left / scale ) / $tile.width()  * 100)) /100
+				var top  = Math.floor((( y - $tile.offset().top / scale )  / $tile.height()  * 100)) /100
+				lineInnerConnectTile($lineInner,tile,position,[left,top])
+			}
 		},
-		//当dot移出Tile时，将其与tile解绑
+		//当lineDot移出Tile时，将lineInner与tile解绑
 		out:function(event,ui){
-			hideTileSnapDot(tile)
-			return_snap_tile(true)
-			//令drag事件重启
-			DotOutTile(ui.draggable,tile)
-			
+			hideDot(tile)
+			var LineDot = ui.draggable
+			if(!$(LineDot).is(".MidwayDot") && $(LineDot).is(".connected")){
+				$(LineDot).removeClass("connected")
+				var lineInner = $(LineDot).data("lineInner")[0][0]
+			}
+			lineInnerDisconnectTile(lineInner,tile)
 		}
 	})
 
@@ -175,6 +196,52 @@ function abilityTile(tile) {
 
 };
 
+//显示与tile相连的线条的dot
+function showConnectLineDot(tile){
+	var lineInner_list = $(tile).data("connect_lineInner")
+	if(lineInner_list && lineInner_list.length > 0){
+		var $tile = $(tile)
+		for(i in lineInner_list){
+			var lineInner = $(lineInner_list[i][0])
+			var line = lineInner.parent(".line")
+			showLineDot(line)
+		}
+	}
+}
+//隐藏与tile相连的线条的dot
+function hideConnectLineDot(tile){
+	var lineInner_list = $(tile).data("connect_lineInner")
+	if(lineInner_list && lineInner_list.length > 0){
+		var $tile = $(tile)
+		for(i in lineInner_list){
+			var lineInner = $(lineInner_list[i][0])
+			var line = lineInner.parent(".line")
+			hideLineDot(line)
+		}
+	}
+}
+//移动与tile绑定的线条
+function dragConnectedLine(tile){
+	var lineInner_list = $(tile).data("connect_lineInner")
+	var $tile = $(tile)
+
+	for(i in lineInner_list){
+		var lineInner = $(lineInner_list[i][0])
+		var position = lineInner_list[i][1]
+		var scale = return_huabu_scale()
+		var [x,y] = lineInner_list[i][2]
+		//将对应lineInner的对应位置移动到tile的对应位置
+		var left = parseInt($tile.css("left")) / scale + $tile.width() * x
+		var top = parseInt($tile.css("top")) / scale + $tile.height() * y
+		if(position == "left"){
+			positionLine(lineInner,[left,top],null)
+		}
+		else if(position == "right"){
+			positionLine(lineInner,null,[left,top])
+		}
+	}
+	
+}
 
 
 
@@ -294,12 +361,13 @@ function changeTileTitle(tile,type){
 //选中指定的磁贴，为其附加tile_selected类使其出现
 function focusingTile(tile){
 	focusing_tile = tile;
-	showDot(tile)
+	showConnectLineDot(tile)
 }
 //取消选中指定的磁贴，消除其focusing类
 function unfocusingTile(tile){
 	focusing_tile = undefined;
 	hideDot(tile)
+	hideConnectLineDot(tile)
 	hideTextBlock(return_focusing_huabu())
 }
 

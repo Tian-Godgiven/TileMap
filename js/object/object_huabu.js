@@ -15,7 +15,6 @@ function return_focusing_huabu() {
 	return focusing_huabu
 }
 
-
 //创建新画布
 function createHuabu(name,width,height) {
 	//对画布名称，画布长宽的默认定义

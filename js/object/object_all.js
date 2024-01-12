@@ -1,6 +1,7 @@
+var focusing_object
 //点击object_container中的某个对象时，令其被聚焦
 function focusingObject(object,type){
-	$object = $(object)
+	$object = focusing_object = $(object)
 	//若这个元素已经被聚焦了，则return 0
 	if($object.is(".focusing")){
 		return 0
@@ -10,7 +11,7 @@ function focusingObject(object,type){
 	if(type == "click"){
 		$(".focusing").removeClass('focusing')
 		//并且使得所有dot消失
-		$(return_focusing_huabu().find(".object_container").find(".dot")).remove()
+		$(return_focusing_huabu()).find(".dot").remove()
 	}
 
 	//否则将其聚焦
@@ -36,7 +37,7 @@ function focusingObject(object,type){
 			 && $(object).has(event.target).length == 0
 			//也不是一个dot元素
 			 && !$(event.target).is(".dot")){
-			 	//则取消聚焦
+			 //则取消聚焦
 				unfocusingObject(object)
 				$(this).off(event)
 			}
@@ -44,7 +45,6 @@ function focusingObject(object,type){
 	}
 
 }
-
 
 //取消该dom的聚焦，根据不同对象调用不同的取消聚焦函数
 function unfocusingObject(object){
@@ -60,6 +60,13 @@ function unfocusingObject(object){
 	}
 	else if($object.is(".composite")){
 		unfoucingComposite(object)
+	}
+}
+
+//删除画布中聚焦的元素
+function deleteFocusingObject(){
+	if(focusing_object != undefined){
+		deleteObject($(return_focusing_huabu()).find(".focusing"))
 	}
 }
 
@@ -122,5 +129,12 @@ function rotateDom(dom,angle,type){
 function deleteObject(object){
 	//先解除其聚焦
 	unfocusingObject(object)
-	$(object).remove()
+	//再根据对象调用不同的删除函数
+	if($(object).is(".line")){
+		deleteLine(object)
+	}	
+	else if($(object).is(".tile")){
+		deleteTile(object)
+	}
+	
 }

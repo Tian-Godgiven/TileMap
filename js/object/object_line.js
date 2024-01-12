@@ -20,6 +20,7 @@ function createLine(width,height,style){
 		"class": "line object",
 		"id": line_id,
 	})
+	$(line).data("LineDot",[])
 	//创建lineInner
 	var lineInner = createLineInner(width,height,style)
 	//放进画布的object_container里面
@@ -31,6 +32,19 @@ function createLine(width,height,style){
 	//创建后聚焦该线条
 	focusingObject(line,"click")
 }
+
+//删除一个线条对象
+function deleteLine(line){
+	//遍历每一根线段，解除这些线段与tile的绑定
+	$(line).children().each(function(){
+		if($(this).is(".lineInner")){
+			lineInnerDisconnectTile(this)
+		}
+	})
+	//然后删除这个元素
+	$(line).remove()
+}
+
 //创建一条线段，这是组成线条对象的元素
 function createLineInner(width,height,style){
 	//创建一条普通的line_inner
@@ -66,6 +80,7 @@ function abilityLine(line){
 			showLineDot(line)
 		}
 	})
+	//点击
 	$(line).on("mousedown",function(event){
 		hideHuabuMenu("all")
 		focusingObject(line,"click")
@@ -87,11 +102,14 @@ function unfocusingLine(line){
 	hideLineDot(line)
 }
 
-//改变线段起始点
+//改变线段起始点，从而改变线段的位置
 function positionLine(lineInner,positionLeft,positionRight){
 	var line = $(lineInner).parent('.line')
 	var line_left = parseInt($(line).css("left"))
 	var line_top = parseInt($(line).css("top"))
+
+	var height = $(lineInner).height()
+	var radius = returnDotRadius()
 	//左端点位置
 	if(positionLeft == null){
 		left_x = parseInt($(lineInner).css("left"))
@@ -108,14 +126,19 @@ function positionLine(lineInner,positionLeft,positionRight){
 	
 	//右端点位置
 	if(positionRight == null){
-		alert("必须提供右端点位置")
+		//获取这个线段的右dot的位置
+		var RightDot = lineInner.data("RightDot")
+		var x2 = parseInt($(RightDot).css("left")) + radius
+		var y2 = parseInt($(RightDot).css("top"))  + radius - height/2 
 	}
 	else{
 		x2 = positionRight[0]
 		y2 = positionRight[1] 
-		right_x = x2 - parseInt($(line).css("left"))
-		right_y = y2 - parseInt($(line).css("top"))
 	}
+	right_x = x2 - parseInt($(line).css("left"))
+	right_y = y2 - parseInt($(line).css("top"))
+
+	
 
 	//计算得到旋转角度
 	var angle;
@@ -150,32 +173,51 @@ function positionLine(lineInner,positionLeft,positionRight){
 	//令其旋转对应的角度
 	rotateDom(lineInner,angle,"change")
 
-	//如果这个线段之前有一个lineInnerDot,则将其移动到线段的前方
-	var lineInnerDot = $(lineInner).prevAll(".lineInnerDot").first()
-	if($(lineInnerDot).length > 0){
-		var height = $(lineInnerDot).height()
-		$(lineInnerDot).css({
-			top: left_y,
-			left: left_x - height/2
-		});
-	}
-
 	//将中点放在line中心位置
 	var CenterDot = $(lineInner).data("CenterDot")
-	var DotWidth = $(CenterDot).width()
-	positionDot(CenterDot,[(x1+x2)/2,(y1+y2)/2 + DotWidth])
+	positionDot(CenterDot,[(x1+x2)/2,(y1+y2)/2 + radius*2])
+}
+
+//创建LineInnerDot对象并将其与左右两端的线段绑定
+function createLineInnerDot(lineInner_Left,lineInner_right,[x,y]){
+	var style = lineInner_Left.data("style")
+	var color = style.color
+	var height = lineInner_Left.height()
+	//创建一个润滑点，这个点会与这两条线段绑定
+	var lineInnerDot = $("<div>",{
+		class:"lineInnerDot"
+	})
+	//放进线条中
+	lineInner_Left.after(lineInnerDot)
+	//修改样式
+	$(lineInnerDot).css({
+		position:"absolute",
+		left:x,
+		top:y,
+		height:height,
+		width:height,
+		backgroundColor:color,
+		borderRadius:"50%"
+	})
+	//绑定数据
+	lineInner_Left.data("lineInnerDot_right",lineInnerDot)
+	lineInner_right.data("lineInnerDot_left",lineInnerDot)
+
+	return lineInnerDot
 }
 
 //令线段一分为二,在其中间加入线条中心点
 function separateLineInner(lineInner){
-	$lineInner = $(lineInner)
-	var line = $lineInner.parent(".line")
-	var height = $lineInner.height()
-	var width = $lineInner.width()
-	var style = $lineInner.data("style")
-	var old_left = parseInt($lineInner.css("left"))
-	var old_top = parseInt($lineInner.css("top"))
-	var angle = $lineInner.attr("angle")
+	$old_lineInner = $(lineInner)
+	var line = $old_lineInner.parent(".line")
+
+	//数据计算
+	var height = $old_lineInner.height()
+	var width = $old_lineInner.width()
+	var style = $old_lineInner.data("style")
+	var old_left = parseInt($old_lineInner.css("left"))
+	var old_top = parseInt($old_lineInner.css("top"))
+	var angle = $old_lineInner.attr("angle")
 	var radians = angle*Math.PI/180
 	//计算得到原线段中点的位置
 	var new_left = old_left + width/2 * Math.cos(radians)
@@ -184,17 +226,31 @@ function separateLineInner(lineInner){
 	//创建一个新的线段，这个线段的样式是原线段的拷贝，会放在原线段的右侧
 	var $new_lineInner = $(createLineInner(width/2,height,style))
 	//将原线段绑定的LineInnerDot_right绑定给新的线段
-	var old_right = $lineInner.data("lineInnerDot_right")
+	var old_right = $old_lineInner.data("lineInnerDot_right")
 	$new_lineInner.data("lineInnerDot_right",old_right)
 
 	//创建一个新的lineInnerDot，并与其左右两个线段绑定
-	var lineInnerDot = createLineInnerDot($lineInner,$new_lineInner,[new_left - height/2,new_top])
+	var lineInnerDot = createLineInnerDot($old_lineInner,$new_lineInner,[new_left - height/2,new_top])
 	//将新的线段放进线条中
 	$(lineInnerDot).after($new_lineInner)
 
+	//将旧线段所绑定的tile转移绑定给新线段
+	var tile_list = $old_lineInner.data("connect_tile")
+	console.log(tile_list)
+	for(i in tile_list){
+		var tile = tile_list[i][0]
+		console.log(tile_list[i][1])
+		//将右侧的tile绑定给新的lineInner
+		if(tile_list[i][1] == "right"){
+			lineInnerConnectTile($new_lineInner,tile,"right",tile_list[i][2])
+			//然后将这个tile与旧线段解绑
+			lineInnerDisconnectTile($old_lineInner,tile)
+		}
+	}
+
 	//修改两条线段的样式
 	//旧线段长度减半
-	$lineInner.css({
+	$old_lineInner.css({
 		width:width/2
 	})
 	//新线段移动到原本的线段的中间位置
@@ -204,7 +260,7 @@ function separateLineInner(lineInner){
 	})
 	rotateDom($new_lineInner,angle,"change")
 
-	//最后重新生成线条的dot
+	//重新生成线条的dot
 	hideLineDot(line)
 	showLineDot(line)
 }
@@ -242,34 +298,70 @@ function combineLineInner(lineInner_1,lineInner_2,lineInnerDot){
 	showLineDot(line)
 }
 
+//将线段与Tile绑定
+function lineInnerConnectTile(lineInner,tile,position,[left,top]){
+	//判断该tile是否已经与该线段绑定，因为线段同时最多绑定两个tile，所以遍历起来更方便
+	var $lineInner = $(lineInner)
+	var tile_list = $lineInner.data("connect_tile")
+	if(tile_list == undefined){
+		tile_list = []
+	}
+	else{
+		for(i in tile_list){
+			if(tile_list[i][0].is(tile)){
+				return false
+			}
+		}
+	}
 
-function createLineInnerDot(lineInner_Left,lineInner_right,[x,y]){
-	var style = lineInner_Left.data("style")
-	var color = style.color
-	var height = lineInner_Left.height()
-	//创建一个润滑点，这个点会与这两条线段绑定
-	var lineInnerDot = $("<div>",{
-		class:"lineInnerDot"
-	})
-	//放进线条中
-	lineInner_Left.after(lineInnerDot)
-	//修改样式
-	$(lineInnerDot).css({
-		position:"absolute",
-		left:x,
-		top:y,
-		height:height,
-		width:height,
-		backgroundColor:color,
-		borderRadius:"50%"
-	})
-	//绑定数据
-	lineInner_Left.data("lineInnerDot_right",lineInnerDot)
-	lineInner_right.data("lineInnerDot_left",lineInnerDot)
 
-	return lineInnerDot
+	var $tile = $(tile)
+	var lineInner_list = $tile.data("connect_lineInner")
+	if(lineInner_list == undefined){
+		lineInner_list = []
+	}
+
+
+	//将tile绑定在lineInner上
+	tile_list.push([tile,position,[left,top]])
+	$lineInner.data("connect_tile",tile_list)
+	//将lineInner绑定在tile上
+	lineInner_list.push([lineInner,position,[left,top]])
+	$tile.data("connect_lineInner",lineInner_list)
+
+	
 }
 
+//将线段与Tile解绑
+function lineInnerDisconnectTile(lineInner,tile){
+	//如果没有给出tile对象，则令线段与其所有关联的tile解绑
+	if(tile == null){
+		var tile_list = $(lineInner).data("connect_tile")
+		for(i in tile_list){
+			lineInnerDisconnectTile(lineInner,tile_list[i])
+		}
+	}
+	else{
+		var lineInner_list = $(tile).data("connect_lineInner")
+		//从tile中删除这个lineInner
+		for(i in lineInner_list){
+			if($(lineInner_list[i][0]).is(lineInner)){
+				lineInner_list.splice(i,1)
+				//重新装回tile中
+				$(tile).data("connect_lineInner",lineInner_list)
+			}
+		}
+		//将这个tile与lineInner解绑
+		var tile_list = $(lineInner).data("connect_tile")
+		for(i in tile_list){
+			if($(tile_list[i][0]).is(tile)){
+				tile_list.splice(i,1)
+				//重新装回lineInner中
+				$(lineInner).data("connect_tile",tile_list)
+			}
+		}
+	}
+}
 
 // //为选中的线条增添一个不同方向的Arrow
 // function createArrowRight(){

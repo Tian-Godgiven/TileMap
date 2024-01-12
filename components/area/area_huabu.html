@@ -23,6 +23,76 @@
 <script src="./js/object/object_textblock.js"></script>
 <script src="./js/object/object_composite.js"></script>
 
+<style type="text/css">
+
+	#huabu_ability{
+        width:100%;
+        height:50px;
+        font-size:25px;
+    }
+
+    /*两侧调整大小半透明条*/
+	.resize_block{
+	    opacity:0;
+	    height:95%;
+	    width:15px;
+	    background-color:grey;
+	    position:absolute;
+	    z-index:2;
+	}
+	#left_resize{
+	    left:0;
+	}
+	#right_resize{
+	    right:0;
+	}
+
+	/*画布对象区域*/
+    #huabu_container{
+	    width:100%;
+	    /*要减去另外两个区域的高度*/
+	    height:calc(100% - 80px);
+	    float: left;
+	    position:absolute;
+	    overflow:hidden;
+    }
+
+	/*画布按键区域*/
+	#huabu_changeBar{
+	    width:100%;
+	    height:30px;
+	    background-color:black;
+	    position:absolute;
+	    bottom:0;
+	}
+    .huabu_button{
+	    text-align:center;
+	    font-size:20px;
+	    padding-left:5px;
+	    padding-right:5px;
+	    background-color:white;
+	    height:100%;
+	    float:left;
+	    position:relative;
+	    border-right: 2px solid;
+    }
+
+	
+
+
+
+	/*画布创建弹窗*/
+	#addHuabu_alerttext{
+		font-size:30px;
+	}
+	.addHuabu_input{
+		font-size:25px;
+		height:30px;
+		width:100px;
+	}
+</style>
+
+<link rel="stylesheet" href="./css/object/object_huabu.css">
 <link rel="stylesheet" href="./css/object/object_tile.css">
 <link rel="stylesheet" href="./css/object/object_dot.css">
 <link rel="stylesheet" href="./css/object/object_line.css">

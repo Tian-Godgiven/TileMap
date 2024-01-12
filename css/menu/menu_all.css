@@ -4,3 +4,21 @@
 	color:#9B9B9BFF;
 	background-color:#E0E0E0FF;;
 }
+
+/*画布区域内的菜单*/
+.huabu_menu{
+    position:absolute;
+    background-color:white;
+    min-width:150px;
+    min-height:100px;
+    display:none;
+    border:2px solid black;
+    z-index:100;
+}
+	/*间隔线条的样式*/
+	.huabu_menu .menu_line{
+		width:98%;
+		height:1px;
+		background-color:#DBDBDBFF;
+		margin:2px auto;
+	}
