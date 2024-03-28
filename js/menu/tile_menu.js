@@ -1,10 +1,25 @@
 //磁贴右键子菜单功能
 
-//改变磁贴右键子菜单的样式和内容
+var focusing_tile
+//同步磁贴右键子菜单的样式和内容
 function changeTileMenu(tile){
+	focusing_tile = tile
 	//同步“背景颜色”与该磁贴的背景颜色相同
 	var color = $(tile).css("background-color")
-	$("#tile_menu #tile_color .colorpicker").css("background-color",color)
+	$("#tile_menu #tile_color .colorpicker .colorpicker_block").css("background-color",color)
+	//同步[打开嵌套画布]只有在其存在嵌套画布时有效
+	if($(tile).is(".nested_tile")){
+		//若已经嵌套了画布，则令其点击后打开画布，并且内容更换为进入画布
+		$("#tile_menu #nest_huabu").off("click").on("click",function(){
+			openNestedHuabu(tile)
+		}).text("进入画布")
+	}
+	else{
+		//否则令其点击后嵌套画布
+		$("#tile_menu #nest_huabu").off("click").on("click",function(){
+			showHuabuNestMenu(tile)
+		}).text("嵌套画布")
+	}
 	//同步“形状”与该磁贴形状相同
 
 	//显示“锁定”或“解锁”
@@ -37,6 +52,12 @@ $("#tile_menu #tile_delete").on("click",function(){
 	deleteObject(focusing_tile)
 	hideHuabuMenu("tile_menu")
 })
+
+//打开链接
+$("#tile_menu #open_link").on("click",function(){
+
+})
+
 //显示与修改背景颜色
 $("#tile_menu #tile_color .colorpicker").on("click",function(){
 	//在该对象旁调用选色器，传入当前聚焦的tile，修改对象是背景颜色

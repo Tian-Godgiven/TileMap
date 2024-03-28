@@ -1,67 +1,73 @@
 <html>
-    <div class="rightArea_inner_block slide_title" mode="expanding">快捷修改
-        <div class="slide_inner">
-
-            <div class="rightArea_inner_ability">
-                <div class="rightArea_inner_ability_title">-字体-</div>
-                <div class="rightArea_inner_ability_inner"> 
-                    <div>大小</div>
-                    <div>颜色</div>
-                    <div>字体类型</div>
-                </div>  
-            </div>
-
-            <div class="rightArea_inner_ability">
-                <div class="rightArea_inner_ability_title">-修饰-</div>
-                <div class="rightArea_inner_ability_inner"> 
-                    <div>背景</div>
-                    <div>边框</div>
-                    <div>加粗/斜体/阴影/上中下三种划线/对齐方式（包括左右上下居中对齐）</div>
-                </div>  
-            </div>
-
-            <div class="rightArea_inner_ability">
-                <div class="rightArea_inner_ability_title">-插入-</div>
-                <div class="rightArea_inner_ability_inner"> 
-                    <div>连接</div>
-                    <div>图片</div>
-                    <div>表格</div>
-                    <div>磁贴，点击可以移动该磁贴的位置或者显示磁贴的内容，这会是一个写着磁贴标题，前方以一个与磁贴背景颜色相同的小方块为标识，字体颜色与磁贴的标题字体颜色相同，并且本身自带浅灰色背景的长得像超链接的结构</div>
-                    <div>嵌套画布，把画布作为内容的一部分，点击这样一个前方以空白长方体为标识，以画布名为文字的块状结构，便可以进入到对应的画布</div>
-                    <div>html（弹出一个方框让用户在里面输入）</div>
-                </div>  
-            </div>
-
-            <div class="rightArea_inner_ability">
-                <div class="rightArea_inner_ability_title">-高级-</div>
-                <div class="rightArea_inner_ability_inner"> 
-                    <div>待定！</div>
-                </div>  
-            </div>
-
-        </div>
+    <div id="rightArea_edit_huabu" class="rightArea_edit_inner_block">画布内容
+        <div>画布成员</div>
     </div>
-    <div class="rightArea_inner_block slide_title" mode="expanding">磁贴内容
-        <div class="slide_inner">
-            <!-- 用于放置对内容的附加功能 -->
-            <div id="rightArea_tile_ability" 
-                 class="rightArea_inner_ability">
-                <div class="rightArea_inner_ability_title">-功能区-</div>
+
+    <div id="rightArea_edit_tile" class="rightArea_edit_inner_block">磁贴内容
+        <div class="slide_title" mode="expanding">内容修饰
+            <div class="slide_inner">
+
+                <div class="rightArea_inner_ability">
+                    <div class="rightArea_inner_ability_title">-字体-</div>
                     <div class="rightArea_inner_ability_inner"> 
-                        <div>这里的功能全是小方块，可以对下方的选中的内容的html进行修改</div>
-                        <div>字体操作+和- // 字体颜色 // 字体样式</div>
-                        <div>背景色 // 边框 // 加粗/斜体/阴影/上中下三种划线/对齐方式（包括左右上下居中对齐）</div>
-                        <div>插入链接//图片 / 表格 / 磁贴 /画布 /html代码</div>
-                        <div>高级待定</div>
+                        <div>大小</div>
+                        <div>颜色</div>
+                        <div>字体类型</div>
                     </div>  
+                </div>
+
+                <div class="rightArea_inner_ability">
+                    <div class="rightArea_inner_ability_title">-修饰-</div>
+                    <div class="rightArea_inner_ability_inner"> 
+                        <div>背景</div>
+                        <div>边框</div>
+                        <div>加粗/斜体/阴影/上中下三种划线/对齐方式（包括左右上下居中对齐）</div>
+                    </div>  
+                </div>
+
+                <div class="rightArea_inner_ability">
+                    <div class="rightArea_inner_ability_title">-插入-</div>
+                    <div class="rightArea_inner_ability_inner"> 
+                        <div>连接</div>
+                        <div>图片</div>
+                        <div>表格</div>
+                        <div>磁贴，点击可以移动该磁贴的位置或者显示磁贴的内容，这会是一个写着磁贴标题，前方以一个与磁贴背景颜色相同的小方块为标识，字体颜色与磁贴的标题字体颜色相同，并且本身自带浅灰色背景的长得像超链接的结构</div>
+                        <div>嵌套画布，把画布作为内容的一部分，点击这样一个前方以空白长方体为标识，以画布名为文字的块状结构，便可以进入到对应的画布</div>
+                        <div>html（弹出一个方框让用户在里面输入）</div>
+                    </div>  
+                </div>
+
+                <div class="rightArea_inner_ability">
+                    <div class="rightArea_inner_ability_title">-高级-</div>
+                    <div class="rightArea_inner_ability_inner"> 
+                        <div>待定！</div>
+                    </div>  
+                </div>
             </div>
-            <!-- 用于放置磁贴的内容 -->
-            <div id="rightArea_tile_edit" >
-                <div id="rightArea_tile_edit_title" class="rightArea_inner_ability">标题</div>
-                <div id="rightArea_tile_edit_text" class="rightArea_inner_ability">文本</div>
+        </div>
+        <div class="slide_title" mode="expanding">内容显示
+            <div class="slide_inner">
+                <!-- 用于放置对内容的附加功能 -->
+                <div id="rightArea_tile_ability" 
+                     class="rightArea_inner_ability">
+                    <div class="rightArea_inner_ability_title">-功能区-</div>
+                        <div class="rightArea_inner_ability_inner"> 
+                            <div>这里的功能全是小方块，可以对下方的选中的内容的html进行修改</div>
+                            <div>字体操作+和- // 字体颜色 // 字体样式</div>
+                            <div>背景色 // 边框 // 加粗/斜体/阴影/上中下三种划线/对齐方式（包括左右上下居中对齐）</div>
+                            <div>插入链接//图片 / 表格 / 磁贴 /画布 /html代码</div>
+                            <div>高级待定</div>
+                        </div>  
+                </div>
+                <!-- 用于放置磁贴的内容 -->
+                <div id="rightArea_tile_edit" >
+                    <div id="rightArea_tile_edit_title" class="rightArea_inner_ability">标题</div>
+                    <div id="rightArea_tile_edit_text" class="rightArea_inner_ability">文本</div>
+                </div>
             </div>
         </div>
     </div>
+    
 </html>
 
 <script src="./js/area_ability/right_edit.js"></script>

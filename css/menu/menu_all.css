@@ -9,10 +9,10 @@
 .huabu_menu{
     position:absolute;
     background-color:white;
-    min-width:150px;
-    min-height:100px;
+
     display:none;
-    border:2px solid black;
+    border:1px solid black;
+    border-radius:3px;
     z-index:100;
 }
 	/*间隔线条的样式*/

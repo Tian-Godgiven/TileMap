@@ -36,7 +36,7 @@ function changeAreaInner(model){
 function rightArea_getTile(tile){
 
 	var title = $(tile).attr("title");
-	var tiletext = $(tile).attr("tiletext");
+	var tiletext = $(tile).data("tiletext");
 	//将内容放入
 	$("#rightArea_tile_edit_title").html(title)
 	$("#rightArea_tile_edit_text").html(tiletext)
@@ -60,8 +60,8 @@ $("#rightArea_tile_edit_title").on("input",function(){
 $("#rightArea_tile_edit_text").on("input",function(){
 	var tile = return_focusing_tile()
 	var text = $(this).html()
-	$(tile).attr("tiletext",toHTML(text))
-	showTileTextBlock(tile)
+	$(tile).data("tiletext",toHTML(text))
+	showTileTextblock(tile)
 })
 
 //更换画布时，会清空内容，防止出现跨画布操作，同时也会关闭修改权限

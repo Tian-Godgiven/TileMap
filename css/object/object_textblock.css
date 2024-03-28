@@ -1,11 +1,10 @@
 .textblock{
-  position:relative;
+  position:absolute;
   width:150px;
   min-height:200px;
   max-height:400px;
   border:2px solid black;
   background:white;
-  display:none;
 }
 
 .textblock > .textblock_bar{

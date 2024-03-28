@@ -1,7 +1,7 @@
 var colorpicker//调色器本身
 var color_target_dom //调色器修改颜色的对象
 var color_target_colorpicker//调用调色器的选色器按钮对象
-var color_type //调色器修改对象的类型，包括“background”，“text"和"border"
+var color_type //调色器修改对象的类型，包括“background”，“text"和"border","huabu_grid"
 //创建调色盘
 function createColorpicker(dom_id){
 	//生成调色盘对象，加入色圆和状态条
@@ -44,8 +44,18 @@ function createColorpicker(dom_id){
 }
 
 //调用调色盘,在指定位置旁显示该调色盘
+// target:调用调色盘的.colorpicker对象
+// position：调色盘显示的位置，分为side（旁边）和down(下方)
+// dom:调色盘修改颜色的对象
+// type:调色盘修改颜色的对象的颜色对象，包括background和text，分别对应修改backgroundcolor和color
 function showColorpicker(target,position,dom,type){
-    //如果这个调色盘已经显示了，那么就把它隐藏
+
+	if(! $(target).has('.colorpicker')){
+		console.log("指定对象不是选色器")
+		return false
+	}
+
+    //如果调色盘已经显示了，那么就把它隐藏
     if($('#colorpicker').css("display") != "none"){
         hideColorpicker()
         return 0
@@ -56,41 +66,67 @@ function showColorpicker(target,position,dom,type){
 	color_type = type
 	//在目标位置旁边显示调色盘
 	var colorpicker = $('#colorpicker')
-	var left = $(target).offset().left + 3
-	var top  = $(target).offset().top
-	//在对象右侧显示调色盘
+	var target_left = $(target).offset().left
+	var target_top  = $(target).offset().top
+
+	//调色盘的位置与大小
+	var the_left = 0
+	var the_top = 0
+	var the_width = $(colorpicker).outerWidth()
+	var the_height = $(colorpicker).outerHeight()
+	//在对象两侧显示调色盘
 	if(position == "side"){
-		//如果右侧不够显示，则显示在左侧
-		if(left + $(colorpicker).width() > $(window).width()){
-			left = left - $(colorpicker).width()
+		//默认显示在右侧
+		the_left = target_left + $(target).width()
+		//如果目标的右侧不够显示调色盘，则在目标左侧显示，
+		if(the_left + the_width > $(window).width()){
+			the_left = target_left - the_width
 		}
-		else{
-			left = left + $(target).width()
-		}
-		//如果下侧不够显示，则显示在中侧
-		if(top + $(colorpicker).height() > $(window).height()){
-			top = top - $(colorpicker).height()/2 + $(target).height()
+
+		//默认与目标的高度持平
+		the_top = target_top
+		//如果目标的下侧不够显示，则将其上移至能够显示
+		if(the_top + the_height > $(window).height()){
+			the_top = $(window).height() - the_height
 		}
 	}
 	//在对象下方显示调色盘
 	else if(position == "down"){
-		if(top + $(colorpicker).height() > window.height()){
-			top = top - $(colorpicker).height()
+		//默认在对象下方
+		the_top = target_top + $(target).height()
+		//若下方的空间不够，则将其显示在右侧
+		if(the_top + the_height > $(window).height()){
+			the_left = target_left + $(target).width()
+			//如果此时右侧空间不足，则将其显示在左侧
+			if(the_left + the_width > $(window).width()){
+				the_left = target_left - the_width
+			}
+			//尽可能地与目标持平
+			the_top = target_top
+			//否则将其上移至能够显示
+			if(the_top + the_height > $(window).height()){
+				the_top = $(window).height() - the_height
+			}
 		}
 		else{
-			top = top + $(target).height()
+			//如果下方空间充足，则左侧与目标持平
+			the_left = target_left
+			//如果右侧的空间不够，则向左移动这个差值
+			if(the_left + the_width > $(window).width()){
+				the_left = $(window).width() - the_width
+			}
 		}
 	}
 	//修改调色盘的位置并将其显示
 	$(colorpicker).show()
 	$(colorpicker).offset({
-		left:left,
-		top:top
+		left:the_left,
+		top:the_top
 	})
 
 
-	//修改调色盘对象的颜色使其与目标当前的颜色相同
-	var color = $(target).css("background-color")
+	//修改调色盘对象的颜色使其与目标选色器当前的颜色相同
+	var color = $(target).children(".colorpicker_block").css("background-color")
 	changeColorpicker(color)
 
 	//监听点击事件，点击到画布外则直接关闭调色盘
@@ -303,11 +339,29 @@ $("#colorpicker_select").on("click"," .colorblock",function(){
 $("#colorpicker_bottom_confirm").on("click",function(){
 	confirmColorpicker()
 })
-//“应用”函数
+//“应用颜色”函数
 function confirmColorpicker(){
     var color = returnColorpicker()
     //放进记忆区
     appendColorpickerMemory(color)
+    //修改选色器方块的颜色
+    $(color_target_colorpicker).children(".colorpicker_block").css("background-color",color)
+
+    //特殊type的颜色修改,更高优先级
+    //huabu_grid的处理
+    if(color_type == "huabu_grid"){
+    	changeHuabuGridColor(color)
+    	return 1
+    }
+    else if(color_type == "tile_background_gradient"){
+    	gradientBackgroundTile(color_target_dom,null,color)
+    	return 1
+    }
+    else if(color_type == "text_shadow"){
+    	textShadowTile(color_target_dom,null,null,null,color)
+    	return 1
+    }
+    
     //修改目标颜色
     if(color_target_dom != undefined){
         if(color_type == "background"){
@@ -319,9 +373,13 @@ function confirmColorpicker(){
         else if(color_type == "border"){
             $(color_target_dom).css("border-color",color)
         }
+        //将这个颜色保存到目标内
+        $(color_target_dom).attr(color_type+"_color",color)
+        //重新聚焦一次目标元素
+        refocusingObject(color_target_dom)
     }
-    //修改选色器按钮的颜色
-    $(color_target_colorpicker).css("background-color",color)
+
+    return color
 }
 //底部栏的“关闭”按钮，按下后关闭选色器
 $("#colorpicker_bottom_cancel").on("click",function(){

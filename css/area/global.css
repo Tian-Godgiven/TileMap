@@ -6,19 +6,143 @@
 	z-index: 100;
 }
 
-/*拾色器方块统一样式*/
-.colorpicker{
-    width:30px;
-    height:15px;
-    border:1px solid black;
-    box-sizing:border-box;
+.flex{
+    display:flex;
 }
+
+.bold{
+    font-weight:bold;
+}
+
+/*覆盖整个网页的蒙版样式*/
+.mask_overlay_background{
+    position: absolute; 
+    background: black; 
+    height: 100%;
+    width:100%; 
+    right: 0px; 
+    z-index: 10002; 
+    opacity: 0.3; 
+    left: 0px; 
+    top: 0px;
+}
+
+/*在蒙版之上的元素样式*/
+.over_mask{
+    position:absolute;
+
+    z-index:10003;
+
+    top:50%;
+    left:50%;
+
+    transform: translate(-50%, -80%);
+}
+
+/*input按键统一样式*/
+    .input_button{
+        height:100%;
+        width:10px;
+        margin-left:2px;
+    }
+    .input_button_up{
+        position: relative;
+        top:0px;
+        height: 9px;
+        width: 10px;
+        background-image:url("../../img/arrow_up.png");
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size:10px 7px;
+    }
+    .input_button_down{
+        position: relative;
+        buttom:0px;
+        height: 9px;
+        width: 10px;
+        background-image:url("../../img/arrow_down.png");
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size:10px 7px;
+    }
+
+/*数字输入栏统一样式*/
+    .number_input{
+        box-sizing: border-box;
+        height:20px;
+        width: 60px;
+        text-align: right;
+    }
+
+/*文件插入按键统一样式*/
+    .file_insert{
+        width:100px;
+        height:20px;
+
+        text-align: center;
+
+        white-space: nowrap;
+        overflow:hidden;
+
+        border:1px solid black;
+        border-radius:3px;
+    }
+    .file_delete{
+        display:none;
+
+        width:20px;
+        height:20px;
+
+        margin-left:3px;
+
+        text-align: center;
+
+        border:1px solid black;
+        border-radius:3px;
+
+        background-image:url("../../img/delete.png");
+        background-size:60% 60%;
+        background-repeat:no-repeat;
+        background-position:center center;
+    }
+    .file_input{
+        display:none;
+    }
+
+/*拾色器统一样式*/
+    .colorpicker{
+        border:1px solid black;
+        border-radius:3px;
+        display:flex;
+        text-align: center;
+        align-items: center;
+        justify-content:center;
+        width:46px;
+        height:20px;
+    }
+    .colorpicker_block{
+        width:24px;
+        height:16px;
+        border:1px solid black;
+        box-sizing:border-box;
+    }
+    .colorpicker_img{
+        margin-left:2px;
+        position:relative;
+        top:-1px;
+        width:16px;
+        height:16px;
+        background-image: url("../../img/colorpicker.png");
+        background-repeat: no-repeat;
+        background-size:100% 100%;
+        background-position:center center;
+    }
 
 
 /*滑块标题样式*/
     .slide_title{
         background-color: #0BFFFFFF;
-        font-size: 20px;
+        font-size: 15px;
     }
 /*滑块内容样式*/
     .slide_inner > div{

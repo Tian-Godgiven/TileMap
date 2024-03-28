@@ -22,3 +22,4 @@ createTile()
 createTileText(tile)
 -输入：某磁贴
 -输出：为该磁贴生成一个tile_text对象，这个对象的编号id与该磁贴相同
+

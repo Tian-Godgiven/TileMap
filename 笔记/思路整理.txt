@@ -85,3 +85,4 @@ clone可以把旧的tile的内容记录下来吗？这样的话我还需要吧ti
 
 
 
+<svg width="56" height="56" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="56" height="56" patternUnits="userSpaceOnUse"><path d="M 0 14 L 56 14 M 14 0 L 14 56 M 0 28 L 56 28 M 28 0 L 28 56 M 0 42 L 56 42 M 42 0 L 42 56" fill="none" stroke="#d0d0d0" opacity="0.2" stroke-width="1"/><path d="M 56 0 L 0 0 0 56" fill="none" stroke="#d0d0d0" stroke-width="1"/></pattern></defs><rect width="100%" height="100%" fill="url(#grid)"/></svg>

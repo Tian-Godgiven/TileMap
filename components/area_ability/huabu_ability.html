@@ -1,74 +1,108 @@
 <html>
-    <div id="huabu_ability_ScaleUp" class="draw_block">
-        <img class="huabu_ability_button" src="./img/ScaleUp.png">
-    </div>
+    <!-- 放大 -->
+    <div id="huabu_ability_ScaleUp" class="draw_block"></div>
+    <!-- 显示缩放度 -->
     <div id="huabu_ability_ScaleShow" class="draw_block">
         <div>100%</div>
     </div>
-    <div id="huabu_ability_ScaleDown" class="draw_block">
-        <img class="huabu_ability_button" src="./img/ScaleDown.png">
-    </div>
+    <!-- 缩小 -->
+    <div id="huabu_ability_ScaleDown" class="draw_block"></div>
 
-    <!-- 未完成↓ -->
+    <!-- 撤销 -->
+    <div id="huabu_ability_Undo" class="draw_block"></div>
+    <!-- 重做 -->
+    <div id="huabu_ability_Redo" class="draw_block"></div>
 
-    <div class="draw_block">
-        <img class="huabu_ability_button" src="./img/undo.png">
-    </div>
-    <div class="draw_block">
-        <img class="huabu_ability_button" src="./img/redo.png">
-    </div>
+    <!-- 删除 -->
+    <div id="huabu_ability_Delete" class="draw_block" ></div>
 
-    <div class="draw_block" id="huabu_ability_Delete">删除</div>
-    <div class="draw_block">上浮</div>
-    <div class="draw_block">下沉</div>
-    <div class="draw_block">颜色</div>
+    <!-- 下沉 -->
+    <div id="huabu_ability_ZIndexDown" class="draw_block"></div>
+    <!-- 上浮 -->
+    <div id="huabu_ability_ZIndexUp" class="draw_block"></div>
 
-    <div class="draw_block">连线样式</div>
-    <div class="draw_block">连线规则</div>
+    <!-- 颜色 -->
+    <div class="draw_block"></div>
 
-    <div class="draw_block">快捷添加</div>
+    <!-- 连线样式 -->
+    <div class="draw_block"></div>
+    <!-- 连线规则 -->
+    <div class="draw_block"></div>
+
+    <!-- 快捷添加 -->
+    <div class="draw_block"></div>
+
+    <!-- 返回上一层画布 -->
+    <div id="huabu_ability_returnNestFrom" class="nest_block">返回</div>
+    <!-- 关闭嵌套画布 -->
+    <div id="huabu_ability_closeNestHuabu" class="nest_block">关闭</div>
 </html>
 
 <script src="./js/area_ability/huabu_ability.js"></script>
 
 <style type="text/css">
     
-
+    /*基础块样式*/
     .draw_block{
         text-align:center;
         padding:0px 5px;
         height:49px;
-        float:left;
-        background-color:#1F9098D2;
-        display: flex; 
+        width:25px;
 
+        font-size:25px;
+
+        background-color:#1F9098D2;
+        
+        flex-shrink:0;
+
+        display: flex; 
         justify-content:center;
         align-items: center;
-    }
 
-    #huabu_ability #search{
-        width:200px;
-        height:49px;
-        right:100px;
+        background-repeat:no-repeat;
+        background-size:80%;
+        background-position:center;
+    }
+    /*嵌套画布块样式*/
+    .nest_block{
+        display:none;
         position:absolute;
+        background-color:white;
+        width:40px;
+        height:40px;
     }
 
-    #huabu_ability #night{
-        right:0px;
-        position:absolute;
-    }
-    #huabu_ability #fullscreen{
-        right:50px;
-        position:absolute;
-    }
+    /*draw_block*/
+        #huabu_ability_ScaleUp{
+            background-image:url("./img/ScaleUp.png");
+        }
+        #huabu_ability_ScaleShow{
+            justify-content:right;
+            text-align:right;
+            width:70px;
+        }
+        #huabu_ability_ScaleDown{
+            background-image: url("./img/ScaleDown.png");
+        }
 
-    .huabu_ability_button{
-        max-width:25px;
-    }
+        #huabu_ability_Undo{
+            background-image:url("./img/undo.png");
+        }
+        #huabu_ability_Redo{
+            background-image:url("./img/redo.png");
+        }
 
-    #huabu_ability_ScaleShow{
-        justify-content:right;
-        text-align:right;
-        width:70px;
-    }
+        #huabu_ability_Delete{
+            background-image: url("./img/delete_bin.png");
+        }
+    /*nest_block*/
+        #huabu_ability_returnNestFrom{
+            left:0px;
+            top:100%;
+        }
+        #huabu_ability_closeNestHuabu{
+            right:0px;
+            top:100%;
+        }
+
 </style>

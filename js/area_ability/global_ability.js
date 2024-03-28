@@ -8,6 +8,8 @@ function import_menus(){
 	$("#global_ability").append($("<div>").load("./components/menu/colorpicker.html"));
 	$("#global_ability").append($("<div>").load("./components/menu/huabu_menu.html"));
 	$("#global_ability").append($("<div>").load("./components/menu/huabu_button_menu.html"));
+	$("#global_ability").append($("<div>").load("./components/menu/huabu_nest_menu.html"));
+	$("#global_ability").append($("<div>").load("./components/menu/tile_link_menu.html"));
 	$("#global_ability").append($("<div>").load("./components/menu/tile_menu.html"));
 	$("#global_ability").append($("<div>").load("./components/menu/MidwayDot_menu.html"));
 }
@@ -171,23 +173,83 @@ function rotatePositionChange(X, Y, a) {
 }
 
 
-//剪贴板对象，在用户进行了复制操作后，将对应的内容存入
-var clipboard
-//将内容存入剪贴板中
-function pushClipboard(target){
-	clipboard = target
-}
-//读取剪贴板中的内容
-function popClipboard(){
-	// //如果剪贴板中没有内容，则读取用户剪贴板中的内容
-	// if(clipboard == undefined){
-	// 	navigator.clipboard.readText()
-	// 	    .then(text => {
-	// 	      return text
-	// 	    })
-	// }
-	// else{
-		return clipboard
-	// }
+
+
+//点击对应的按钮修改与其相邻的input的值
+$(document).on("click",".input_button .input_button_up",function(){
+	//获取改变值
+	var value = parseFloat($(this).attr("step"))
+	//获取与input_button相邻的input
+	var input = $(this).parent(".input_button").siblings("input")
+	var input_unit = $(input).attr("unit")
+	if(input_unit == undefined){
+		input_unit = null
+	}
+	//按照改变值增加Input的值
+	var new_value = parseFloat($(input).val()) + value
+	//随后将其标准化
+	$(input).val(intValue(new_value,"px"))
+
+	//触发这个input的change监听
+	$(input).change()
+})
+$(document).on("click",".input_button .input_button_down",function(){
+	//获取改变值
+	var value = parseInt($(this).attr("step"))
+	//获取与input_button相邻的input
+	var input = $(this).parent(".input_button").siblings("input")
+	var input_unit = $(input).attr("unit")
+	if(input_unit == undefined){
+		input_unit = null
+	}
+	//按照改变值增加Input的值
+	var new_value = parseFloat($(input).val()) - value
+	$(input).val(intValue(new_value,input_unit))
+	$(input).val(new_value)
+	//触发这个input的change监听
+	$(input).change()
+})
+
+//处理输入值，返回纯数字或者百分数的值
+function intValue(input,unit){
+	//如果不包含数字则设为0
+	if(isNaN(parseFloat(input))){
+		input = 0
+	}
+	var regex = /^-?\d+(\.\d+)?%$/;
+	//如果是百分数则添加%
+    if(regex.test(input)) {
+        input = parseFloat(input) +"%"
+    } 
+    //否则添加单位
+    else{
+    	//去除非数字部分
+    	input = parseFloat(input)
+    	//若为整数，则不作处理
+    	if (Math.floor(input) === input){
+    		input = parseInt(input)
+    	}
+    	//若为浮点数，则保留两位小数
+    	else{
+    		input = input.toFixed(2)
+    	}
+    	//添加单位
+    	if(unit != null){
+    		input = input + unit
+    	}
+    }
+
+    //返回处理后的值
+    return input
 }
 
+//获取网格图片的base64编码
+function getGridBase64(grid_size,grid_color){
+	var svg = '<svg width="' + grid_size + '" height="' + grid_size + '" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="' + grid_size + '" height="' + grid_size + '" patternUnits="userSpaceOnUse">\
+				<path d="M 0 ' + grid_size/4 + ' L ' + grid_size + ' ' + grid_size/4 + ' M ' + grid_size/4 + ' 0 L ' + grid_size/4 + ' ' + grid_size + ' M 0 ' + grid_size/2 + ' L ' + grid_size + ' ' + grid_size/2 + ' M ' + grid_size/2 + ' 0 L ' + grid_size/2 + ' ' + grid_size + ' M 0 ' + grid_size*3/4 + ' L ' + grid_size + ' ' + grid_size*3/4 + ' M ' + grid_size*3/4 + ' 0 L ' + grid_size*3/4 + ' ' + grid_size + '" fill="none" stroke="'+ grid_color +'" opacity="0.2" stroke-width="1"/>\
+				<path d="M ' + grid_size + ' 0 L 0 0 0 ' + grid_size + '" fill="none" stroke="'+ grid_color +'" stroke-width="1"/></pattern></defs><rect width="100%" height="100%" fill="url(#grid)"/></svg>';
+
+	//将svg转化为base64编码
+	var base64 = btoa(svg)
+	return base64
+}

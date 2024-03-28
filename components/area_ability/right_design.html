@@ -1,175 +1,543 @@
 <html>
-    <div class="rightArea_inner_block slide_title" mode="expanding">画布
-        <div class="slide_inner">
-
-            <div class="rightArea_inner_ability">
-                <div class="rightArea_inner_ability_title">-属性-</div>
-                <div class="rightArea_inner_ability_inner"> 
-                    <div>画布名称（可以重命名）</div>
-                    <div>画布大小（可以修改）</div>
-                    <div>画布成员：显示该画布所包含的磁贴，若磁贴嵌套了画布则用展开式显示，可以借此定位或删除某些磁贴</div>
-                </div>  
-            </div>
-
-            <div class="rightArea_inner_ability">
-                <div class="rightArea_inner_ability_title">-显示-</div>
-                <div class="rightArea_inner_ability_inner"> 
-                    <div>背景颜色</div>
-                    <div>网格画布</div>
-                    <div>插入图片</div>
-                </div>  
-            </div>
-
-            <div class="rightArea_inner_ability">
-                <div class="rightArea_inner_ability_title">-操作-</div>
-                <div class="rightArea_inner_ability_inner"> 
-                    <div>删除</div>
-                    <div>拷贝（可以选择仅拷贝画布 或者联同Tile一起拷贝）</div>
-                </div>  
-            </div>
-
-
-
+    <div id="rightArea_design_huabu" class="rightArea_design_inner_block">画布样式
+        <!-- 画布属性 -->
+        <div id="huabu_state" class="rightArea_inner_ability">
+            <div class="rightArea_inner_ability_title">-属性-</div>
+            <div> 
+                <!-- 画布名称 -->
+                <div id="huabu_state_name" class="flex">名称：
+                    <div id="huabu_state_name_block" class="bold">　　　　</div>
+                    <div id="huabu_state_name_edit">
+                        <img src="./img/edit.png">
+                    </div>
+                </div>
+                <!-- 画布尺寸 -->
+                <div id="huabu_state_size" class="flex">
+                    <div>尺寸：</div>
+                    <div>
+                        <div id="huabu_state_size_select">
+                            <select>
+                                <option value="" selected hidden></option>
+                                <option value="customization">自定义</option>
+                                <option value="A0">A0 (841mm x 1189mm)</option>
+                                <option value="A1">A1 (594mm x 841mm)</option>
+                                <option value="A2">A2 (420mm x 594mm)</option>
+                                <option value="A3">A3 (297mm x 420mm)</option>
+                                <option value="A4">A4 (210mm x 297mm)</option>
+                                <option value="A5">A5 (148mm x 210mm)</option>
+                                <option value="A6">A6 (105mm x 148mm)</option>
+                                <option value="B4">B4 (250mm x 353mm)</option>
+                                <option value="B5">B5 (176mm x 250mm)</option>
+                                <option value="16:9">16:9 (1600px x 900px)</option>
+                                <option value="4:3">4:3 (400px x 300px)</option>
+                            </select>
+                        </div>
+                        <div id="huabu_state_size_input" class="flex">
+                            <div>
+                                <input class="number_input" id="huabu_state_size_width">
+                                <div>　宽</div>
+                            </div>
+                            <div>
+                                <input class="number_input" id="huabu_state_size_height">
+                                <div>　高</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 画布成员 -->
+                <div>成员：显示该画布所包含的磁贴，若磁贴嵌套了画布则用展开式显示，可以借此定位或删除某些磁贴</div>
+            </div>  
+        </div>
+        <!-- 画布显示 -->
+        <div id="huabu_display" class="rightArea_inner_ability">
+            <div class="rightArea_inner_ability_title">-显示-</div>
+            <div> 
+                <!-- 画布颜色 -->
+                <div id="huabu_display_color" class="flex">画布颜色：
+                    <div class="colorpicker">
+                        <div class="colorpicker_block"></div>
+                        <div class="colorpicker_img"></div>
+                    </div>
+                </div>
+                <!-- 画布网格 -->
+                <div id="huabu_display_grid" class="flex">画布网格
+                    <input id="huabu_display_grid_checkbox" type="checkbox">
+                    <div id="huabu_display_grid_inner" class="flex">
+                        <!-- 输入框和按键 -->
+                        <input class="number_input" id="huabu_display_grid_size" unit="px">
+                        <div class="input_button">
+                            <div class="input_button_up" step="1"></div>
+                            <div class="input_button_down" step="1"></div>
+                        </div>
+                        <!-- 选色器 -->
+                        <div class="colorpicker">
+                            <div class="colorpicker_block"></div>
+                            <div class="colorpicker_img"></div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <!-- 背景图片 -->
+                <div id="huabu_display_background" class="flex">
+                    <div>背景图片：</div>
+                    <div id="huabu_display_background_inner">
+                        <div class="flex">
+                            <div id="huabu_display_background_insert" class="file_insert">插入图片</div>
+                            <div id="huabu_display_background_delete" class="file_delete"></div>
+                            <input id="huabu_display_background_input" class="file_input" type="file">
+                        </div>
+                        <div id="huabu_display_background_set">图片设置
+                            <select>
+                                <option value = "放置">放置</option>
+                                <option value = "拉伸">拉伸</option>
+                                <option value = "重复">重复</option>
+                            </select>
+                        </div>
+                        <div id="huabu_display_background_position">
+                            <span>左</span>
+                            <input class="number_input" id="huabu_display_background_left">
+                            <span>右</span>
+                            <input class="number_input" id="huabu_display_background_top">
+                        </div>
+                    </div>
+                </div>
+            </div>  
+        </div>
+        <!-- 画布操作 -->
+        <div id="huabu_operate" class="rightArea_inner_ability">
+            <div class="rightArea_inner_ability_title">-操作-</div>
+            <div> 
+                <div id="huabu_operate_deleteHuabu">
+                    <div id="huabu_operate_delete">删除当前画布</div>
+                </div>
+                <div id="huabu_operate_copyHuabu" class="flex">
+                    <div id="huabu_operate_copy">拷贝画布</div>
+                    <div>
+                        <input id="huabu_operate_noCopyTile" type="checkbox">不拷贝画布内元素
+                        <br>
+                        <input id="huabu_operate_noCopyNest" type="checkbox">不拷贝嵌套画布
+                    </div>
+                </div>
+            </div>  
         </div>
     </div>
 
-    <div class="rightArea_inner_block slide_title" mode="expanding">磁贴
-        <div class="slide_inner">
-
-        <div class="slide_title" mode="expanding">图形
+    <div id="rightArea_design_tile" class="rightArea_design_inner_block">磁贴样式
+        <div class="slide_title" mode="expanding">-图形-
             <div class="slide_inner">
-                <div class="rightArea_inner_ability">
-                    <div class="rightArea_inner_ability_title">-背景-</div>
-                    <div class="rightArea_inner_ability_inner"> 
-                        <div>背景颜色</div>
-                        <div>填充类型(可以不是纯色)</div>
-                        <div>插入图片</div>
-                    </div>  
-                </div>
 
+                <!-- 背景 -->
                 <div class="rightArea_inner_ability">
-                    <div class="rightArea_inner_ability_title">-位置-</div>
-                    <div class="rightArea_inner_ability_inner"> 
-                        <div>top X left</div>
-                        <div>角度</div>
-                    </div>  
-                </div>
-
-                <div class="rightArea_inner_ability">
-                    <div class="rightArea_inner_ability_title">-形状-</div>
-                    <div class="rightArea_inner_ability_inner"> 
-                        <div>高度 X 宽度</div>
-                        <div>比例限制选项(增加或减少的值比例同步)</div>
-                        <div>改变形状</div>
-                    </div>  
-                </div>
-
-                <div class="rightArea_inner_ability">
-                    <div class="rightArea_inner_ability_title">-边框-</div>
-                    <div class="rightArea_inner_ability_inner"> 
-                        <div>类型</div>
-                        <div>宽度/粗细</div>
-                        <div>颜色</div>
-                        <div>弧度(圆润度)</div>
-                    </div>  
-                </div>
-
-                <div class="rightArea_inner_ability">
-                    <div class="rightArea_inner_ability_title">-层叠-</div>
-                    <div class="rightArea_inner_ability_inner"> 
-                        <div>显示和修改层叠优先级</div>
-                        <div>调整层叠优先级</div>
-                    </div>  
-                </div>
-
-                <div class="rightArea_inner_ability">
-                    <div class="rightArea_inner_ability_title">-样式设置-</div>
-                    <div class="rightArea_inner_ability_inner"> 
-                        <div>锁定/解锁</div>
-                        <div>复制该样式</div>
-                        <div>粘贴该样式</div>
-                        <div>加入：记忆面包（或者选择其他的自定义分类）</div>
+                    <!-- 背景颜色 -->
+                    <div class="flex">背景颜色：
+                        <div id="tile_background_color" class="colorpicker">
+                            <div class="colorpicker_block"></div>
+                            <div class="colorpicker_img"></div>
+                        </div>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="slide_title" mode="expanding">文字
-            <div class="slide_inner">
-
-                <div class="rightArea_inner_ability">
-                    <div class="rightArea_inner_ability_title">-显示-</div>
-                    <div class="rightArea_inner_ability_inner"> 
-                        <div>是否显示标题</div>
-                        <div>标题显示的位置</div>
-                        <div>换行</div>
-                    </div>  
-                </div>
-
-                <div class="rightArea_inner_ability">
-                    <div class="rightArea_inner_ability_title">-字体-</div>
-                    <div class="rightArea_inner_ability_inner"> 
-                        <div>字体大小</div>
-                        <div>字体类型</div>
-                        <div>字体颜色（透明度）</div>
-                    </div>  
-                </div>
-
-                <div class="rightArea_inner_ability">
-                    <div class="rightArea_inner_ability_title">-修饰-</div>
-                    <div class="rightArea_inner_ability_inner"> 
-                        <div>加粗</div>
-                        <div>斜体</div>
-                        <div>阴影</div>
-                        <div>上中下三种下划线</div>
-                        <div>对齐方式</div>
-                    </div>  
-                </div>
-
-            </div>
-        </div>
-
-        <div class="slide_title" mode="expanding">高级
-            <div class="slide_inner">
-                <div class="rightArea_inner_ability">
-                    <div class="rightArea_inner_ability_title">-插入-</div>
-                    <div class="rightArea_inner_ability_inner"> 
-                        <div>连接</div>
-                        <div>注释</div>
-                        <div>嵌套画布
-                            <div>新建画布</div>
-                            <div>选择画布，可以选择已经打开的，或者文件形式的画布</div>
-                            <div>相关设置比如如何进入嵌套的画布之类的</div>
+                    <!-- 背景图片 -->
+                    <div id="tile_background_insert" class="flex">背景图片：
+                        <div>
+                            <div class="flex">
+                                <div class="file_insert">插入图片</div>
+                                <div class="file_delete"></div>
+                                <input class="file_input" type="file">
+                            </div>
+                            <div id="tile_background_insert_set">图片设置
+                                <select>
+                                    <option value = "放置">放置</option>
+                                    <option value = "拉伸">拉伸</option>
+                                    <option value = "重复">重复</option>
+                                </select>
+                            </div>
+                            <div id="tile_background_insert_position" class="flex">
+                                <div>
+                                    <div class="flex">
+                                        <input unit="px" class="number_input" id="tile_background_position_left">
+                                        <div class="input_button">
+                                            <div class="input_button_up" step="1"></div>
+                                            <div class="input_button_down" step="1"></div>
+                                        </div>
+                                    </div>
+                                    <div>　　左</div>
+                                </div>
+                                <div>
+                                    <div class="flex">
+                                        <input unit="px" class="number_input" id="tile_background_position_top">
+                                        <div class="input_button">
+                                            <div class="input_button_up" step="1"></div>
+                                            <div class="input_button_down" step="1"></div>
+                                        </div>
+                                    </div>
+                                    <div>　　上</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 背景渐变 -->
+                    <div id="tile_background_gradient" class="flex">渐变
+                        <input type="checkbox">
+                        <div id="tile_background_gradient_set" style="display:none;">
+                            <select style="margin-right:4px">
+                                <option value="top">向上</option>
+                                <option value="bottom">向下</option>
+                                <option value="left">向左</option>
+                                <option value="right">向右</option>
+                                <option value="radial">环绕</option>
+                            </select>
+                            <div class="colorpicker">
+                                <div class="colorpicker_block"></div>
+                                <div class="colorpicker_img"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- 位置 -->
                 <div class="rightArea_inner_ability">
-                    <div class="rightArea_inner_ability_title">-tiletext设置-</div>
-                    <div class="rightArea_inner_ability_inner"> 
-                        <div>脱离当前tile</div>
-                        <div>保持显示</div>
-                        <div>不显示该tile的textblock</div>
+                    <div id="tile_position" class="flex">磁贴位置：
+                        <div>
+                            <input id="tile_position_left" class="number_input">
+                            <div>　　左</div>
+                        </div>
+                        <div>
+                            <input id="tile_position_top" class="number_input">
+                            <div>　　上</div>
+                        </div>
+                    </div>
+                    <div class="flex">旋转角度：
+                        <input id="tile_position_angle" class="number_input" unit="°">
+                        <div class="input_button">
+                            <div class="input_button_up" step="1"></div>
+                            <div class="input_button_down" step="1"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 形状 -->
+                <div class="rightArea_inner_ability">
+                    <div id="tile_size" class="flex">磁贴大小：
+                        <div>
+                            <div class="flex">
+                                <div>
+                                    <input id="tile_size_width" class="number_input">
+                                    <div>　　宽</div>
+                                </div>
+                                <div>
+                                    <input id="tile_size_height" class="number_input">
+                                    <div>　　高</div>
+                                </div>
+                            </div>
+                            <div>比例限制
+                                <input id="tile_size_limit" type="checkbox">
+                            </div>
+                            <div>
+                                改变形状
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 边框 -->
+                <div class="rightArea_inner_ability">
+                    <div style="display: inline-flex;margin-bottom:4px">磁贴边框：
+                        <!-- 边框类型 -->
+                        <select id="tile_border_type">
+                            <option value="none">无</option>
+                            <option value="solid">实线</option>
+                            <option value="dashed">虚线</option>
+                            <option value="dotted">点状</option>
+                            <option value="double">双线</option>
+                        </select>
+                        <!-- 边框粗度 -->
+                        <div class="flex">
+                            <input id="tile_border_width" class="number_input" unit="px">
+                            <div class="input_button">
+                                <div class="input_button_up" step="0.5"></div>
+                                <div class="input_button_down" step="0.5"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <!-- 边框颜色 -->
+                    <div style="display: flex;margin-bottom:4px">边框颜色：
+                        
+                        <div id="tile_border_color" class="colorpicker">
+                            <div class="colorpicker_block"></div>
+                            <div class="colorpicker_img"></div>
+                        </div>
+                    </div>
+                    <!-- 边框弧度 -->
+                    <div class="flex">边框弧度：
+                        <input id="tile_border_radius" class="number_input" unit="px">
+                        <div class="input_button">
+                            <div class="input_button_up" step="0.2"></div>
+                            <div class="input_button_down" step="0.2"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 层叠 -->
+                <div class="rightArea_inner_ability">
+                    <div id="tile_zIndex" class="flex">当前层叠：<span></span>
+                        <div id="tile_zIndex_up"></div>
+                        <div id="tile_zIndex_down"></div>
+                    </div>
+                    <div class="flex">
+                        <div id="tile_zIndex_max">移至最前</div>
+                        <div id="tile_zIndex_min">移至最后</div>
+                    </div>
+                </div>
+
+                <!-- 管理 -->
+                <div class="rightArea_inner_ability">
+                    <div>锁定磁贴
+                        <input id="tile_manage_lock" type="checkbox">
+                    </div>
+                    <div class="flex">
+                        <div id="tile_manage_copy">复制样式</div>
+                        <div id="tile_manage_paste">粘贴样式</div>
+                    </div>
+                    <div>加入：
+                        <select id="tile_manage_add">
+                            <option>记忆面包</option>
+                            <option>其他自定义栏位</option>
+                        </select>
                     </div>
                 </div>
             </div>
         </div>
 
-            
+        <div class="slide_title" mode="expanding">-文本-
+            <div class="slide_inner">
+                <!-- 标题设置 -->
+                <div class="rightArea_inner_ability">
 
+                    <div class="flex">显示标题
+                        <input id="tile_title_show" type="checkbox">
+                    </div>
+
+                    <div class="flex">自动换行
+                        <input id="tile_title_wrap" type="checkbox">
+                    </div>
+
+                    <div class="flex">标题位置：
+                        <div>
+                            <div class="flex" style="margin-bottom:4px">横向
+                                <select id="tile_title_horizontal" value="0">
+                                    <option value="-100%">左侧</option>
+                                    <option value="0">居中</option>
+                                    <option value="100%">右侧</option>
+                                </select>
+                            </div>
+                            <div class="flex">竖向
+                                <select id="tile_title_vertical" value="0">
+                                    <option value="-100%">上方</option>
+                                    <option value="0">居中</option>
+                                    <option value="100%">下方</option>
+                                </select>
+                            </div>
+                        </div>
+
+                    </div> 
+                </div>
+
+                <div class="rightArea_inner_ability">字体
+                    <!-- 字体修饰 -->
+                    <div style="margin-bottom:4px">
+                        <!-- 字体类型 -->
+                        <div>
+                            <select id="tile_font_style">
+                                <option value='"Microsoft YaHei", Arial, sans-serif'>微软雅黑</option>
+                                <option value='SimSun, "Songti SC", serif'>宋体</option>
+                                <option value="SimHei, Arial, sans-serif">黑体</option>
+                                <option value="KaiTi, cursive">楷体</option>
+                                <option value="FangSong, serif">仿宋</option>
+                                <option value="Arial, sans-serif">Arial</option>
+                                <option value="Helvetica, sans-serif">Helvetica</option>
+                                <option value='"Times New Roman", serif'>Times New Roman</option>
+                                <option value="Georgia, serif">Georgia</option>
+                                <option value="Verdana, sans-serif">Verdana</option>
+                                <option value='"Courier New", monospace'>Courier New</option>
+                            </select>
+                        </div>
+
+                        <div style="margin-bottom:4px;" class="flex">
+                            <div style="margin-right:12px;align-items:center;justify-content:center;" class="flex">
+                                <!-- 字体颜色 -->
+                                <div id="tile_font_color" class="colorpicker">
+                                    <div class="colorpicker_block"></div>
+                                    <div class="colorpicker_img"></div>
+                                </div>
+                                <!-- 字体大小 -->
+                                <div class="flex">
+                                    <input id="tile_font_size" class="number_input" unit="px">
+                                    <div class="input_button">
+                                        <div class="input_button_up" step="1"></div>
+                                        <div class="input_button_down" step="1"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 字体样式修饰 -->
+                            <div class="flex">
+                                <div id="tile_font_bold" class="rightArea_button"></div>
+                                <div id="tile_font_italic" class="rightArea_button"></div>
+                                <div id="tile_font_vertical" class="rightArea_button">垂直</div>
+                            </div>
+                        </div>
+                        <div class="flex">
+                            <div style="margin-right:6px;" class="flex">
+                                <div id="tile_font_overline" class="rightArea_button"></div>
+                                <div id="tile_font_strickline" class="rightArea_button"></div>
+                                <div id="tile_font_underline" class="rightArea_button"></div>
+                            </div>
+                            <div class="flex">
+                                <div id="tile_font_alignLeft" class="rightArea_button"></div>
+                                <div id="tile_font_alignCenter" class="rightArea_button"></div>
+                                <div id="tile_font_alignRight" class="rightArea_button"></div>
+                            </div>
+                        </div>
+                    </div>  
+                </div>
+                <!-- 文本阴影 -->
+                <div class="rightArea_inner_ability">
+                    <div id="tile_font_shadow" class="flex">阴影
+                        <div>
+                            <!-- 阴影选项 -->
+                            <input id="tile_font_shadow_check" type="checkbox">
+                            <!-- 阴影设置 -->
+                            <div id="tile_font_shadow_set">
+                                <div class="flex" style="align-items:center;">颜色：
+                                    <div id="tile_font_shadow_color" class="colorpicker" style="margin-right:4px">
+                                        <div class="colorpicker_block"></div>
+                                        <div class="colorpicker_img"></div>
+                                    </div>
+                                </div>
+                                <!-- 阴影位置 -->
+                                <div class="flex">位置：
+                                    <div class="flex" style="margin-right:4px;">
+                                        <input id="tile_font_shadow_left" class="number_input" unit="px">
+                                        <div class="input_button">
+                                            <div class="input_button_up" step="1"></div>
+                                            <div class="input_button_down" step="1"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex">
+                                        <input id="tile_font_shadow_top" class="number_input" unit="px">
+                                        <div class="input_button">
+                                            <div class="input_button_up" step="1"></div>
+                                            <div class="input_button_down" step="1"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 模糊半径 -->
+                                <div class="flex">模糊：
+                                    <input id="tile_font_shadow_vague" class="number_input" unit="px">
+                                    <div class="input_button">
+                                        <div class="input_button_up" step="0.2"></div>
+                                        <div class="input_button_down" step="0.2"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+
+        <div class="slide_title" mode="expanding">-内容-
+            <div class="slide_inner">
+                <div class="rightArea_inner_ability">
+                    <!-- 绑定链接 -->
+                    <div>绑定链接
+                        <input id="tile_content_link" type="checkbox">
+                        <br>
+                        <div id="tile_content_link_set" style="display:none;">
+                            <input id="tile_content_link_input">
+                            <br>
+                            禁用链接提示弹窗<input id="tile_content_link_menu_check" type="checkbox">
+                        </div>
+                    </div>
+                    <!-- 添加注释 -->
+                    <div>添加注释
+                        <input id="tile_content_annotation" type="checkbox">
+                        <br>
+                        <input id="tile_content_annotation_input" style="display:none;">
+                    </div>
+                </div>
+
+                <!-- 嵌套画布 -->
+                <div class="rightArea_inner_ability">
+                    <div>
+                        <div id="tile_content_nestHuabu">嵌套画布</div>
+                        <div id="tile_content_nestHuabu_delete"></div>
+                    </div>
+                    <div id="tile_content_nestSet">
+                        <div >双击进入画布
+                            <input id="tile_content_nestSet_dbClick" type="checkbox" name="">
+                        </div>
+                        <div >点击侧栏按键
+                            <input id="tile_content_nestSet_clickButton" type="checkbox" name="">
+                        </div>
+                        <div >禁止进入画布
+                            <input id="tile_content_nestSet_noOpen" type="checkbox" name="">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rightArea_inner_ability">磁贴内容
+                    <div class="flex">尺寸：
+                        <div class="flex">
+                            <div>
+                                <input id="tile_textblock_size_width" class="number_input"  >
+                                <div>　　宽</div>
+                            </div>
+                            <div>
+                                <input id="tile_textblock_size_height" class="number_input" >
+                                <div>　　高</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex">显示位置：
+                        <div class="flex">
+                            <select id="tile_textblock_position_vertical">
+                                <option value="top">上方</option>
+                                <option value="center">对齐</option>
+                                <option value="bottom">下方</option>
+
+                            </select>
+                            <select id="tile_textblock_position_horizontal">
+                                <option value="left">左侧</option>
+                                <option value="left_edge">左对齐</option>
+                                <option value="center">居中</option>
+                                <option value="right_edge">右对齐</option>
+                                <option value="right">右侧</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex">显示方式：
+                        <select id="tile_textblock_showState">
+                            <option value = "normal">跟随聚焦</option>
+                            <option value = "enternalShow">保持显示</option>
+                            <option value = "enternalHide">保持隐藏</option>
+                        </select>
+                    </div>
+
+                    <div>绑定磁贴<input id="tile_textblock_bindState" type="checkbox" name=""></div>
+
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="rightArea_inner_block slide_title" mode="expanding">线条
-        <div class="slide_inner">
-            <div>111</div>
-        </div>
+    <div class="rightArea_design_inner_block">线条样式
+        <div>111</div>
     </div>
 
-    <div class="rightArea_inner_block slide_title" mode="expanding">组合
-        <div class="slide_inner">
-            <div>111</div>
-        </div>
+    <div class="rightArea_design_inner_block">组合样式
+        <div>222</div>
     </div>
 </html>
 

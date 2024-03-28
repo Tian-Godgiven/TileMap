@@ -62,7 +62,7 @@ function createHuabuButton(huabu) {
     if($(huabu).attr("id").length<2){
         $(button).css("width","35px")
     }
-    $("#huabu_changeBar").append(button)
+    $("#huabu_buttonBar").append(button)
     $(button).on("click",function(){
         changeHuabuButton(this)
     })
