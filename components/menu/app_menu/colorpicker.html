@@ -1,0 +1,167 @@
+<html>
+    <div id="colorpicker" class="app_menu">
+        <div id="colorpicker_ability">
+            <div id="colorpicker_input">
+                <input>
+                <div id="colorpicker_input_comfirm" class="button"></div>
+                <div id="colorpicker_input_copy" class="button"></div>
+                <div id="colorpicker_input_menu" menu="down" class="button"></div>
+            </div>
+            <div id="colorpicker_menu">
+                <div class="menu_line"></div>
+                <div id="colorpicker_memory">
+                    <div class="colorblock" id="delete"></div>
+                </div>
+                <div class="menu_line"></div>
+                <div id="colorpicker_select">
+                    <div id="transparent" class="colorblock"></div>
+                </div>
+            </div>
+            <div id="colorpicker_bottom">
+                <div id="colorpicker_bottom_confirm" class="button">应用</div>
+                <div id="colorpicker_bottom_cancel" class="button">关闭</div>
+            </div>
+        </div>
+    </div>
+</html>
+
+<script src="./js/menu/colorpicker.js"></script>
+<script type="text/javascript">
+    createColorpicker("#colorpicker")
+</script>
+
+<style type="text/css">
+    /*选色器本体*/
+        #colorpicker{
+            background-color:var(--color-1);
+
+            position:absolute;
+            width:250px;
+            height:390px;
+            padding:4px;
+
+            border:2px solid var(--color-5);
+            
+            display:none;
+
+            z-index:1000;
+        }
+
+    /*功能部分，上面就是色板*/    
+        #colorpicker_ability{
+            position:absolute;
+            top:160px;
+            height:250px;
+            width:calc(100% - 8px);
+        }
+
+        /*输入栏*/
+            #colorpicker #colorpicker_input{
+                display:flex;
+                align-items:center;
+
+                height:25px;
+                width:100%;
+            }
+                /*input*/
+                #colorpicker #colorpicker_input input{
+                    box-sizing: border-box;
+                    height:24px;
+                    width:68%;
+                    margin:0 2px;
+                }
+                /*三个按键*/
+                #colorpicker #colorpicker_input div{
+                    margin:1.2px;
+                    height:20px;
+                    width:20px;
+                    background-size:80%;
+                    background-repeat: no-repeat;
+                    background-position:center;
+                }
+                #colorpicker_input_comfirm{
+                    background-image:url("././img/check.png");
+                }
+                #colorpicker_input_copy{
+                    background-image:url("././img/copy.png");
+                }
+                #colorpicker_input_menu{
+                    background-image:url("././img/menu_up.png");
+                }
+
+        /*与色盘和输入行下面的菜单区*/
+            #colorpicker_menu{
+                width:100%;
+                height:162px;
+            }
+
+            /*记忆颜色区*/
+                #colorpicker #colorpicker_memory{
+                    height:22px;
+                    width:calc(100% - 6px);
+                    margin-left:3px;
+                }
+
+                    #colorpicker #colorpicker_memory #delete{
+                        float: right;
+                        display:flex;
+                        align-items: center;
+                        justify-content:center;
+                        background-size:70%;
+                        background-repeat: no-repeat;
+                        background-position:center;
+                        background-image:url("././img/delete.png");
+                    }
+
+            /*选色板*/
+                #colorpicker #colorpicker_select{
+                    height:140px;
+                    width:calc(100% - 6px);
+                    margin-left:3px;
+                }
+                /*透明格子*/
+                    #colorpicker #colorpicker_select #transparent{
+                        box-sizing:border-box;
+                        border:1px solid black;
+                        background-image:url("././img/colorblock_transparent.jpg");
+                        background-size:100%;
+                        background-repeat: no-repeat;
+                        background-position:center;
+                    }
+
+            /*底部*/
+                #colorpicker #colorpicker_bottom{
+                    height:25px;
+                    width:100%;
+                    margin-top:12px;
+                }
+                /*底部的两个按键*/
+                #colorpicker #colorpicker_bottom div{
+                    height:25px;
+                    width:50px;
+
+                    float:right;
+
+                    margin-right:4px;
+
+                    display:flex;
+                    align-items: center;
+                    justify-content:center;
+                }
+        
+        /*所有按键的样式*/
+        #colorpicker .button{
+            border:1px solid var(--border-color);
+            background-color:var(--color-2);
+            border-radius:3px;
+        }
+        #colorpicker .button:hover{
+            background-color:var(--color-3);
+        }
+        /*颜色块的样式*/
+        #colorpicker .colorblock{
+            height:20px;
+            width:20px;
+            float:left;
+        }
+</style>

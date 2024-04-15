@@ -5,27 +5,35 @@
 
 */
 
-//创建一个与tile相关的textblock元素
+//创建一个与磁贴绑定的内容块元素
 function createTextBlock(tile){
     //html内容
     var textblock = $("<div>\
                             <div class='textblock_bar'>\
-                                <div class='escape' title='脱离'>脱离</div>\
-                                <div class='eternalshow' title='永久显示'>永久显示</div>\
-                                <div class='eternalhide' title='永久隐藏'>永久隐藏</div>\
+                                <div class='textblock_title'></div>\
+                                <div class='textblock_button'>\
+                                    <div class='bindTile unbind' title='绑定切换'></div>\
+                                    <div class='enternalShow' title='永久显示'></div>\
+                                    <div class='enternalHide' title='永久隐藏'></div>\
+                                </div>\
                             </div>\
                             <div class='textblock_content'></div>\
                         </div>")
     //属性
+    var id = $(tile).attr("id") + "_textblock"
     $(textblock).attr({
-        "id" : $(tile).attr("id") + "_textblock",
-        "class" : "textblock",
+        "id" : id,
+        "class" : "textblock huabu_object",
         "state" : "normal",
     })
+    $(textblock).append("<div class='center'></div>")
+    var tile_title = $(tile).children(".tile_title").text()
+    $(textblock).find(".textblock_title").text(tile_title)
 
     //与tlie相关联
-    $(tile).data("textblock",textblock)
-    $(textblock).data("tile",tile)
+    //将Id存进去
+    $(tile).data("textblock",id)
+    $(textblock).data("tile",$(tile).attr("id"))
 
     //功能
     $(textblock).resizable({
@@ -42,6 +50,13 @@ function createTextBlock(tile){
     });
     
     return textblock
+}
+
+//改变内容块的标题
+function changeTextBlockTitle(tile){
+    var tile_title = $(tile).children(".tile_title").text()
+    var textblock = $("#"+$(tile).data("textblock"))
+    $(textblock).find(".textblock_title").text(tile_title)
 }
 
 //控制所有textblock显示
@@ -68,7 +83,6 @@ function showTileTextblock(tile,boal){
     if(textblock_bind){
         //如果这个tile已经显示了textblock，则先将其隐藏
         if($(tile).data("textblock") != null){
-            //则先将其隐藏，再显示，并刷新位置
              hideTileTextblock(tile,true)
         }
         //创建并显示textblock
@@ -81,7 +95,8 @@ function showTileTextblock(tile,boal){
     }
     //如果是独立状态则令其显示
     else{
-        $(tile).data("textblock").show()
+        $("#"+$(tile).data("textblock")).show()
+        var textblock = $("#"+$(tile).data("textblock"))
     }
    
 
@@ -107,7 +122,6 @@ function showTileTextblock(tile,boal){
     $(textblock).css({
         "z-index":$(tile).css("z-index")
     })
-    
 }
 
 //隐藏textblock（用于一部分分离后固定显示的textblock的隐藏或者显示
@@ -120,13 +134,13 @@ function hideTileTextblock(tile,boal){
     else{
         //如果tile的textblock处于独立状态，且boal为真时令其隐藏
         if(!$(tile).prop("textblock_bindState") && boal){
-            $(tile).data("textblock").hide()
+            $("#"+$(tile).data("textblock")).hide()
         }
         //若不是独立状态，则令其消除
         else{
             //将指定Tile的textblock消除
             if($(tile).data("textblock") != null){
-                $(tile).data("textblock").remove()
+                $("#"+$(tile).data("textblock")).remove()
                 $(tile).data("textblock",null)    
             }
         }
@@ -148,10 +162,10 @@ function setTileTextblockShowState(tile, type) {
 }
 
 //修改tile的textblock的绑定方式
-function setTileTextblockBindState(tile,boal){
-    if([true,false].includes(boal)){
+function setTileTextblockBindState(tile,bool){
+    if([true,false].includes(bool)){
         //若为绑定，则令textblock与tile绑定
-        if(boal){
+        if(bool){
             bindTextblock(tile)
         }
         //否则令其解绑
@@ -163,9 +177,10 @@ function setTileTextblockBindState(tile,boal){
 
 //令tile的textblock与其绑定，其会根据设置显示在tile周围，并随着tile的移动而隐藏/显示，其无法被拖拽
 function bindTextblock(tile){
-    var textblock = $(tile).data("textblock")
+    var textblock = $("#"+$(tile).data("textblock"))
     //无法自由移动
     $(textblock).draggable("destroy")
+    $(textblock).find(".bindTile").toggleClass('unbind bind')
     //修改属性值
     $(tile).prop("textblock_bindState",true)
     //回到tile身边
@@ -176,13 +191,14 @@ function bindTextblock(tile){
 //其可以自由移动，其内容仍然与tile同步
 function escapeTextblock(tile){
     //如果tile当前没有显示textblock，则先令textblock显示
-    var textblock = $(tile).data("textblock")
+    var textblock = $("#"+$(tile).data("textblock"))
     if(textblock == null){
         showTileTextblock(tile,true)
-        textblock = $(tile).data("textblock")
+        textblock = $("#"+$(tile).data("textblock"))
     }
     //可以自由移动
     $(textblock).draggable()
+    $(textblock).find(".bindTile").toggleClass('unbind bind')
     //修改属性值
     $(tile).prop("textblock_bindState",false)
     //如果此时显示设置为永久隐藏，则令其hide
@@ -194,7 +210,7 @@ function escapeTextblock(tile){
 
 //根据垂直和水平两个方向的值，修改textblock的位置
 function setTextblockPosition(tile){
-    var textblock = $(tile).data("textblock")
+    var textblock = $("#"+$(tile).data("textblock"))
 
     var vertical = $(tile).attr("textblock_vertical")
     if(vertical == null){
@@ -205,9 +221,12 @@ function setTextblockPosition(tile){
         horizontal = "right"
     }
 
+    //获取当前磁贴所在的画布中的container
+    var container = $(tile).parents(".object_container")
     //获取当前tile的位置与尺寸
-    var tile_left = parseInt($(tile).css("left"))
-    var tile_top = parseInt($(tile).css("top"))
+    var tile_position = positionAandB(container,tile)
+    var tile_left = tile_position.left
+    var tile_top = tile_position.top
     var tile_width = $(tile).outerWidth();
     var tile_height = $(tile).outerHeight()
     //获取当前textblock的尺寸
@@ -275,3 +294,42 @@ function setTextblockPosition(tile){
         "top":block_top
     })
 }
+
+//聚焦到一个textblock，令右侧输入栏为其对应的磁贴的内容栏
+function focusingTextblock(textblock){
+    var tile = $("#"+$(textblock).data("tile"))
+    changeTileEdit(tile)
+    changeModel("edit")
+}
+
+
+//按键功能
+    //解除绑定
+    $("#huabu_container").on("click",".textblock .bindTile.unbind",function(e){
+        e.stopPropagation()
+        var textblock = $(this).parents('.textblock')
+        var tile = $("#"+$(textblock).data("tile"))
+        setTileTextblockBindState(tile,false)
+    })
+    //重新绑定
+    $("#huabu_container").on("click",".textblock .bindTile.bind",function(e){
+        e.stopPropagation()
+        var textblock = $(this).parents('.textblock')
+        var tile = $("#"+$(textblock).data("tile"))
+        setTileTextblockBindState(tile,true)
+    })
+    //永久显示
+    $("#huabu_container").on("click",".textblock .enternalShow",function(e){
+        e.stopPropagation()
+        var textblock = $(this).parents('.textblock')
+        var tile = $("#"+$(textblock).data("tile"))
+        setTileTextblockShowState(tile, "enternalShow")
+    })
+    //永久隐藏
+    $("#huabu_container").on("click",".textblock .enternalHide",function(e){
+        e.stopPropagation()
+        console.log("123")
+        var textblock = $(this).parents('.textblock')
+        var tile = $("#"+$(textblock).data("tile"))
+        setTileTextblockShowState(tile, "enternalHide")
+    })

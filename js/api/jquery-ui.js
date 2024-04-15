@@ -10012,16 +10012,16 @@ $.widget( "ui.draggable", $.ui.mouse, {
 			relative: this._getRelativeOffset()
 		};
 
-		//修改3
+		//修改3:若存在一个center，则令移动开始时，鼠标相对于元素的位置以center的left和Top为标准
+		//从而使得旋转元素也可以移动，也能修正开始移动时产生的偏移
 		if($(this.bindings).children(".center").length != 0){
-			var center_left = $(this.bindings).find(".center").offset().left
-			var center_top = $(this.bindings).find(".center").offset().top
+			var center_left = $(this.bindings).children(".center").offset().left
+			var center_top = $(this.bindings).children(".center").offset().top
 		}
 		else{
 			var center_left = this.offset.left
 			var center_top = this.offset.top
 		}
-
 		
 		this.offset.click = {
 			left: event.pageX - center_left,
@@ -10035,10 +10035,13 @@ $.widget( "ui.draggable", $.ui.mouse, {
 		if ( this.hasFixedAncestor ) {
 			this.offset.parent = this._getParentOffset();
 		}
-			//修改1：实际使用的parentOffset
-			this.offset.parent = this.helper.offsetParent().offset()
 
+		//修改1：使用的parentOffset是helper的parent的offset
+		this.offset.parent = this.helper.offsetParent().offset()
 		//Compute the helpers position
+		//获得元素当前应该处于的left和top位置
+		//也就是鼠标位置-父元素偏移值-鼠标相对于元素的偏移值
+		//但是由于画布被缩放了，因此下面使用时，还要修改这个值：修改2
 		this.position = this._generatePosition( event, true );
 		this.positionAbs = this._convertPositionTo( "absolute" );
 
@@ -10053,10 +10056,19 @@ $.widget( "ui.draggable", $.ui.mouse, {
 		}
 
 		//修改2：移动距离受到画布缩放的影响
-		this.helper[ 0 ].style.left = this.position.left / return_huabu_scale() + "px";
-		this.helper[ 0 ].style.top = this.position.top / return_huabu_scale() + "px";
+		//如果这个对象在画布内，则令其left和top受画布影响
+		//修改helper的style的left和top值，但这个计算值没有考虑画布的缩放
+		//实际修改的值应该等于【计算值】/scale，从而在画布内正确地移动
+		if(this.helper.is(".huabu_object")){
+			var scale = return_huabu_scale(return_focusing_huabu())
+			this.helper[ 0 ].style.left = this.position.left / scale  + "px";
+			this.helper[ 0 ].style.top = this.position.top / scale  + "px";
+		}
+		else{
+			this.helper[ 0 ].style.left = this.position.left  + "px";
+			this.helper[ 0 ].style.top = this.position.top  + "px";
+		}
 		
-
 		if ( $.ui.ddmanager ) {
 			$.ui.ddmanager.drag( this, event );
 		}
@@ -10394,8 +10406,8 @@ $.widget( "ui.draggable", $.ui.mouse, {
 
 	},
 
+	//这个函数会提供当前元素应当处于的位置
 	_generatePosition: function( event, constrainPosition ) {
-
 		var containment, co, top, left,
 			o = this.options,
 			scrollIsRootNode = this._isRootNode( this.scrollParent[ 0 ] ),
@@ -10475,9 +10487,11 @@ $.widget( "ui.draggable", $.ui.mouse, {
 			}
 		}
 
-		//修改2
-
-		if($(this.bindings).children(".center").length != 0){
+		//修改2:计算元素此时应该处于的位置
+		//在修改3中，我们使用了元素中心的宽度和高度，因此这里要额外计算元素的宽度or高度的一半
+		//需要注意的是width和height对于画布内元素来说是一个固定的值，因此要乘以scale来修正
+		//能够修正开始拖拽时的拖拽的画布内对象的位置
+		if($(this.bindings).is(".huabu_object")){
 			var scale = return_huabu_scale()
 			var center_left = $(this.bindings).width()/2 * scale;
 			var center_top = $(this.bindings).height()/2 * scale;
@@ -10487,20 +10501,24 @@ $.widget( "ui.draggable", $.ui.mouse, {
 			var center_top = 0
 		}
 
-			return {
+		return {
 			top: (
 
-				// The absolute mouse position
+				// 鼠标在网页中的偏移量
 				pageY -
 
+				// 元素的中心位置，如果这是一个画布内元素，修正下面的这个偏移量
 				center_top - 
 
-				// Click offset (relative to the element)
+				// 鼠标按下时，其相对于移动元素本身的偏移量
+				// 如果这是一个画布内元素，那么这个值是该元素中心的offset位置
+				// 需要结合上面这个中心位置来进行修改
 				this.offset.click.top -
 
 				// Only for relative positioned nodes: Relative offset from element to offset parent
 				this.offset.relative.top -
 
+				// 元素的parent相对于网页的偏移量，对于画布内元素，就是画布本身的偏移量
 				// The offsetParent's offset without borders (offset + border)
 				this.offset.parent.top +
 				( this.cssPosition === "fixed" ?
@@ -11465,8 +11483,10 @@ $.widget( "ui.resizable", $.ui.mouse, {
 		var data, props,
 			smp = this.originalMousePosition,
 			a = this.axis,
-			dx = ( event.pageX - smp.left ) / return_huabu_scale() || 0,
-			dy = ( event.pageY - smp.top ) / return_huabu_scale() || 0,
+			//修改：在画布内拖动时令其被画布的scale修改
+			//暂时不知道有什么用
+			dx = ( event.pageX - smp.left ) || 0,
+			dy = ( event.pageY - smp.top )|| 0,
 			trigger = this._change[ a ];
 
 		this._updatePrevProperties();
@@ -13508,10 +13528,11 @@ $.ui.ddmanager = {
 				m[ i ]._activate.call( m[ i ], event );
 			}
 
+			//修改：当拖拽一个对象进入一个droppable时，这个对象的width和height的判定
 			m[ i ].offset = m[ i ].element.offset();
 			m[ i ].proportions( {
-				width: m[ i ].element[ 0 ].offsetWidth * return_huabu_scale(),
-				height: m[ i ].element[ 0 ].offsetHeight * return_huabu_scale()
+				width: m[ i ].element[ 0 ].offsetWidth,
+				height: m[ i ].element[ 0 ].offsetHeight
 			} );
 
 		}

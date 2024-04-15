@@ -1,24 +1,145 @@
-/*未启用的菜单项目*/
-.menu .disabled{
-	pointer-events:none;
-	color:#9B9B9BFF;
-	background-color:#E0E0E0FF;;
-}
-
-/*画布区域内的菜单*/
-.huabu_menu{
-    position:absolute;
-    background-color:white;
-
-    display:none;
-    border:1px solid black;
-    border-radius:3px;
-    z-index:100;
-}
-	/*间隔线条的样式*/
-	.huabu_menu .menu_line{
-		width:98%;
-		height:1px;
-		background-color:#DBDBDBFF;
-		margin:2px auto;
+/*通用菜单样式*/
+	.menu{
+		display:none;
 	}
+	/*失效的菜单项目*/
+	.menu .disabled{
+		pointer-events:none;
+		color:var(--color-3);
+	}
+/*应用内显示的app菜单,通常有更复杂的样式*/
+	.app_menu{
+		background-color:var(--color-1);
+	}
+
+/*弹出显示的modal菜单统一样式*/
+	.modal_menu{
+		display:none;
+		position:absolute;
+
+		background-color:var(--color-0);
+
+		border:1px solid;
+		border-radius:3px;
+
+		box-sizing: border-box;
+
+		box-shadow:var(--color-4) 0px 0px 10px;
+
+		padding:20px;
+		
+		position:absolute;
+
+	    z-index:10003;
+
+	    top:200px;
+	    left:50%;
+
+	    transform: translate(-50%, -5%);
+	}
+
+	/* 在窗口宽度小于 600px 时将宽度设置为 100% */
+	@media (max-width: 600px){
+		.modal_menu{
+			width:100% !important;
+		}
+	}
+
+	/*标题*/
+		.modal_menu_title{
+			position:relative;
+		}
+
+	/*按键栏*/
+		.modal_menu_button{
+			position: absolute;
+			display:flex;
+	  		left: 50%;
+	  		bottom:20px;
+	  		transform: translate(-50%, 0px);
+		}
+		/*按键*/
+			.modal_menu_button > div{
+				display:flex;
+				align-items:center;
+				justify-content:center;
+
+				padding:1px 8px;
+				background-color:var(--color-2);
+				border:1px solid var(--border-color);
+				border-radius:3px;
+			}
+
+			.modal_menu_button > div:hover{
+				background-color:var(--color-3);
+			}
+
+/*顶部区域的菜单*/
+	#topArea_ability .menu{
+     	border-bottom:2px solid var(--border-color);
+     	border-right:2px solid var(--border-color);
+     	border-left:2px solid var(--border-color);
+     	border-top:2px solid var(--color-3);
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+        background-color:var(--color-1);
+        min-width:200px;
+        text-align:left;
+        position:absolute;
+        display:none;
+        z-index:10;
+    }
+
+    #topArea_ability .menu > div{
+        white-space: nowrap;
+        padding:2px 10px;
+    }
+
+    #topArea_ability .menu > div:hover{
+        background-color:var(--color-3);
+    }
+
+    #topArea_ability .side_menu > .menu{
+    	border-bottom:2px solid var(--border-color);
+     	border-right:2px solid var(--border-color);
+     	border-left:2px solid var(--color-3);
+     	border-top:2px solid var(--border-color);
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+    }
+
+/*画布区域内的对象菜单*/
+	.object_menu{
+		border:2px solid var(--border-color);
+        border-radius:3px;
+        background-color:var(--color-1);
+
+        min-width:100px;
+        text-align:left;
+
+		position:absolute;
+		white-space: nowrap;
+	    display:none;
+	    border-radius:3px;
+	    z-index:100;
+	}
+	/*对象菜单为嵌套结构，第一层div是组，第二次div才是选项*/
+
+		/*分割组的线条的样式*/
+		.object_menu > div:not(:last-child):after{
+			content:"";
+			display:block;
+			position:relative;
+			left:2%;
+			width:96%;
+			height:1px;
+			background-color:var(--border-color);
+		}
+
+	.object_menu > div > div{
+		padding:2px 10px;
+	}
+
+	.object_menu > div > div:hover{
+        background-color:var(--color-3);
+    }

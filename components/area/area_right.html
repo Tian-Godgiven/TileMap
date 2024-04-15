@@ -1,17 +1,18 @@
 <html>
     <div id="rightArea_top">
-        <div id="tile_design" class="rightArea_top_block">样式</div>
-        <div id="tile_edit"   class="rightArea_top_block">内容</div>
+        <div id="rightArea_design_model" class="rightArea_top_block" model="design">样式</div>
+        <div id="rightArea_edit_model"   class="rightArea_top_block" model="edit">内容</div>
     </div>
 
     <!-- 样式模式内容 -->
-    <div id="tile_design_inner" class="rightArea_inner"></div>
+    <div id="rightArea_design_inner" class="rightArea_inner"></div>
     <!-- 磁贴内容模式内容 -->
-    <div id="tile_edit_inner" class="rightArea_inner"></div>
+    <div id="rightArea_edit_inner" class="rightArea_inner"></div>
 </html>
 
-<script>$("#tile_design_inner").load("./components/area_ability/right_design.html")</script>
-<script>$("#tile_edit_inner").load("./components/area_ability/right_edit.html")</script>
+<script>$("#rightArea_design_inner").load("./components/area_ability/right_design.html")</script>
+<script>$("#rightArea_edit_inner").load("./components/area_ability/right_edit.html")</script>
 <script src="./js/area/area_right.js"></script>
 
 <link rel="stylesheet" href="./css/area/area_right.css">
+

@@ -1,12 +1,12 @@
 //新画布的创建窗口
-function addNewHuabu(type) {
+function createNewHuabuMenu(type) {
     return new Promise((resolve, reject) => {
         swal.fire({
             title: "创建画布",
             html: '<div id="addHuabu_alerttext">                                         \
-                画布名：<input class="addHuabu_input" id="huabu_name"></input> <br>    \
-                画布长：<input class="addHuabu_input" id="huabu_width"></input> <br>   \
-                画布宽：<input class="addHuabu_input" id="huabu_height"></input>\
+                画布名：<input class="addHuabu_input" id="huabu_name"> <br>    \
+                画布长：<input class="addHuabu_input" id="huabu_width"> <br>   \
+                画布宽：<input class="addHuabu_input" id="huabu_height">\
                 </div>'
         }).then((result) => {
             if (result.isConfirmed) {
@@ -16,8 +16,6 @@ function addNewHuabu(type) {
 
                 // 创建画布
                 var huabu = createHuabu(name, width, height)
-                //移动到该画布
-				changeHuabu(huabu)
 				//返回画布对象
                 resolve(huabu);
             } else {
@@ -27,43 +25,68 @@ function addNewHuabu(type) {
     });
 }
 
-//画布区域的选择功能，创建画布区域的套索并对选择的目标进行判定
-// $("#huabu_container").selectable({
-// 	distance:1,
-// 	filter:".tile .center , .line , .line_dot",
-// 	tolerance:"touch",
-// 	selecting:function(event,ui){
-// 		$dom = $(ui.selecting)
-// 		//参与组合的不是这些子对象而是其父对象
-// 		if($dom.is(".line_dot , .center")){
-// 			$dom.removeClass('ui-selecting')
-// 			$dom = $dom.parent()
-// 			$dom.addClass('ui-selected')
-// 		}
-// 		focusingObject($dom,"select")
-// 	},
-// 	unselecting:function(event,ui){
-// 		$dom = $(ui.unselecting)
-// 		//参与组合的不是这些子对象而是其父对象
-// 		if($dom.is(".line_dot , .center")){
-// 			$dom = $dom.parent()
-// 			$dom.removeClass('ui-selected')
-// 		}
-// 		unfocusingDom($dom)
-// 	},
-// 	start:function(){
-// 		//消除之前的选中体和selected类
-// 		$(".ui-selected").removeClass('ui-selected')
-// 		destroyComposite($(this).find(".select_composite"))
-// 	},
-// 	stop:function(){
-// 		//将选中的对象变成一个选中体=临时组合体
-// 		createComposite($(this).find('.ui-selected'),"select")
+// 画布区域的选择功能，创建画布区域的套索并对选择的目标进行判定
+$("#huabu_container").selectable({
+	distance:1,
+	filter:".huabu_object:not(.textblock,.component)",
+	tolerance:"touch",
+	//将目标选中，并赋予.ui-selected类，同时将其聚焦
+	selecting:function(event,ui){
+		//参与组合的是huabu_object
+		focusingObject($(ui.selecting),"select")
+	},
+	unselecting:function(event,ui){
+		$dom = $(ui.unselecting)
+		unfocusingObject($dom)
+	},
+	start:function(){
+		//消除之前的selected类
+		$(".ui-selected").removeClass('ui-selected')
+		//删除掉之前聚焦的临时组合体
+		destroyComposite($(this).find(".temp_composite.focusing"))
+	},
+	stop:function(){
+		var all_select = $(this).find('.ui-selected')
+		var huabu = return_focusing_huabu()
+		//将选中的对象变成一个临时组合体
+		createTempComposite(all_select,huabu)
+	}
+})
 
-// 	}
-// })
+//拖动对象块进入画布区域时，令其scale同步当前画布
+$(document).ready(function(){
+	$("#area_huabu").droppable({
+		tolerance:"fit",
+		accept:".objectBlock",
+		//在进入画布区域时
+		over:function(event,ui){
+			var huabu = return_focusing_huabu()
+			if(huabu){
+				//设置其scale与画布同步
+				var scale = $(huabu).css("transform")
+	  			ui.helper.css({
+	  				'transform':scale,
+	  				"transform-origin": "0% 0%",
+	  			});
+	  			//添加一个临时class
+	  			ui.helper.addClass('in_huabu_area')
+			}
+		},
+		out:function(event,ui){
+			ui.helper.removeClass('in_huabu_area')
+		}
+	})
+})
 
 
+//清空画布
+function clearHuabuContainer(){
+	$("#huabu_container").empty()
+	$("#huabu_buttonBar").empty()
+	//隐藏所有样式和内容
+	$(".rightArea_design_inner_block").hide()
+	$(".rightArea_edit_inner_block").hide()
+}
 
 
 //底部按键changeBar
@@ -76,27 +99,36 @@ function addNewHuabu(type) {
 			deleteHuabuButton(huabu)
 		}
 
-		//如果是嵌套画布，则text改为其来源的tile的标题 > 画布名
-		//若不存在的标题，则显示来源的tile所在的画布的名称
-		if($(huabu).is(".nested_huabu")){
-			var tile = $(huabu).data("nest_from")
-			var from = $(tile).children(".tile_title").text()
-			if(from == null || from == ""){
-				from = $(tile).parents(".huabu").attr("name")
+		//如果这个画布有一个来源，也就是说其是一个嵌套画布
+		//则text改为其来源名称 > 画布名
+		var source = $(huabu).data("nest_from")
+		if(source != undefined || source != null){
+			if($(source).is(".tile")){
+				var from = $(source).children(".tile_title").text()
+				//若来源tile不存在标题，则显示来源tile所在的画布的名称
+				if(from == null || from == ""){
+					from = $(source).parents(".huabu").attr("name")
+				}
 			}
+			else if($(source).is(".huabu")){
+				from = $(source).attr("name")
+			}
+			
 			var text = from + " > "+$(huabu).attr("name")
-		}
+		}		
+		//如果不是则直接显示画布的名称
 		else{
 			var text = $(huabu).attr("name")
 		}
 
+		//创建button对象
 		let button = $("<div></div>", {
 			"class": "huabu_button",
 			"id": id,
 			"huabu": $(huabu).attr("id")
 		});
 		$(button).text(text)
-
+		//画布名字过短时
 		if(text.length<2){
 			$(button).css("width","35px")
 		}
@@ -109,6 +141,7 @@ function addNewHuabu(type) {
 			}
 		}
 	};
+
 	//删除画布切换按钮
 	function deleteHuabuButton(huabu){
 		var button = $("#"+$(huabu).attr("id") + "_button")
@@ -121,9 +154,9 @@ function addNewHuabu(type) {
 	//切换到对应的画布按钮
 	function changeHuabuButton(huabu){
 		//令其他画布按钮取消聚焦
-		$(".huabu_button").css("color", "black")
+		$(".huabu_button").removeClass('focusing_button')
 		//令该画布对应的画布按钮聚焦
-		$("#" + $(huabu).attr("id") + "_button").css("color", "red")
+		$("#" + $(huabu).attr("id") + "_button").addClass('focusing_button')
 	}
 	//2.画布切换按钮的点击事件，点击即可切换到另一张画布
 	$("#huabu_buttonBar").on("mousedown",".huabu_button",function(event){
@@ -132,7 +165,7 @@ function addNewHuabu(type) {
 		changeHuabu(huabu); 
 		//右键事件，打开对应的子菜单
 		if(event.button === 2) {
-			showHuabuMenu(event,"huabu_button_menu");
+			showObjectMenu(event,"huabu_button_menu");
 		}
 	});
 	//3.画布切换按钮的拖动事件，可以在这条changeBar内拖动按钮以改变其顺序
@@ -231,24 +264,26 @@ function addNewHuabu(type) {
 		//使用document的方法防止拖动速度过快导致移出判定框
 		document.onmousemove = function(event){
 			if(resize_dragging){
-				var huabu_width = $("#area_huabu").width();
-				var huabu_left 	= $("#area_huabu").position().left;
-				var huabu_right = $("#area_huabu").position().right;
+				var huabu_width = $("#area_huabu").outerWidth();
 				//根据点击判定框获取将要移动的区域
-				var resize_width = $("#area_"+resizeside).prop("offsetWidth");
-
+				var resize_width = $("#area_"+resizeside).outerWidth()
 				//拖动的距离，将判定框向→拖动时，这是一个正数
 				var distantX = event.clientX - resize_lastX;
 				if(resizeside == "left"){
 					//当修改左侧大小时，画布向左侧移动时令left减少，此时distantX为负数所以+distantX
 					distantX = - distantX
 				}
+				//计算改变后的宽度，除以当前body的宽度，并用百分比表示
+				var width = $("#area_bottom").outerWidth()
+				var new_huabu_width = (huabu_width + distantX)/width * 100 + "%"
+				var new_resize_width = (resize_width - distantX)/width * 100 + "%"
+
 				//改变画布和对应区域的宽度
 				$("#area_huabu").css({
-					"width": huabu_width + distantX,
+					"width": new_huabu_width
 				})
 				$("#area_"+resizeside).css({
-					"width": resize_width - distantX,
+					"width": new_resize_width
 				})
 				resize_lastX = event.clientX;
 			}

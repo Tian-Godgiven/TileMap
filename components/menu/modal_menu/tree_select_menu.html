@@ -1,0 +1,106 @@
+<html>
+    <!-- 一个显示指定范围内的内容树的菜单 -->
+	<div id="tree_select_menu" class='alert modal_menu over_mask'>
+        <div class="modal_menu_title"></div>
+        <div id="tree_select_menu_container"></div>   
+        <div id="tree_select_menu_button" class="modal_menu_button">
+            <div id="tree_select_menu_button_confirm" style="margin-right:15px;">确认</div>
+            <div id="tree_select_menu_button_quit">取消</div>
+        </div>    
+    </div>
+</html>
+
+<script type="text/javascript" scoped>
+    var target_object
+    var target_type
+    //显示菜单，指定范围（文件或画布）和选择类型，根据范围显示其中的内容树
+    function showTreeSelectMenu(range,target){
+        return new Promise(function(resolve, reject) {
+            //显示菜单
+            showModalMenu($("#tree_select_menu"))
+            //清空原本保存的内容
+            target_object = null
+            target_type = null
+            $("#tree_select_menu_container").empty()
+
+            //根据指定的范围，获取当前文件内的内容树
+            if(range == "file"){
+                var tree = createFileTree(null)
+            }
+            //或者获取当前聚焦画布内的内容树
+            else if(range == "huabu"){
+                var tree = createHuabuTree(return_focusing_huabu())
+            }
+
+            //根据target获得我们要选中的target_type
+            if(target == "huabu"){
+                target_type = ".tree_huabu_row"
+                //修改标题
+                $("#tree_select_menu .modal_menu_title").text("选择画布：")
+            }
+            else if(target == "tile"){
+                target_type = ".tree_tile_row"
+                $("#tree_select_menu .modal_menu_title").text("选择磁贴：")
+            }
+            else if(target == "textblock"){
+                target_type = ".tree_textblock_row"
+                $("#tree_select_menu .modal_menu_title").text("选择内容块：")
+            }
+
+            //将内容树加入到画布的container中
+            $("#tree_select_menu_container").append(tree)
+            
+
+            //点击确认时，返回所选择的对象
+            $("#tree_select_menu_button_confirm").on("click", function(){
+                //关闭菜单
+                hideModalMenu($("#tree_select_menu"))
+                //返回选择有效对象
+                if(target_object != null){
+                    resolve(target_object)
+                }
+                else{
+                    reject(false)
+                }
+            })
+
+            //点击取消，关闭菜单
+            $("#tree_select_menu_button_quit").on("click", function(){
+                hideModalMenu($("#tree_select_menu"))
+                reject(false)
+            })
+        })
+    }
+
+    //绑定菜单内的点击事件，点击到选择类型所在的行时，令其选中，并且保存下来
+    $("#tree_select_menu_container").on("click",".tree_row",function(event){
+        if($(this).is(target_type)){
+            $(".tree_select_menu_selected").removeClass('tree_select_menu_selected')
+            $(this).addClass('tree_select_menu_selected')
+            //获取其绑定的元素
+            target_object = $(this).children(".miniObject").data("target")
+        }
+    })
+</script>
+
+<style type="text/css" scoped>
+    #tree_select_menu{
+        overflow:hidden;
+        width:300px;
+        max-height:calc(100% - 400px);
+    }
+
+    #tree_select_menu_container{
+        max-height:250px;
+        margin-top:4px;
+        margin-bottom:40px;
+        overflow-y:overlay;
+    }
+
+    .tree_select_menu_selected{
+        background-color:var(--color-3) !important;
+        font-weight:bold;
+        border-radius:5px;
+    }
+
+</style>

@@ -1,27 +1,79 @@
 .textblock{
-  position:absolute;
-  width:150px;
-  min-height:200px;
-  max-height:400px;
-  border:2px solid black;
-  background:white;
+  	position:absolute;
+  	width:180px;
+  	background-color:var(--color--1);
+  	min-height:200px;
+  	border:2px solid var(--color-5);
 }
+/*按键*/
+	.textblock > .textblock_bar{
+		height:25px;
+		width:100%;
+		display:flex;
+	}
 
-.textblock > .textblock_bar{
-	display:flex;
-	width:100%;
-	height:25px;
-	border-bottom:2px solid black;
-}
+	.textblock > .textblock_bar > .textblock_title{
+		width:calc(100% - 110px);
+		text-align:left;
+		padding:0px 5px;
+		height:100%;
+		overflow:hidden;
+	}
 
-.textblock > .textblock_bar > div{
-	width:33%;
-	border-left:2px solid black;
-}
+	.textblock .textblock_bar .textblock_button{
+		display:flex;
+		flex-shrink:0;
+		overflow:hidden;
+		width:110px;
+		height:100%;
+		border-left:1px solid var(--color-5);
+		border-bottom:1px solid var(--color-5);
+	}
 
-.textblock > .textblock_content{
-	width:100%;
-	max-height:calc(100% - 25px);
-	overflow-y:overlay;
-	word-wrap: break-word;
-}
+
+	.textblock > .textblock_bar > .textblock_button > div{
+		width:33%;
+		border-right:1px solid var(--color-5);
+		box-sizing: border-box;
+		background-color:inherit;
+		background-repeat:no-repeat;
+		background-position:center;
+	}
+
+	.textblock > .textblock_bar > .textblock_button > div:hover{
+		background-color:var(--color-3);
+	}
+
+	.textblock > .textblock_bar> .textblock_button > div:nth-child(3){
+		border:none;
+	}
+
+	/*解锁*/
+	.textblock > .textblock_bar > .textblock_button > .bindTile.unbind{
+		background-size:70%;
+		background-image:url("../../img/link_break.png");
+	}
+	.textblock > .textblock_bar > .textblock_button > .bindTile.bind{
+		background-size:70%;
+		background-image:url("../../img/link.png");
+	}
+	/*永久显示*/
+	.textblock > .textblock_bar > .textblock_button > .enternalShow{
+		background-size:70%;
+		background-image:url("../../img/eye_show.png");
+	}
+	/*永久隐藏*/
+	.textblock > .textblock_bar > .textblock_button > .enternalHide{
+		background-size:70%;
+		background-image:url("../../img/eye_hide.png");
+	}
+
+
+
+/*内容*/
+	.textblock > .textblock_content{
+		width:100%;
+		height:calc(100% - 25px);
+		overflow-y:overlay;
+		word-wrap: break-word;
+	}

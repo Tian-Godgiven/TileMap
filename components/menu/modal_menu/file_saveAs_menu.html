@@ -1,0 +1,453 @@
+<html>
+    <!-- 另存为菜单 -->
+	<div id="file_saveAs_menu" class='alert modal_menu over_mask'>
+        <div class="flex">
+            <!-- 侧边栏 -->
+            <div id="file_saveAs_menu_left">
+                <div>
+                    <div id="file_saveAs_menu_title">另存为</div>
+                    <div id="file_saveAs_menu_selectType" class="block">
+                        <div value="png" class="selecting">png图片</div>
+                        <div value="html">html文件</div>
+                    </div>
+                </div>
+                <div id="file_saveAs_menu_selectHuabu" class="block">选择画布</div>
+            </div>
+            <!-- 主内容 -->
+            <div id="file_saveAs_menu_right">
+                <div id="file_saveAs_menu_huabuImg" class="block"></div>
+                <div id="file_saveAs_menu_bottom">
+                    <div id="file_saveAs_menu_information" class="block">
+                        <div id="file_saveAs_menu_pngInformation">  
+                        </div>
+                        <div id="file_saveAs_menu_htmlInformation">
+                            <div class="flex">
+                                <div>
+                                    <div><input type="checkbox">允许拖拽移动</div>
+                                    <div><input type="checkbox">允许移动组合体内的组件</div>
+                                </div>
+                                <div>
+                                    <div><input type="checkbox">允许显示内容块</div>
+                                    <div><input type="checkbox">添加内容块显示控制组件</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div id="file_saveAs_menu_confirm" class="block button">确认</div>
+                        <div id="file_saveAs_menu_cancel" class="block button">取消</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</html>
+
+<script type="text/javascript" scoped>
+    //默认为png格式
+    var selecting_type = "png"
+    var selecting_huabu
+
+    //显示该菜单
+    function showFileSaveAsMenu(){
+        //读取当前的画布，保存进“画布选择”中
+        changeFileSaveAsHuabuSelect()
+        //显示菜单
+        showModalMenu($("#file_saveAs_menu"))
+        //清空内容
+        $("#file_saveAs_menu input").prop("checked", false);
+        $("#file_saveAs_menu_huabuImg").empty().text("左侧选择画布，查看其预览图")
+        $("#file_saveAs_menu_pngInformation").empty()
+    }
+
+    //选择类型
+    $("#file_saveAs_menu_selectType > div").on("click",function(){
+        $(this).siblings(".selecting").removeClass("selecting")
+        $(this).addClass("selecting")
+        //修改选中的类型
+        selecting_type = $(this).attr("value")
+        //修改底部信息栏的内容
+        toggleFileSaveAsMenuBottomInformation()
+    })
+
+    //遍历画布并填装进画布选择栏
+    function changeFileSaveAsHuabuSelect(){
+        //清空
+        var select_huabu = $("#file_saveAs_menu_selectHuabu")
+        $(select_huabu).empty()
+
+        //遍历当前显示的所有画布
+        $("#huabu_container").children(".huabu").each(function(){
+            //获取其id和名称
+            var huabu_id = $(this).attr("id")
+            var huabu_name = $(this).attr("name")
+            //生成一个组件，包含一个选择input和画布的名称
+            var huabu_block = $("<div class='file_saveAs_menu_huabuBlock'>\
+                                    <input type='checkbox'>\
+                                    <span>"+huabu_name+"</span>\
+                                </div>")
+            //把画布的id存储进去
+            $(huabu_block).attr("huabu_id",huabu_id)
+            //把这个block放进去
+            $(select_huabu).append(huabu_block)
+        })
+    }
+
+    //点击一个画布Block会将其选中，并在预览图生成该画布的图片
+    $("#file_saveAs_menu_selectHuabu").on("click",".file_saveAs_menu_huabuBlock",function(){
+        //如果其已经被选中了，则无事发生
+        if($(this).is(".selecting")){
+            return false
+        }
+        //清楚其他选中
+        $("#file_saveAs_menu_selectHuabu .selecting").removeClass("selecting")
+        //将其选中
+        $(this).addClass("selecting")
+        selecting_huabu = $("#"+ $(this).attr("huabu_id"))
+        //修改预览图中的内容
+        changeFileSaveAsMenuHuabuImg()
+    })
+
+    //点击一个画布Block的input会令其变为“selected”，表示在生成内容时，将其包含在内
+    $("#file_saveAs_menu_selectHuabu").on("click",".file_saveAs_menu_huabuBlock input",function(event){
+        event.stopPropagation()
+    })
+    $("#file_saveAs_menu_selectHuabu").on("change",".file_saveAs_menu_huabuBlock input",function(event){
+        //将其所在的画布block选中
+        var value = $(this).prop("checked")
+        var huabu_block = $(this).parent()
+        if(value){
+            $(huabu_block).addClass("selected")
+        }
+        else{
+            $(huabu_block).removeClass("selected")
+        }
+        //在底部的图片信息栏生成或移出这个画布的信息
+        var huabu_id = $(huabu_block).attr("huabu_id")
+        changeFileSaveAsHuabuPngInformation(huabu_id,value)
+
+    })
+
+
+    //根据selecting_huabu显示画布预览图
+    function changeFileSaveAsMenuHuabuImg(){
+        //获得当前选中的画布
+        var huabu = selecting_huabu
+        //改一下缩放
+        var huabu_scale = $(huabu).attr("scale")
+        $(huabu).css({
+            "transform":"scale(1)"
+        })
+        //获得其img图片
+        domToPicture(huabu,"img").then(img=>{
+            //先清空，然后将img放入预览区中
+            $("#file_saveAs_menu_huabuImg").empty().append(img)
+            //然后把画布的缩放改回去
+            $(huabu).css({
+                "transform":"scale(" + huabu_scale + ")",
+            })
+        })
+    }
+    //根据画布生成对应的图片文件信息
+    async function getHuabuImageInformation(huabu){
+        //将画布变成base64
+        var url = await domToPicture(huabu,"base64")
+        var base64 = url.split(',')[1]
+        //在文件夹中生成相应的临时png文件，并获得文件信息
+        var image_info = await getImageInfoFromBase64(base64)
+
+        return image_info
+    }
+    //修改底部图片信息栏中的内容
+    function changeFileSaveAsHuabuPngInformation(huabu_id,value){
+        //如果是true，在添加对应画布的信息block
+        if(value){
+            var huabu = $("#" + huabu_id)
+            //获取这个画布所对应的png文件的信息
+            getHuabuImageInformation(huabu).then(image_info=>{
+                var info_name = $(huabu).attr("name") + ".png"
+                var info_size = image_info.width + " x " + image_info.height
+                var info_fileSize = byteToSize(image_info.fileSize)
+                //生成信息block
+                var info_block = $("<div class='file_saveAs_menu_pngInformation_infoBlock' huabu_id = "+huabu_id+">\
+                                    <span>"+ info_name +"</span>\
+                                    <span>"+ info_size +"</span>\
+                                    <span>"+ info_fileSize +"</span>\
+                                </div>")
+                //把这个信息block放进去
+                $("#file_saveAs_menu_pngInformation").append(info_block)
+            })
+        }
+        //如果是false，则删除对应的信息block
+        else{
+            $("#file_saveAs_menu_pngInformation").children(".file_saveAs_menu_pngInformation_infoBlock[huabu_id="+huabu_id+"]").remove()
+        }
+    }
+    //修改底部信息栏的类型
+    function toggleFileSaveAsMenuBottomInformation(){
+        console.log(selecting_type)
+        //修改为图片信息
+        if(selecting_type == "png"){
+            //隐藏文件功能栏
+            $("#file_saveAs_menu_pngInformation").show()
+            $("#file_saveAs_menu_htmlInformation").hide()
+        }
+        //修改为html文件功能选项
+        else if(selecting_type == "html"){
+            $("#file_saveAs_menu_pngInformation").hide()
+            $("#file_saveAs_menu_htmlInformation").show()
+        }
+    }
+    //点击确定，根据选中的画布和模式来产生不同的文件/文件夹
+    $("#file_saveAs_menu_confirm").on("click",async function(){
+        var huabuBlocks = $("#file_saveAs_menu .selected.file_saveAs_menu_huabuBlock")
+        
+        //如果没有选中画布的则无效
+        if(huabuBlocks.length == 0){
+            return false
+        }
+
+        //如果是Png，则将所有选中的画布的png生成到指定的路径下
+        if(selecting_type == "png"){
+            //如果选中的画布为1个
+            if(huabuBlocks.length == 1){
+                var huabu = $("#"+$(huabuBlocks).attr("huabu_id"))
+                var huabu_name = $(huabu).attr("name")
+                //打开文件保存窗口，返回选择的路径
+                var file = await openFileSaveDialog("png",huabu_name,null)
+                if(file){
+                    var file_path = file.path
+                    //获取画布的base64
+                    var url = await domToPicture(huabu,"base64")
+                    var base64 = url.split(',')[1]
+                    //在该路径保存对应base64的png
+                    var bool = await saveBase64ToPng(file_path,base64)
+                    if(bool){
+                        alert("保存成功")
+                    }
+                    else{
+                        alert("保存失败")
+                    }
+                }
+            }
+            //如果为多个，则先创建一个文件夹，再在这个文件夹内放置每个画布的png
+            else{
+                //向创建一个文件夹
+                var dir_path = await createFileDir("磁贴导图画布png生成图")
+                //遍历这些画布，依次生成在这个文件夹内生成png图片
+                for(huabu_block of huabuBlocks){
+                    var huabu = $("#"+$(huabu_block).attr("huabu_id"))
+                    var huabu_name = $(huabu).attr("name")
+                    //获取画布的base64
+                    var url = await domToPicture(huabu,"base64")
+                    var base64 = url.split(',')[1]
+                    //拼接路径,在该路径保存对应base64的png
+                    var file_path = dir_path +"/"+ huabu_name + ".png"
+                    var bool = await saveBase64ToPng(file_path,base64)
+                    if(!bool){
+                        alert("保存失败")
+                    }
+                }
+            }
+        }
+        else if(selecting_type == "html"){
+            //备忘，还没有做html的另存为
+        }
+
+        hideModalMenu($("#file_saveAs_menu"))
+    })
+    //点击取消，关闭这个菜单
+    $("#file_saveAs_menu_cancel").on("click",function(){
+        hideModalMenu($("#file_saveAs_menu"))
+    })
+</script>
+
+<style type="text/css" scoped>
+    /*整个菜单*/
+    #file_saveAs_menu{
+        width:600px;
+        height:500px;
+        background-color:var(--color-2);
+        padding:15px;
+        box-sizing: content-box;
+    }
+
+    #file_saveAs_menu .button:hover{
+        background-color:var(--color-3);
+    } 
+
+    #file_saveAs_menu > div{
+        width:100%;
+        height:100%;
+    }
+
+    #file_saveAs_menu div{
+        box-sizing: border-box;
+    }
+
+    /*通用*/
+    #file_saveAs_menu .block{
+        background-color:var(--color-1);
+        border:1px solid var(--border-color);
+        border-radius:3px;
+    }
+
+    /*左侧栏*/
+        #file_saveAs_menu_left{
+            width:155px;
+            margin-right:5px;
+            height:100%;
+        }
+
+        #file_saveAs_menu_title{
+            width:100%;
+            height:40px;
+            font-size:30px;
+            font-weight:bold;
+            text-align:left;
+        }
+
+        #file_saveAs_menu_selectType{
+            width:100%;
+            height: 65px;
+            margin-bottom: 5px;
+            padding:5px;
+        }
+            #file_saveAs_menu_selectType > div{
+                font-size: 21px;
+            } 
+
+            #file_saveAs_menu_selectType > div.selecting{
+                position:relative;
+                background-color:var(--color-3);
+                border-radius:5px;
+                border:1px solid var(--border-color);
+            }
+
+
+        #file_saveAs_menu_selectHuabu{
+            width:100%;
+            height:calc(100% - 110px);
+            padding:5px;
+            overflow:overlay;
+        }
+
+        #file_saveAs_menu_selectHuabu > div{
+            display: flex;
+            align-items: flex-start;
+        }
+        #file_saveAs_menu_selectHuabu > div:hover{
+            background-color:var(--color-2);
+        }
+        #file_saveAs_menu_selectHuabu > div.selecting{
+            background-color:var(--color-3);
+        }
+        #file_saveAs_menu_selectHuabu > div > span{
+            overflow:hidden;
+            text-overflow:ellipsis;
+        }
+
+    /*右侧*/
+        #file_saveAs_menu_right{
+        width:445px;
+        height:440px;
+        
+    }
+
+        #file_saveAs_menu_huabuImg{
+            display: flex;
+            align-items: center;
+            justify-content:center;
+            width:440px;
+            height:405px;
+            margin-bottom:5px;
+            background-size:100% 100%;
+            background-repeat: no-repeat;
+            background-position:center;
+        }
+
+        #file_saveAs_menu_huabuImg > *{
+            max-width:100%;
+            max-height:100%;
+            object-fit:contain;
+        }
+
+    /*右下*/
+        #file_saveAs_menu_bottom{
+            height:90px;
+            width:440px;
+            display:flex;
+        }
+
+        #file_saveAs_menu_information{
+            padding:5px 10px;
+            height:100%;
+            width:calc(100% - 90px);
+            border:1px solid var(--border-color);
+            margin-right:5px;
+        }
+        /*图片信息*/
+            #file_saveAs_menu_pngInformation{
+                width:100%;
+                height:100%;
+                overflow-y:overlay;
+                overflow-x:hidden;
+            }
+            .file_saveAs_menu_pngInformation_infoBlock{
+                width:100%;
+                margin:1px;
+            }
+            .file_saveAs_menu_pngInformation_infoBlock > span{
+                margin:0 5px;
+                display: inline-block;
+                overflow:hidden;
+                text-overflow:ellipsis;
+            }
+            .file_saveAs_menu_pngInformation_infoBlock > span:first-child{
+                width:100px;
+            }
+            .file_saveAs_menu_pngInformation_infoBlock > span:nth-child(2){
+                width:100px;
+            }
+            .file_saveAs_menu_pngInformation_infoBlock > span:nth-child(3){
+                width:60px;
+            }
+
+        /*html文件信息*/
+            #file_saveAs_menu_htmlInformation{
+                width:100%;
+                height:100%;
+                display:none;
+            }
+            #file_saveAs_menu_htmlInformation > div{
+                width:100%;
+                height:100%;
+                align-items:center;
+            }
+            #file_saveAs_menu_htmlInformation > div > div > div{
+                display:flex;
+                align-items: flex-start;
+            }
+
+        #file_saveAs_menu_confirm{
+            font-size: 25px;
+            justify-content: center;
+            align-items: center;
+            display: flex;
+            height: 42px;
+            width: 90px;
+            margin-bottom:4px;
+        }
+
+        #file_saveAs_menu_cancel{
+            font-size: 25px;
+            justify-content: center;
+            align-items: center;
+            display: flex;
+            height: 42px;
+            width: 90px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+
+</style>

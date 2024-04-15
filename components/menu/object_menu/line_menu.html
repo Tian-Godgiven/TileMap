@@ -1,0 +1,151 @@
+<html>
+<!-- 线条菜单，包括删除，修改颜色，样式修改，连线逻辑修改，控制箭头 -->
+	<div id="line_menu" class="menu object_menu">
+		<div>
+	        <div id="line_menu_delete">删除该线条</div>
+	    </div>
+	    <div>
+	        <div id="line_menu_color" class="flex">颜色：
+	        	<div class="colorpicker">
+                    <div class="colorpicker_block colorpicker_color" style="background-color: rgba(0, 0, 0, 0);"></div>
+                    <div class="colorpicker_img"></div>
+                </div>
+            </div>
+            <div id="line_menu_width" class="flex">粗度：
+            	<input class="number_input" unit="px">
+				<div class="input_button">
+				    <div class="input_button_up" step="1"></div>
+				    <div class="input_button_down" step="1"></div>
+				</div>
+            </div>
+	        <div class="flex">样式：
+	        	<select id="line_menu_style">
+	        		<option value="solid">实线</option>
+	        		<option value="dashed">虚线</option>
+	        		<option value="dotted">点线</option>
+	        		<option value="dotdash">点虚线</option>
+	        	</select>
+	        </div>
+	        <div class="flex">类型：
+	        	<select id="line_menu_type">
+	        		<option value="straight">直线连接</option>
+	        		<option value="besier">曲线连接</option>
+	        		<option value="flowchart">折线连接</option>
+	        	</select>
+	        </div>
+	    </div>
+	    <div>
+	        <div id="line_menu_startArrow">源箭头</div>
+	        <div id="line_menu_endArrow">尾箭头</div>
+	    </div>
+    </div>
+</html>
+
+<script type="text/javascript">
+	var line
+	//显示菜单
+	function showLineMenu(event,line_svg){
+		showObjectMenu(event,"line_menu")
+		line = line_svg
+		var path = $(line_svg).children('path')
+		//修改颜色
+		var color = $(path).attr("stroke")
+		$("#line_menu_color .colorpicker_block").css("background-color",color)
+		//修改宽度
+		var width = intValue($(path).attr("stroke-width"),"px")
+		$("#line_menu_width input").val(width)
+		//修改样式
+		$("#line_menu_style").val($(path).attr("line_style"))
+		//修改连线逻辑
+		$("#line_menu_type").val($(line_svg).attr("type"))
+		//修改箭头
+			if($(path).attr("start_arrow") != "none" && $(path).attr("start_arrow") != undefined){
+				$("#line_menu_startArrow").addClass('have_arrow')
+			}
+			else{
+				$("#line_menu_startArrow").removeClass('have_arrow')
+			}
+			//修改箭头
+			if($(path).attr("end_arrow") != "none" && $(path).attr("end_arrow") != undefined){
+				$("#line_menu_endArrow").addClass('have_arrow')
+			}
+			else{
+				$("#line_menu_endArrow").removeClass('have_arrow')
+			}
+	}
+
+	//删除
+	$("#line_menu_delete").on("click",function(){
+		deleteObject(line)
+	})
+	//修改颜色
+	$("#line_menu_color .colorpicker").on('click',function(){
+		//打开调色盘
+		showColorpicker(this,"side",line,"line_color")
+	})
+	//改变粗度
+	$("#line_menu_width input").on("change",function(){
+		var value = intValue($(this).val(),"px")
+		$(this).val(value)
+		widthLine(line,value.slice(0, -2))
+	})
+	//改变style
+	$("#line_menu_style").on('change',function(){
+		var value = $(this).val()
+		styleLine(line,value)
+	})
+	//改变type
+	$("#line_menu_type").on("change",function(){
+		var value = $(this).val()
+		typeLine(line,value)
+	})
+	//添加or去除源箭头
+	$("#line_menu_startArrow").on("click",function(){
+		//去除
+		if($(this).is(".have_arrow")){
+			$(this).removeClass('have_arrow')
+			unarrowLine(line,"start")
+		}
+		else{
+			$(this).addClass('have_arrow')
+			arrowLine(line,"start")
+		}
+	})
+	//添加or去除尾箭头
+	$("#line_menu_endArrow").on("click",function(){
+		//去除
+		if($(this).is(".have_arrow")){
+			$(this).removeClass('have_arrow')
+			unarrowLine(line,"end")
+		}
+		else{
+			$(this).addClass('have_arrow')
+			arrowLine(line,"end")
+		}
+	})
+
+
+</script>
+
+<style type="text/css">
+	#line_menu select{
+		width:78px
+	}
+
+	#line_menu_startArrow,#line_menu_endArrow{
+		position:relative;
+	}
+	.have_arrow:after{
+		content:"";
+		display:block;
+		position:absolute;
+		right:10px;
+		top:5px;
+		height:15px;
+		width:15px;
+		background-image:url("././img/check.png");
+		background-position:center;
+		background-size:100%;
+		background-repeat:no-repeat;
+	}
+</style>

@@ -1,0 +1,410 @@
+<html>
+    <!-- 导入菜单 -->
+	<div id="file_insert_menu" class='alert modal_menu over_mask'>
+        <div class="flex">
+            <!-- 侧边栏 -->
+            <div id="file_insert_menu_left">
+                <div>
+                    <div id="file_insert_menu_title">导入</div>
+                    <div id="file_insert_menu_selectType" class="block">
+                        <div value="huabu" class="selecting">画布</div>
+                        <div value="collection">集合</div>
+                        <div value="object">磁贴/组合体</div>
+                    </div>
+                    <div style="font-size: 20px;text-align: center;" class="block">
+                        <div id="file_insert_menu_selectFile" class="button">选择文件</div>
+                        <div id="file_insert_menu_clearFile" class="button">清除文件</div>
+                    </div>
+                </div>
+            </div>
+            <!-- 主内容 -->
+            <div id="file_insert_menu_right">
+                <div id="file_insert_menu_information" class="block">
+                    <div id="file_insert_menu_emptyInformation">点击此处选择导入文件</div>     
+                    <div id="file_insert_menu_huabuInformation">
+                        <div class="file_insert_menu_information_title">选择画布：</div>
+                        <div id="file_insert_menu_huabuSelect"></div>
+                        <div class="file_insert_menu_information_end">将选中的画布添加到当前作图空间</div>
+                    </div>
+                    <div id="file_insert_menu_collectionInformation">
+                        <div class="file_insert_menu_information_title">集合内容：</div>
+                        <div id="file_insert_menu_collectionContainer"></div>
+                        <div class="file_insert_menu_information_end">将该集合添加至应用程序</div>
+                    </div>
+                    <div id="file_insert_menu_objectInformation">
+                        <div class="file_insert_menu_information_title">对象预览：</div>
+                        <div id="file_insert_menu_objectShow"></div>
+                        <div class="file_insert_menu_information_end">将该对象添加至：
+                            <select id="file_insert_menu_collectionSelect"></select>
+                        </div>
+                    </div>
+                </div>
+                <div id="file_insert_menu_bottom" class="flex">
+                    <div id="file_insert_menu_confirm" class="block button">确认</div>
+                    <div id="file_insert_menu_cancel" class="block button">取消</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</html>
+
+<script type="text/javascript" scoped>
+    var selecting_type = "huabu"
+    var select_data = null
+
+    //显示这个菜单
+    function showFileInsertMenu(){
+        //清空select_data
+        select_data = null
+        showModalMenu($("#file_insert_menu"))
+        changeFileInsertMenuInformation("empty")
+    }
+
+    //选择类型
+    $("#file_insert_menu_selectType > div").on("click",function(){
+        $(this).siblings(".selecting").removeClass("selecting")
+        $(this).addClass("selecting")
+        //修改选中的类型
+        selecting_type = $(this).attr("value")
+        //切换至empty
+        changeFileInsertMenuInformation("empty")
+    })
+
+    //切换信息栏显示的内容
+    function changeFileInsertMenuInformation(mode){
+        //全隐藏
+        $("#file_insert_menu_information > div").hide()
+        //空
+        if(mode == "empty"){
+            $("#file_insert_menu_emptyInformation").css("display","flex")
+            //清空
+            $("#file_insert_menu_huabuSelect").empty()
+            $("#file_insert_menu_collectionContainer").empty()
+            $("#file_insert_menu_objectShow").empty()
+            select_data = null
+        }
+        else if(mode == "huabu"){
+            $("#file_insert_menu_huabuInformation").show()
+        }
+        else if(mode == "collection"){
+            $("#file_insert_menu_collectionInformation").show()
+        }
+        else if(mode == "object"){
+            $("#file_insert_menu_objectInformation").show()
+            //先清空
+            $("#file_insert_menu_collectionSelect").empty()
+            //向select中添加当前自定义集合选项
+            $("#leftArea_object_collection_container > div:not([type=default])").each(function(){
+                //获得其名称，并将option与其绑定
+                var name = $(this).find(".slide_title").text()
+                var option = $("<option> "+name+" </option>")
+                $(option).data("select_collection",this)
+                //将对应的这个option放进select中
+                $("#file_insert_menu_collectionSelect").append(option)
+            })
+        }
+    }
+
+
+    //点击空信息栏或选择文件时，打开文件选择框，选择对应类型的文件
+    //用文件修改对应信息栏的内容，并切换到对应信息栏
+    $("#file_insert_menu_emptyInformation , #file_insert_menu_selectFile").on("click",function(){
+        if(selecting_type == "collection"){
+            var file_type = "object_lib"
+        }
+        else if(selecting_type == "huabu"){
+            var file_type = "tilemap"
+        }
+        else{
+            var file_type = "object"
+        }
+        //打开文件选择框,返回选择的文件路径
+        openFileSelectDialog(file_type).then(file=>{
+            if(file){
+                //获取文件的内容，顺便判断一下这个文件是否是可以导入的文件
+                getFileData(file.path,file_type).then(file_data=>{
+                    if(file_data){
+                        //保存这个数据
+                        select_data = file_data
+                        // 用这个file_data来修改信息栏的内容
+                        changeFileInsertMenuInformationBlock(file_data)
+                        //切换到对应的information
+                        changeFileInsertMenuInformation(selecting_type)
+                    }
+                })
+            }
+        })
+    })
+
+    //点击清空文件，即可清空
+    $("#file_insert_menu_clearFile").on("click",function(){
+        changeFileInsertMenuInformation("empty")
+    })
+
+    //利用文件数据修改对应的informationBlock的内容
+    function changeFileInsertMenuInformationBlock(data){
+        //画布信息栏
+        if(selecting_type == "huabu"){
+            //先清空
+            $("#file_insert_menu_huabuSelect").empty()
+            //遍历该tilemap文件中的huabus
+            if(data["tilemap"]["huabus"].length == 0){
+                $("#file_insert_menu_huabuSelect").text("无")
+            }
+            for(huabu of data["tilemap"]["huabus"]){
+                //获取对应画布的id和名称
+                var huabu_name = huabu["attr"]["name"]
+                var huabu_id = huabu["id"]
+                //生成一个huabu_block
+                var huabu_block = $("<div>\
+                                        <input type='checkbox'>\
+                                        <div>"+huabu_name+"</div>\
+                                    </div>")
+                $(huabu_block).attr("huabu_id",huabu_id)
+                //把这个block放进选项里
+                $("#file_insert_menu_huabuSelect").append(huabu_block)
+            }
+        }
+        //磁贴集合信息栏
+        else if(selecting_type == "collection"){
+            //情空
+            $("#file_insert_menu_collectionContainer").empty()
+            //遍历lib文件的内容，生成block
+            var collection_objects = data["collection_objects"]
+            for(i in collection_objects){
+                var block_type = collection_objects[i]
+                var block = createObjectBlock(block_type,50)
+                //加入到预览框
+                $("#file_insert_menu_collectionContainer").append(block)
+            }
+        }
+        //对象信息栏
+        else if(selecting_type == "object"){
+            //利用数据生成一个block
+            var block_type = data
+            var block = createObjectBlock(block_type,100)
+            //把他放进去
+            $("#file_insert_menu_objectShow").append(block)
+        }   
+    }
+
+    //按下确认时，根据type，利用数据将对应的内容导入
+    $("#file_insert_menu_confirm").on("click",function(){
+        if(select_data != null){
+            if(selecting_type == "huabu"){
+                //将当前选中的画布导入
+                $("#file_insert_menu_huabuSelect input:checked").each(function(){
+                    var huabu_id = $(this).parent().attr("huabu_id")
+                    //将data中对应的画布导入
+                    for(huabu_json of select_data["tilemap"]["huabus"]){
+                        if(huabu_json["id"] == huabu_id){
+                            //将这个画布生成出来
+                            var huabu = jsonToHuabu(huabu_json,"file")
+                            //不过要注意，得先把他隐藏
+                            $(huabu).hide()
+                        }
+                    }
+                })
+            }
+            else if(selecting_type == "collection"){
+                //创建一个collection
+                var name = select_data["collection_name"]
+                createLibFile(name,"customize",select_data)
+                .then(new_file=>{
+                    //创建这个文件的collection
+                    createObjectCollection(new_file,"customize")
+                })
+            }
+            else if(selecting_type == "object"){
+                //获取用户选中的option
+                var option = $("#file_insert_menu_collectionSelect option:selected")
+                var collection = $(option).data("select_collection")
+                console.log(collection)
+                var file_name = $(collection).attr("file_name")
+                var type = $(collection).attr("type")
+                //放入对应lib的object中
+                var the_lib = return_collection_lib(file_name,type)
+                the_lib["collection_objects"].push(select_data)
+                //修改all_lib
+                changeAllLib(file_name,type,the_lib)
+                //用有新内容的the_lib修改对应的lib文件
+                changeLibFile(file_name,type,the_lib)
+                //向这个集合中加入这个对象
+                appendBlockToCollection(collection,select_data)
+            }
+        }
+
+        //关闭这个菜单
+        hideModalMenu($("#file_insert_menu"))
+    })
+
+    $("#file_insert_menu_cancel").on("click",function(){
+        //关闭这个菜单
+        hideModalMenu($("#file_insert_menu"))
+    })
+</script>
+
+<style type="text/css" scoped>
+    /*整个菜单*/
+        #file_insert_menu{
+            width:475px;
+            height:300px;
+            background-color:var(--color-2);
+            padding:15px;
+            box-sizing: content-box;
+        }
+
+        #file_insert_menu .button:hover{
+            background-color:var(--color-3);
+        } 
+
+        #file_insert_menu > div{
+            width:100%;
+            height:100%;
+        }
+
+        #file_insert_menu div{
+            box-sizing: border-box;
+        }
+
+    /*通用*/
+        #file_insert_menu .block{
+            background-color:var(--color-1);
+            border:1px solid var(--border-color);
+            border-radius:3px;
+        }
+
+    /*左侧栏*/
+        #file_insert_menu_left{
+            width:135px;
+            margin-right:5px;
+            height:100%;
+        }
+
+        #file_insert_menu_title{
+            width:100%;
+            height:40px;
+            font-size:30px;
+            font-weight:bold;
+            text-align:left;
+        }
+
+        #file_insert_menu_selectType{
+            width:100%;
+            height: 95px;
+            margin-bottom: 5px;
+            padding:5px;
+        }
+            #file_insert_menu_selectType > div{
+                font-size: 21px;
+            } 
+
+            #file_insert_menu_selectType > div.selecting{
+                position:relative;
+                background-color:var(--color-3);
+                border-radius:5px;
+                border:1px solid var(--border-color);
+            }
+
+    /*右侧*/
+
+        #file_insert_menu_right{
+            width:calc(100% - 120px);
+        }
+
+        #file_insert_menu_information{
+            padding:5px 10px;
+            height:calc(100% - 45px);
+            width:100%;
+            border:1px solid var(--border-color);
+            margin-bottom:5px;
+        }
+
+        #file_insert_menu_information > div:not(#file_insert_menu_emptyInformation){
+            display:none;
+            position:relative;
+            height:100%;
+            width:100%;
+        }
+
+            #file_insert_menu_emptyInformation{
+                width:100%;
+                height:100%;
+                font-size:20px;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+            }
+
+            .file_insert_menu_information_title{
+                font-size:20px;
+            }
+            .file_insert_menu_information_end{
+                font-size:20px;
+            }
+
+        /*画布信息*/
+            #file_insert_menu_huabuSelect{
+                overflow: overlay;
+                height: 170px;
+                margin:10px 0px;
+            }
+            #file_insert_menu_huabuSelect > div{
+                display:flex;
+                align-items: flex-start;
+            }
+        /*集合信息*/
+            #file_insert_menu_collectionContainer{
+                margin: 10px 0px;
+                max-height: 170px;
+                width: 100%;
+                display: flex;
+                flex-wrap: wrap;
+                overflow: overlay;
+            }
+            #file_insert_menu_collectionContainer .objectBlock{
+                width:70px;
+                height:70px;
+            }
+            #file_insert_menu_collectionContainer .objectBlock_mini{
+                height:50px;
+                width:50px;
+            }
+
+        /*磁贴or组合体信息*/
+            #file_insert_menu_objectShow{
+                max-width: 100%;
+                margin: 10px;
+                max-height: 170px;
+                overflow: overlay;
+            }
+
+    /*右下*/
+
+        #file_insert_menu_bottom{
+            align-items:center;
+            justify-content:center;
+        }
+        
+        #file_insert_menu_confirm{
+            font-size: 25px;
+            justify-content: center;
+            align-items: center;
+            display: flex;
+            height: 42px;
+            width: 90px;
+            margin-right:5px;
+        }
+
+        #file_insert_menu_cancel{
+            font-size: 25px;
+            justify-content: center;
+            align-items: center;
+            display: flex;
+            height: 42px;
+            width: 90px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+
+</style>

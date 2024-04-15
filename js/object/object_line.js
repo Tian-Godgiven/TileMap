@@ -1,597 +1,673 @@
-//点击在当前画布内生成一条线
-function createStyleLine(){
-	var width = "300px";
-	var height = "30px";
-	var style = {color : "black",
-				 lineStyle : "solid",
-				 lineStyle_width : "0px"}
-
-	var line = createLine(width,height,style)
-
-		// creatArrow(line,"right","arrow_1")
-		// creatArrow(line,"left","arrow_1")
+//基于jsplumb.js实现的磁贴对象链接系统
+var connect_line_mode = false
+var num = 0
+var start
+var end
+//默认style
+var style = {
+	color : "black",
+	line_width : "2",
+	type : "besier",
+	line_style : "solid",
+	start_arrow: "none",
+	end_arrow:"arrow"
 }
 
-var focusing_line
-//生成一个线条对象,其本质是一个div元素包裹的条形div
-function createLine(width,height,style){
-	var line_id = "line_" + createRandomId()
-	var line = $("<div>",{
-		"class": "line object",
-		"id": line_id,
-	})
-	$(line).data("LineDot",[])
-	//创建lineInner
-	var lineInner = createLineInner(width,height,style)
-	//放进画布的object_container里面
-	$(line).append(lineInner)
-	$(return_focusing_huabu().find('.object_container')).append(line); 
+//修改默认style，同时也会修改画布工具栏的设定
+function changeLineStyle(new_style){
 
-	//为线条附加功能
-	abilityLine(line)
-	//创建后聚焦该线条
-	focusingObject(line,"click")
+
+	if(["besier","flowchart","straight"].includes(new_style.type)){
+		style.type = new_style.type
+		//同时改变画布工具栏的设定
+		$("#huabu_ability_lineType").find(".checked").removeClass('checked')
+		$("#huabu_ability_lineType").find(".huabu_ability_button[value="+new_style.type+"]").addClass('checked')
+	}
+	if(new_style.color != undefined){
+		style.color = new_style.color
+	}
+	if(new_style.line_width != undefined){
+		style.line_width = new_style.line_width
+	}
+	if(["solid","dashed","dotted","dotdash"].includes(new_style.line_style)){
+		style.line_style = new_style.line_style
+		//同时改变画布工具栏的设定
+		$("#huabu_ability_lineStyle_option").find(".checked").removeClass('checked')
+		var the_div = $("#huabu_ability_lineStyle_option").find(".huabu_ability_button[value="+new_style.line_style+"]")
+		$(the_div).addClass('checked')
+		$("#huabu_ability_lineStyle").css("background-image",$(the_div).css("background-image"))
+	}
+	if(new_style.start_arrow != undefined){
+		style.start_arrow = new_style.start_arrow
+		//同时改变画布工具栏的设定
+		if(new_style.start_arrow != "none"){
+			$("#huabu_ability_startArrow").addClass('checked')
+		}
+		else{
+			$("#huabu_ability_startArrow").removeClass('checked')
+		}
+	}
+	if(new_style.end_arrow != undefined){
+		style.end_arrow = new_style.end_arrow
+		//同时改变画布工具栏的设定
+		if(new_style.end_arrow != "none"){
+			$("#huabu_ability_endArrow").addClass('checked')
+		}
+		else{
+			$("#huabu_ability_endArrow").removeClass('checked')
+		}
+	}
+}
+//返回默认style，用于左侧线条工具的信息同步
+function returnLineStyle(){
+	return style
 }
 
-//删除一个线条对象
-function deleteLine(line){
-	//遍历每一根线段，解除这些线段与tile的绑定
-	$(line).children().each(function(){
-		if($(this).is(".lineInner")){
-			lineInnerDisconnectTile(this)
+//进入连线模式，在此模式下选中两个tile对象可以使其相连
+function startConnectingMode(){
+	connect_line_mode = true
+	//监听画布区域的点击
+	$("#huabu_container").on("click.connectLineMode",function(event){
+		//点击到磁贴时
+		if($(event.target).is(".tile.huabu_object",)){
+			var tile = event.target
+			num += 1
+			//第一次点击将其标记为start
+			if(num == 1){
+				start = $(tile)
+				$(tile).addClass("line_connect_start")
+			}
+			//第二次点击将其标记为end，重置计数，并使得两个对象相连
+			else if(num == 2){
+				end = $(tile)
+				num = 0
+				if(!start.is(end)){
+					//点击到另一个对象时添加end属性
+					$(tile).addClass("line_connect_end")
+					//两个对象必须存在在同一个画布
+					var huabu = $(start).parents(".huabu")
+					if($(end).parents(".huabu").is(huabu)){
+						connectObjects(huabu,start,end)
+					}
+				}
+				//等待一段时间后清除两个类
+				setTimeout(function(){
+					$(".line_connect_start").removeClass('line_connect_start')
+					$(".line_connect_end").removeClass('line_connect_end')
+				},500)
+			}
+		}
+		//点击到别的地方时，归零并清除类
+		else{
+			num = 0
+			$(".line_connect_start").removeClass('line_connect_start')
+			$(".line_connect_end").removeClass('line_connect_end')
 		}
 	})
-	//然后删除这个元素
-	$(line).remove()
 }
 
-//创建一条线段，这是组成线条对象的元素
-function createLineInner(width,height,style){
-	//创建一条普通的line_inner
-	var lineInner = $("<div>",{
-		"class": "lineInner",
-		"angle":"0"
-	})
-	$(lineInner).data("style",style)
-	//为这个元素创建绑定点数据
-	$(lineInner).data("LineDot",[])
-	//css修饰
-	var color = style.color
-	var lineStyle = style.lineStyle
-	var lineStyle_width = style.lineStyle_width
-
-	$(lineInner).css({
-		width:width,
-		height:height,
-		backgroundColor:color,
-	})
-
-	return lineInner
+//结束连线模式
+function endConnectingMode(){
+	connect_line_mode = true
+	//终止监听
+	$("#huabu_container").off("click.connectLineMode")
 }
 
-//线条的功能
-function abilityLine(line){
-	//拖拽
-	$(line).draggable({
-		drag:function(){
-			hideLineDot(line)
-		},
-		stop:function(){
-			showLineDot(line)
+//在画布内新创建一根线条，使其连接两个对象
+function connectObjects(huabu, start, end ,the_style) {
+	//创建一个线条对象
+	var line_svg = createLine(the_style,null) 
+	//是新的对象，所以给它一个id
+ 	var line_id = "line_" + createRandomId(20)
+ 	$(line_svg).attr("id",line_id)
+ 	//将其与两个元素绑定
+ 	connectLineAndObject(line_svg,start,end)
+    //添加到画布
+    objectIntoHuabu(line_svg,huabu)
+    //刷新一下位置
+    refreshLinePosition(line_svg)
+}
+
+//创建一个线条，本质是一个svg
+function createLine(the_style,text){
+	//读取style
+		if(the_style != null){
+			//读取传入的style,有默认值
+			var color = the_style.color ? the_style.color : "black";
+			var line_width = the_style.line_width ? the_style.line_width : "2";
+			var type = the_style.type ? the_style.type :　"besier"
+			var line_style = the_style.line_style ? the_style.line_style : "solid"
+			var start_arrow = the_style.start_arrow ? the_style.start_arrow : "none"
+			var end_arrow = the_style.end_arrow ? the_style.end_arrow : "arrow"
 		}
-	})
-	//点击
-	$(line).on("mousedown",function(event){
-		hideHuabuMenu("all")
-		focusingObject(line,"click")
-	})
-}
+		//否则就用默认的style
+		else{
+			var color = style.color
+			var line_width = style.line_width
+			var type = style.type
+			var line_style = style.line_style
+			var start_arrow = style.start_arrow
+			var end_arrow = style.end_arrow
+		}
+	// 创建 SVG 元素
+    var line_svg = $('<svg xmlns="http://www.w3.org/2000/svg" version="1.1"></svg>');
+ 	// 添加对应的class
+ 	$(line_svg).addClass('line object')
+ 	// 创建路径元素
+ 	var path = document.createElementNS("http://www.w3.org/2000/svg", "path")
+ 	// 将元素添加到SVG中
+ 	$(path).addClass('line_path')
+ 	$(path).css("pointer-events","visiblePainted")
+    $(line_svg).append(path);
 
-//聚焦line,在两端和中间分别显示dot
-function focusingLine(line){
-	//修改focusing_line
-	focusing_line = line
-		//暂时不知道这个的作用是什么
-		// if($(line).is(".line_selected")){return false}
-	//显示LineDot
-	showLineDot(line)
-}
+ 	//调整line的样式
+	colorLine(line_svg,color)
+	widthLine(line_svg,line_width)
+	styleLine(line_svg,line_style)
+	if(start_arrow != "none"){
+		arrowLine(line_svg,"start")
+	}
+	if(end_arrow != "none"){
+		arrowLine(line_svg,"end")
+	}
+	$(line_svg).attr("type",type)
 
-function unfocusingLine(line){
-	focusing_line = undefined;
-	hideLineDot(line)
-}
-
-//改变线段起始点，从而改变线段的位置
-function positionLine(lineInner,positionLeft,positionRight){
-	var line = $(lineInner).parent('.line')
-	var line_left = parseInt($(line).css("left"))
-	var line_top = parseInt($(line).css("top"))
-
-	var height = $(lineInner).height()
-	var radius = returnDotRadius()
-	//左端点位置
-	if(positionLeft == null){
-		left_x = parseInt($(lineInner).css("left"))
-		left_y = parseInt($(lineInner).css("top"))
-		x1 = left_x + line_left;
-		y1 = left_y + line_top
+	//添加线条文本
+	if(text == null){
+		createLineText(line_svg,"输入文本")
 	}
 	else{
-		x1 = positionLeft[0]
-		y1 = positionLeft[1]
-		left_x = x1 - line_left
-		left_y = y1 - line_top
+		createLineText(line_svg,text)
 	}
-	
-	//右端点位置
-	if(positionRight == null){
-		//获取这个线段的右dot的位置
-		var RightDot = lineInner.data("RightDot")
-		var x2 = parseInt($(RightDot).css("left")) + radius
-		var y2 = parseInt($(RightDot).css("top"))  + radius - height/2 
-	}
-	else{
-		x2 = positionRight[0]
-		y2 = positionRight[1] 
-	}
-	right_x = x2 - parseInt($(line).css("left"))
-	right_y = y2 - parseInt($(line).css("top"))
 
-	
+	//返回这个线条对象
+	return line_svg
+}
 
-	//计算得到旋转角度
-	var angle;
-	if(left_x === right_x){
-	    if(left_y < right_y){
-	        angle = 90;  //垂直向下
+//更新线条的位置
+function refreshLinePosition(line_svg,mode){
+	//获取其绑定的元素
+	var start = $("#"+ $(line_svg).attr("start_id"))
+	var end = $("#"+ $(line_svg).attr("end_id"))
+
+	//如果type为new或者file就重新绑定一次
+	if(mode == "new" || mode == "file"){
+		connectLineAndObject(line_svg,start,end)
+	}
+	//获取对应的元素的位置信息,这个位置信息应当是这个对象相对于线条所在的容器的相对距离
+	var line_container = $(line_svg).parent()
+	var a_position = positionAandB(line_container,start)
+	var b_position = positionAandB(line_container,end)
+
+	var a_left = a_position.left
+	var a_top = a_position.top
+	var b_left = b_position.left
+	var b_top = b_position.top
+
+ 	var a_width = $(start).outerWidth()
+ 	var a_height = $(start).outerHeight()
+ 	//end
+ 	var b_width = $(end).outerWidth()
+ 	var b_height = $(end).outerHeight()
+
+ 	//获取线条两端的锚点位置，一共有4个锚点，上下左右，锚点位置在边框中心
+
+	 	//获取两点x,y轴的中心差
+	 	var dis_x = (a_left + a_width/2) - (b_left + b_width/2)
+	 	var dis_y = (a_top + a_height/2) - (b_top + b_height/2)
+	 	//判断两点的x,y轴差，若x轴差大于y轴差，则在左右
+	 	if(Math.abs(dis_x) >= Math.abs(dis_y)){
+	 		//如果dis为负数，则说明a在b的左边，a使用右锚点，b使用左锚点
+	 		if(dis_x < 0){
+	 			//右锚点即为left+完整的width和top+一半的高度
+	 			var a_point = { left : a_left + a_width , top : a_top + a_height/2}
+	 			//左锚点即为left+0的width和同上
+	 			var b_point = { left : b_left, top : b_top + b_height/2}
+	 		}
+	 		//否则二者相反
+	 		else{
+	 			var a_point = { left : a_left , top : a_top + a_height/2}
+	 			//左锚点即为0的left和同上
+	 			var b_point = { left : b_left + b_width , top : b_top + b_height/2}
+	 		}
+	 		//此时的
+	 	}
+	 	//如果y轴差大于x轴差，则在上下
+	 	else{
+	 		//如果dis为负数，则说明a在b的上方，a用下锚点，b用上锚点
+	 		if(dis_y < 0){
+	 			var a_point = { left : a_left + a_width/2 , top : a_top + a_height}
+	 			var b_point = { left : b_left + b_width/2 , top : b_top}
+	 		}
+	 		//否则二者相反
+	 		else{
+	 			//上锚点即为left+一半的宽度和top+0的高度
+	 			var a_point = { left : a_left + a_width/2 , top : a_top}
+	 			//左锚点即为同上和完整的top
+	 			var b_point = { left : b_left + b_width/2 , top : b_top + b_height}
+	 			
+	 		}
+	 	}
+
+	//通过锚点来修改svg和line的刷新
+    var pos1_left = a_point.left
+ 	var pos1_top = a_point.top
+    var pos2_left = b_point.left
+ 	var pos2_top = b_point.top
+
+	//根据锚点的位置更新svg本身的宽度和位置
+	$(line_svg).attr({
+ 		"width":Math.abs(pos1_left - pos2_left)+100,
+ 		"height":Math.abs(pos1_top - pos2_top)+100
+ 	})
+ 	//移动到两点之间相对靠左上的位置-10
+ 	var svg_left = Math.min(pos1_left,pos2_left)-50
+ 	var svg_top = Math.min(pos1_top,pos2_top)-50
+ 	$(line_svg).css({
+ 		left:svg_left,
+ 		top:svg_top
+ 	})
+ 	//再更新线条的两端
+	var line_x1 = pos1_left - svg_left
+ 	var line_x2 = pos2_left - svg_left
+ 	var line_y1 = pos1_top - svg_top
+ 	var line_y2 = pos2_top - svg_top
+ 	//获取路径对象
+ 	var path = $(line_svg).children("path")
+
+ 	var type = $(line_svg).attr("type")
+ 	//三次贝塞尔曲线
+ 	if(type == "besier"){
+ 		 //起点和终点
+ 		var p0 = {x:line_x1,y:line_y1}
+ 		var p3 = {x:line_x2,y:line_y2}
+
+ 		//贝塞尔曲线的设置,获得控制点
+ 		var [besier_1,besier_2]= besierControlPoints(p0,p3,dis_x,dis_y)
+		//定义路径描述
+ 		var d = "M "+line_x1+" "+line_y1;
+		d += " C "+ besier_1.x + " " + besier_1.y + " " + besier_2.x + " " + besier_2.y +" "+line_x2+" "+line_y2; 
+ 		$(path).attr("fill", "none");
+ 	}
+ 	//直线
+ 	else if(type == "straight"){
+ 		var d = "M "+line_x1+" "+line_y1 +" "+line_x2+" "+line_y2;
+ 	}
+ 	//折线
+ 	else if(type == "flowchart"){
+ 		//起点和终点
+ 		var start = {x:line_x1,y:line_y1}
+ 		var end = {x:line_x2,y:line_y2}
+ 		var d = flowchartPathD(start,end,dis_x,dis_y)
+ 	}
+ 	
+	//修改路径
+	$(path).attr("d", d);
+}
+
+//删除线条
+function deleteLine(line_svg){
+	var id = $(line_svg).attr("id")
+	//删除绑定它的tile的line_list中的它
+	var start = $("#" + $(line_svg).attr("start_id"))
+	var start_list = $(start).data("line_list")
+	start_list = $.grep(start_list, function(value) {
+	    return value !== id;
+	});
+	$(start).data("line_list",start_list)
+
+	var end = $("#" + $(line_svg).attr("end_id"))
+	var end_list = $(end).data("line_list")
+	end_list = $.grep(end_list, function(value) {
+	    return value !== id;
+	});
+	$(end).data("line_list",end_list)
+	//最后才删除掉这个元素
+	$(line_svg).remove()
+}
+
+//右键线条显示线条菜单
+$("#huabu_container").on("mouseup",".line_path,.line_text",function(event){
+	//如果是右键
+	if(event.button == 2){
+		var line_svg = $(this).parents('.line')
+		showLineMenu(event,line_svg)
+	}
+})
+//双击线条时，若其文本没有内容，添加“输入文本”
+$("#huabu_container").on("dblclick",".line_path",function(event){
+	var text_div = $(this).parents('.line').find('.line_text')
+	if($(text_div).text() == ""){
+		$(text_div).text("输入文本")
+		$(text_div).dblclick()
+	}
+})
+
+//生成线条
+	// 让线条svg对象与对象互联
+	function connectLineAndObject(line_svg,start,end){
+		var line_id = $(line_svg).attr("id")
+		//对象的id保存进svg内
+		$(line_svg).attr("start_id",$(start).attr("id"))
+		$(line_svg).attr("end_id",$(end).attr("id"))
+		//svg的id保存进对象的line_list内，一个对象可以绑定多个line_svg
+		var list = $(start).data("line_list")
+
+		//要求list为空或不存在对应的line_svg
+		if(list == undefined || !list.includes(line_id)){
+			if(list == undefined){
+				list = []
+			}
+			list.push(line_id)
+			$(start).data("line_list",list)
+		}
+		//end的
+		var list2 = $(end).data("line_list")
+		//要求list为空或不存在对应的line_svg
+		if(list2 == undefined || !list2.includes(line_id)){
+			if(list2 == undefined){
+				list2 = []
+			}
+			list2.push(line_id)
+			$(end).data("line_list",list2)
+		}
+	}
+
+	//生成贝塞尔曲线控制点参数
+	function besierControlPoints(p0, p3,dis_x,dis_y) {
+	    // 计算中心点
+	    var center = {
+	        x: (p0.x + p3.x) / 2,
+	        y: (p0.y + p3.y) / 2
+	    };
+
+	    // 计算控制点
+	    var distance_x = (p0.x + p3.x)/3; // 控制点到端点的距离为端点之间距离的 1/3
+	    var distance_y = (p0.y + p3.y)/3
+
+	    // 根据位置关系控制反转
+	  	if(Math.abs(dis_x) >= Math.abs(dis_y)){
+	 		if(dis_x < 0){
+	 			if(dis_y > 0){
+	 				distance_x_p1 = distance_x
+	 				distance_y_p1 = distance_y
+	 				distance_x_p2 = - distance_x
+	 				distance_y_p2 = - distance_y
+	 			}
+	 			else{
+	 				distance_x_p1 = distance_x
+	 				distance_y_p1 = - distance_y
+	 				distance_x_p2 = - distance_x
+	 				distance_y_p2 = distance_y
+	 			}
+	 			
+	 		}
+	 		//水平反转
+	 		else{
+	 			if(dis_y > 0){
+	 				distance_x_p1 = - distance_x
+	 				distance_y_p1 = distance_y
+	 				distance_x_p2 = distance_x
+	 				distance_y_p2 = - distance_y
+	 			}
+	 			else{
+	 				distance_x_p1 = - distance_x
+	 				distance_y_p1 = - distance_y
+	 				distance_x_p2 = distance_x
+	 				distance_y_p2 = distance_y
+	 			}
+	 		}
+	 	}
+	 	else{
+	 		if(dis_y < 0){
+	 			if(dis_x > 0){
+	 				distance_x_p1 = distance_x
+	 				distance_y_p1 = distance_y
+	 				distance_x_p2 = - distance_x
+	 				distance_y_p2 = - distance_y
+	 			}
+	 			else{
+	 				distance_x_p1 = - distance_x
+	 				distance_y_p1 = distance_y
+	 				distance_x_p2 = distance_x
+	 				distance_y_p2 = - distance_y
+	 			}
+	 		}
+	 		else{
+	 			if(dis_x > 0){
+	 				distance_x_p1 = distance_x
+	 				distance_y_p1 = - distance_y
+	 				distance_x_p2 = - distance_x
+	 				distance_y_p2 = distance_y
+	 			}
+	 			else{
+	 				distance_x_p1 = - distance_x
+	 				distance_y_p1 = - distance_y
+	 				distance_x_p2 = distance_x
+	 				distance_y_p2 = distance_y
+	 			}
+	 		}
+	 	}
+
+	 	// 计算控制点坐标
+	 	var p1 = {
+			x: center.x + distance_x_p1,
+			y: center.y + distance_y_p1
+		};
+		var p2 = {
+		    x: center.x + distance_x_p2,
+		    y: center.y + distance_y_p2
+		};
+
+	    return [p1, p2];
+	}
+
+	//生成折线的d
+	function flowchartPathD(pointA,pointB,dis_x,dis_y){
+		// 获取起点和终点的坐标
+	    var x1 = pointA.x;
+	    var y1 = pointA.y;
+	    var x2 = pointB.x;
+	    var y2 = pointB.y;
+
+	    // 计算水平和垂直的偏移距离
+	    var deltaX = (x1 - x2)/2;
+	    var deltaY = (y1 - y2)/2;
+
+	    // 根据位置关系控制反转
+	  	if(Math.abs(dis_x) >= Math.abs(dis_y)){
+	 		p1_x = x1 - deltaX
+			p1_y = y1
+			p2_x = x1 - deltaX
+			p2_y = y2
+	 	}
+	 	else{
+	 		p1_x = x1
+			p1_y = y1 - deltaY
+			p2_x = x2
+			p2_y = y1 - deltaY
+	 	}
+
+	    // 两个转折点
+	 	var p1 = {
+			x: p1_x,
+			y: p1_y
+		};
+		var p2 = {
+		    x: p2_x,
+			y: p2_y
+		};
+
+	    // 创建路径
+	    var d = "M" + x1 + "," + y1 + " L" + p1.x + "," + p1.y + " L" + p2.x + "," + p2.y + " L" + x2 + "," + y2;
+	    return d
+	}
+
+//改变线条样式
+	//改变颜色
+		function colorLine(line_svg,color){
+			var path = $(line_svg).children('path')
+			$(path).attr("stroke", color)
+			//改变箭头的颜色
+			$(line_svg).find(".arrow_inner").attr("stroke",color)
+			$(line_svg).find(".arrow_inner").attr("fill",color)
+		}
+	//改变粗细
+		function widthLine(line_svg,line_width){
+			var path = $(line_svg).children('.line_path')
+			$(path).attr("stroke-width", line_width)
+
+		}
+	//改变样式
+		function styleLine(line_svg,line_style){
+			var path = $(line_svg).children('path')
+			$(path).attr("line_style",line_style)
+
+			if(line_style == "solid"){
+				$(path).attr("style","")
+				path.attr("fill", "none"); // 取消空心样式
+			}
+			else if(line_style == "dashed"){
+				$(path).attr("style","stroke-dasharray: 10,10")
+				path.attr("fill", "none"); // 取消空心样式
+			}
+			else if(line_style == "dotted"){
+				$(path).attr("style","stroke-dasharray: 2,5")
+				path.attr("fill", "none"); // 取消空心样式
+			}
+			else if(line_style == "dotdash"){
+				$(path).attr("style","stroke-dasharray: 2,10,10,10")
+				path.attr("fill", "none"); // 取消空心样式
+			}
+
+		}
+	//改变类型
+		function typeLine(line_svg,type){
+			//修改line的type
+			$(line_svg).attr("type",type)
+			//刷新线条
+			refreshLinePosition(line_svg)
+		}
+//增加箭头
+	function arrowLine(line_svg, arrow_position) {
+	    var path = $(line_svg).children('path');
+	    if (arrow_position == "start") {
+	        // 添加开始箭头
+	        var startArrow = createArrow(path,"start");
+	        $(startArrow).attr("id", "start_arrow"); // 添加唯一的ID
+	        $(line_svg).append(startArrow);
+	        $(path).attr("marker-start", "url(#start_arrow)");
+	        $(path).attr("start_arrow","arrow")
 	    } 
-	    else{
-	        angle = -90;  //垂直向上
-	    }
-	} 
-	else if(left_y === right_y){
-	    if(left_x < right_x){
-	        angle = 0;  // 从左到右
+	    else if (arrow_position == "end") {
+	        // 添加结束箭头
+	        var endArrow = createArrow(path,"end");
+	        $(endArrow).attr("id", "end_arrow"); // 添加唯一的ID
+	        $(line_svg).append(endArrow);
+	        $(path).attr("marker-end", "url(#end_arrow)");
+	        $(path).attr("end_arrow","arrow")
 	    } 
-	    else{
-	        angle = 180;  // 从右到左
+	}
+	//去除箭头
+	function unarrowLine(line_svg,arrow_position){
+		var path = $(line_svg).children('path');
+		if (arrow_position == "start") {
+	        $(line_svg).children('#start_arrow').remove(); // 移除所有箭头元素
+	        $(path).attr("marker-start", ""); // 移除开始箭头引用
+	        $(path).attr("start_arrow","none")
+	    } 
+	    else if(arrow_position == "end") {
+	        $(line_svg).children('#end_arrow').remove(); // 移除所有箭头元素
+	        $(path).attr("marker-end", ""); // 移除结束箭头引用
+	        $(path).attr("end_arrow","none")
 	    }
-	} 
-	else{
-	    angle = Math.atan2(right_y - left_y, right_x - left_x) * (180 / Math.PI)
 	}
-	//计算得到线条长度
-	var distance = Math.sqrt(Math.pow(right_x - left_x, 2) + Math.pow(right_y - left_y, 2));
-	
-	//修改线段的属性
-	$(lineInner).css({
-		left:left_x,
-		top:left_y,
-		width:distance,
-	})
-	//令其旋转对应的角度
-	rotateDom(lineInner,angle,"change")
+	/*创造箭头本身*/
+	function createArrow(path,position) {
+		if(position == "start"){
+	 		var d = "M9,0 L9,6 L0,3 z" // 修改箭头方向，使其指向路径起点
+        	var refX = "0" // 调整箭头位置，使其与路径起点对齐
+        }
+        else if(position == "end"){
+        	var d = "M0,0 L0,6 L9,3 z"
+        	var refX = "8"
+        }
+        var arrow = document.createElementNS("http://www.w3.org/2000/svg", "marker");
+        $(arrow).attr({
+            "markerWidth": "10",
+            "markerHeight": "10",
+            "refX":refX,
+            "refY": "3",
+            "orient": "auto",
+            "markerUnits": "strokeWidth"
+        });
+        // 定义箭头内部路径
+        var arrow_inner = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        var color = $(path).attr("stroke")
+        $(arrow_inner).attr({
+            "d":d,
+            "fill": color,
+            "class": "arrow_inner",
+        });
 
-	//将中点放在line中心位置
-	var CenterDot = $(lineInner).data("CenterDot")
-	positionDot(CenterDot,[(x1+x2)/2,(y1+y2)/2 + radius*2])
+        // 将箭头内部路径附加到箭头上
+        $(arrow).append(arrow_inner);
+
+        return arrow;
+    }
+
+//增添文字内容
+	//在线条中心插入一个文本内容
+	function createLineText(line_svg,text){
+	    // 创建文本的外壳
+	    var textElement = document.createElementNS("http://www.w3.org/2000/svg", 'foreignObject');
+	    // 设置外壳的属性
+	    $(textElement).attr({
+	   		'width': '100%',
+	   		"height":"100%"
+	   	}); 
+
+	    // 创建文本本体
+	    var text_div = $("<div class='line_text'>"+text+"</div>")
+	    // 放入外壳中
+	    $(textElement).append(text_div)
+
+	    // 将文本元素添加到 SVG 容器中
+	    $(line_svg).append(textElement);
+	}
+
+	// 双击线条文本，可以将其聚焦并修改
+	$("#huabu_container").on("dblclick",".line_text",function(event){
+		event.stopPropagation()
+		$(this).addClass('focusing_lineText')
+		$(this).attr('contenteditable', 'true');
+		$(this).focus()
+	})
+	// 失去焦点时结束修改
+    $("#huabu_container").on("mousedown",function(event){
+    	if(!$(event.target).is(".focusing_lineText")){
+    		$(".focusing_lineText").attr('contenteditable', 'false');
+        	$(".focusing_lineText").removeClass('focusing_lineText')
+    	}
+    });
+
+//聚焦线条
+function focusingLine(line_svg){
+	//备忘，我也不知道聚焦线条干什么
+}	
+//取消线条的聚焦
+function unfocusingLine(line_svg){
+	//隐藏line_menu
+	hideObjectMenu("line_menu")
 }
 
-//创建LineInnerDot对象并将其与左右两端的线段绑定
-function createLineInnerDot(lineInner_Left,lineInner_right,[x,y]){
-	var style = lineInner_Left.data("style")
-	var color = style.color
-	var height = lineInner_Left.height()
-	//创建一个润滑点，这个点会与这两条线段绑定
-	var lineInnerDot = $("<div>",{
-		class:"lineInnerDot"
-	})
-	//放进线条中
-	lineInner_Left.after(lineInnerDot)
-	//修改样式
-	$(lineInnerDot).css({
-		position:"absolute",
-		left:x,
-		top:y,
-		height:height,
-		width:height,
-		backgroundColor:color,
-		borderRadius:"50%"
-	})
-	//绑定数据
-	lineInner_Left.data("lineInnerDot_right",lineInnerDot)
-	lineInner_right.data("lineInnerDot_left",lineInnerDot)
 
-	return lineInnerDot
+//启用一个线条对象
+function useLine(line_svg){
+	var start = $("#"+$(line_svg).attr("start_id"))
+	var end = $("#"+$(line_svg).attr("end_id"))
+	//将svg与这两个元素绑定
+	connectLineAndObject(line_svg,start,end)
+	//刷新它的位置
+	refreshLinePosition(line_svg)
 }
-
-//令线段一分为二,在其中间加入线条中心点
-function separateLineInner(lineInner){
-	$old_lineInner = $(lineInner)
-	var line = $old_lineInner.parent(".line")
-
-	//数据计算
-	var height = $old_lineInner.height()
-	var width = $old_lineInner.width()
-	var style = $old_lineInner.data("style")
-	var old_left = parseInt($old_lineInner.css("left"))
-	var old_top = parseInt($old_lineInner.css("top"))
-	var angle = $old_lineInner.attr("angle")
-	var radians = angle*Math.PI/180
-	//计算得到原线段中点的位置
-	var new_left = old_left + width/2 * Math.cos(radians)
-	var new_top = old_top + width/2 * Math.sin(radians)
-
-	//创建一个新的线段，这个线段的样式是原线段的拷贝，会放在原线段的右侧
-	var $new_lineInner = $(createLineInner(width/2,height,style))
-	//将原线段绑定的LineInnerDot_right绑定给新的线段
-	var old_right = $old_lineInner.data("lineInnerDot_right")
-	$new_lineInner.data("lineInnerDot_right",old_right)
-
-	//创建一个新的lineInnerDot，并与其左右两个线段绑定
-	var lineInnerDot = createLineInnerDot($old_lineInner,$new_lineInner,[new_left - height/2,new_top])
-	//将新的线段放进线条中
-	$(lineInnerDot).after($new_lineInner)
-
-	//将旧线段所绑定的tile转移绑定给新线段
-	var tile_list = $old_lineInner.data("connect_tile")
-	console.log(tile_list)
-	for(i in tile_list){
-		var tile = tile_list[i][0]
-		console.log(tile_list[i][1])
-		//将右侧的tile绑定给新的lineInner
-		if(tile_list[i][1] == "right"){
-			lineInnerConnectTile($new_lineInner,tile,"right",tile_list[i][2])
-			//然后将这个tile与旧线段解绑
-			lineInnerDisconnectTile($old_lineInner,tile)
-		}
-	}
-
-	//修改两条线段的样式
-	//旧线段长度减半
-	$old_lineInner.css({
-		width:width/2
-	})
-	//新线段移动到原本的线段的中间位置
-	$new_lineInner.css({
-		left:new_left,
-		top:new_top,
-	})
-	rotateDom($new_lineInner,angle,"change")
-
-	//重新生成线条的dot
-	hideLineDot(line)
-	showLineDot(line)
-}
-
-//令两条线段合二为一
-function combineLineInner(lineInner_1,lineInner_2,lineInnerDot){
-	var $lineInner_1 = $(lineInner_1)
-	var $lineInner_2 = $(lineInner_2)
-	//获取相关数据
-	var width_1 = $lineInner_1.width()
-	var width_2 = $lineInner_2.width()
-	//暂时隐藏LineDot
-	var line = $lineInner_1.parent(".line")
-	hideLineDot(line)
-
-	//并将靠后的lineInner所绑定的lineInnerDot_right绑定给他
-	var right_dot = $lineInner_2.data("lineInnerDot_right")
-	if(right_dot == undefined){
-		//不能将值直接定义为undefined，但是在js中null == undefined
-		$lineInner_1.data("lineInnerDot_right",null)
-	}
-	else{
-		$lineInner_1.data("lineInnerDot_right",right_dot)
-	}
-
-	//删除较为靠后的lineInner和lineInnerDot
-	$(lineInnerDot).remove()
-	$lineInner_2.remove()
-	//修改较为靠前的线段的css
-	$lineInner_1.css({
-		width:width_1 + width_2
-	})
-
-	//重新生成线条的dot
-	showLineDot(line)
-}
-
-//将线段与Tile绑定
-function lineInnerConnectTile(lineInner,tile,position,[left,top]){
-	//判断该tile是否已经与该线段绑定，因为线段同时最多绑定两个tile，所以遍历起来更方便
-	var $lineInner = $(lineInner)
-	var tile_list = $lineInner.data("connect_tile")
-	if(tile_list == undefined){
-		tile_list = []
-	}
-	else{
-		for(i in tile_list){
-			if(tile_list[i][0].is(tile)){
-				return false
-			}
-		}
-	}
-
-
-	var $tile = $(tile)
-	var lineInner_list = $tile.data("connect_lineInner")
-	if(lineInner_list == undefined){
-		lineInner_list = []
-	}
-
-
-	//将tile绑定在lineInner上
-	tile_list.push([tile,position,[left,top]])
-	$lineInner.data("connect_tile",tile_list)
-	//将lineInner绑定在tile上
-	lineInner_list.push([lineInner,position,[left,top]])
-	$tile.data("connect_lineInner",lineInner_list)
-
-	
-}
-
-//将线段与Tile解绑
-function lineInnerDisconnectTile(lineInner,tile){
-	//如果没有给出tile对象，则令线段与其所有关联的tile解绑
-	if(tile == null){
-		var tile_list = $(lineInner).data("connect_tile")
-		for(i in tile_list){
-			lineInnerDisconnectTile(lineInner,tile_list[i])
-		}
-	}
-	else{
-		var lineInner_list = $(tile).data("connect_lineInner")
-		//从tile中删除这个lineInner
-		for(i in lineInner_list){
-			if($(lineInner_list[i][0]).is(lineInner)){
-				lineInner_list.splice(i,1)
-				//重新装回tile中
-				$(tile).data("connect_lineInner",lineInner_list)
-			}
-		}
-		//将这个tile与lineInner解绑
-		var tile_list = $(lineInner).data("connect_tile")
-		for(i in tile_list){
-			if($(tile_list[i][0]).is(tile)){
-				tile_list.splice(i,1)
-				//重新装回lineInner中
-				$(lineInner).data("connect_tile",tile_list)
-			}
-		}
-	}
-}
-
-// //为选中的线条增添一个不同方向的Arrow
-// function createArrowRight(){
-// 	var line = focusing_line
-// 	//如果没有选中则跳过
-// 	if(line == undefined){
-// 		return 0
-// 	}
-// 	creatArrow(line,"right","arrow_1")
-// }
-// function createArrowLeft(){
-// 	var line = focusing_line
-// 	//如果没有选中则跳过
-// 	if(line == undefined){
-// 		return 0
-// 	}
-// 	creatArrow(line,"left","arrow_1")
-// }
-
-
-
-
-// //创建箭头,在给定line的给定方向的最边缘端点处放置一个箭头，这个箭头的顶点是这个dot的圆心，箭头会随着line的角度变化而变化
-// function creatArrow(line,direction,style){
-// 	//得到dot对象
-// 	if(direction == "left"){
-// 		var dot = $(line).children(".line_dotLeft")
-// 	}
-// 	else if(direction == "right"){
-// 		var dot = $(line).children(".line_dotRight")
-// 	}
-// 	//如果箭头对象已经存在则跳过
-// 	if($(dot).next().is(".line_arrow")){
-// 		return 0
-// 	}
-
-// 	//箭头对象是一个父元素div内的div包裹img，这个父元素用于定位，这个div用于旋转，这个img是箭头的图形
-// 	var arrow = $("<div>",{"class":"line_arrow line_arrow_" + direction})
-// 	var arrow_inner = $("<div>",{"class":"line_arrow_inner"})
-// 	var arrow_img = new Image()
-// 	arrow_img.src = "./img/" + style +".png"
-
-// 	//把做好的箭头放进line对象里具体位置是对应dot的后面
-// 	$(arrow_inner).append(arrow_img)
-// 	$(arrow).append(arrow_inner)
-// 	$(dot).after(arrow)
-
-// 	changeArrow(arrow)
-// 	dragLineDot(dot)
-// }
-
-// //修改某个arrow的位置使其能够对准所处的线段上
-// function changeArrow(arrow){
-// 	//取操作对象
-// 	var line = $(arrow).parent('.line')
-// 	var arrow_inner = $(arrow).children()
-// 	var arrow_img = $(arrow_inner).children()
-// 	var dot = $(arrow).prev(".line_dot")
-// 	//箭头只与端点绑定，而端点只有一个链接
-// 	var list = $(dot).data("connected")
-// 	for(i in list){
-// 		var line_inner = list[i]["line_inner"]
-// 	}
-
-// 	//根据箭头的方向选择箭头附着的dot
-// 	if($(dot).is(".line_dotLeft")){
-// 		//是左侧点，要+270度
-// 		var basic_angle = 270
-// 	}
-// 	else if($(dot).is(".line_dotRight")){
-// 		//是右侧侧点，要+90度
-// 		var basic_angle = 90
-// 	}
-
-// 	//获取圆心的位置
-// 	var radius = $(dot).width()/2 * return_huabu_scale()
-// 	var x = $(dot).offset().left + radius
-// 	var y = $(dot).offset().top + radius
-
-// 	//获取对应线段的粗度颜色和角度
-// 	var thick = $(line_inner).height()
-// 	var angle = parseInt($(line_inner).attr("angle"))
-// 	var color = $(line_inner).css("background-color")
-
-// 	if(isNaN(angle)){
-// 		angle = 0;
-// 	}
-// 	angle = basic_angle + angle
-
-// 	//箭头的宽度和高度与线条正相关
-// 	var width = (thick*1.5 + 15)
-// 	var height = (thick*1.2 + 10)
-
-// 	//修饰arrow_inner，其中arrow的颜色与线条相同，大小比线条的粗度稍大，角度根据其dot有所变化
-// 	$(arrow_inner).css({
-// 		"position":"absolute",
-// 		"left":-width / 2,
-// 		"text-indent":-width,
-// 		"width":width,
-// 		"height":height,
-// 		"overflow":"hidden",
-// 	})
-// 	$(arrow_img).css({
-// 		"position":"absolute",
-// 		"width":width,
-// 		"height":height,
-// 		"filter":"drop-shadow("+width+ "px 0" +" " +color+")",
-// 	})
-// 	//位置则是其箭头顶端（上边缘的中点）与dot的圆心相同
-// 	$(arrow).css({
-// 		"transform":"rotate(" + angle +"deg)",
-// 	})
-// 	$(arrow).offset({
-// 		left: x,
-// 		top: y ,
-// 	})
-// }
-
-
-
-
-//当line_dot移入tile中，使其与tile绑定，一个line_dot只能绑定一个tile
-//总是更优先地绑定z-index更好的，或者说更新的（这个元素会比其他元素更上层）的tile
-//为其增加一个类connected_dot
-// var old_priority = 0
-// var old_z_index = 0
-// var old_tile = undefined
-// function DotIntoTile(dot,tile){
-// 	$tile = $(tile)
-// 	//检测这个点是否已经链接上了一个tile，如果是，则判断优先级
-// 	if($(dot).is(".connected_dot")){
-// 		var new_priority = $tile.index()
-// 		var new_z_index = $tile.css("z-index")
-// 		//优先判断z-index,如果旧的优先级更大，则直接结束
-// 		if(old_z_index > new_z_index){
-// 			return 0 
-// 		}
-// 		//如果z-index相同，则判定index的优先级
-// 		else if(old_z_index = new_z_index){
-// 			//若旧的优先级更大，则直接结束
-// 			if(old_priority > new_priority){
-// 				return 0
-// 			}
-// 		}
-// 		//否则将dot与旧的tile解绑
-// 		DotOutTile(dot,old_tile)
-// 	}
-// 	//存储tile和他的优先级
-// 	old_priority = $tile.index()
-// 	old_z_index = $tile.css("z-index")
-// 	old_tile = $tile
-// 	//获得line的list
-// 	var line = $(dot).parent(".line")
-// 	var list = $(line).data("connecting_dot")
-// 	if(list == undefined){
-// 		list = []
-// 	}
-// 	//如果这个dot不存在于list中，则加入
-// 	if($.inArray(dot,list) == -1){
-// 		list.push(dot)
-// 	}
-// 	//随后改变Dot的类表示其已经连接上了,并将其原本所处的line存储在data里面
-// 	$(dot).addClass('connected_dot')
-// 	$(dot).data("line",line)
-// 	//将修改后的list返还给line
-// 	$(line).data("connecting_dot",list)
-// 	//若line中有一个dot为连接状态，则无法直接移动line
-// 	$(line).draggable("disable")
-// 	//调整dot的css使其位置不变并与tile成比例，使其可以自然贴附到tile上随之变化
-// 	var line_offset = offsetWithHuabu(line)
-// 	var width = $tile.width()
-// 	var height = $tile.height()
-// 	var tile_left = parseInt($tile.css("left"))
-// 	var tile_top = parseInt($tile.css("top"))
-// 	//如果这个tile旋转了，则需要再加上旋转导致的left和top的改变
-// 	var angle = $tile.attr("angle")
-// 	if(angle != 0){
-// 		var rotate_position = rotatePositionChange(width,height,angle)
-// 		tile_left += rotate_position.left
-// 		tile_top += rotate_position.left
-// 	}
-// 	//修改line_dot的css以改变其位置，当其未处于边缘时，令left或top为百分比，随着tile的大小变化而自然地移动
-// 	var left = (parseInt($(dot).css("left")) + line_offset.left - tile_left)
-// 	var top = (parseInt($(dot).css("top"))  + line_offset.top  - tile_top)
-	
-// 	if(left > 0){
-// 		left = Math.floor(left / width * 100 )+"%"
-// 	}
-// 	if(top > 0){
-// 		top = Math.floor(top / height * 100 )+"%"
-// 	}
-// 	$(dot).css({
-// 		"left":left,
-// 		"top":top
-// 	})
-// 	//将dot放进tile中作为子元素
-// 	$tile.append(dot)
-// }
-
-// //dot离开tile后，将其与tile解绑，回到对应的line当中
-// function DotOutTile(dot,tile){
-// 	//获取dot原本的line对象和line的链接list
-// 	var line = $(dot).data("line")
-// 	var list = $(line).data("connecting_dot")
-// 	var index = $.inArray(dot,list)
-// 	//查找dot是否存在在line当中
-// 	var found = false;
-// 	for (var i = 0; i < list.length; i++) {
-// 	  if ($(list[i]).is($(dot))) {
-// 	    found = true;
-// 	    break;
-// 	  }
-// 	}
-// 	//如果dot存在于list中，则将其移出tile
-// 	if(found == true){
-// 		//从connecting_dot列表中删除这个dot
-// 		list.splice(index,1)
-// 		//颜色变回来
-// 		$(dot).css("background","#00D0FFFF")
-// 		//线条的移动功能重新启用
-// 		$(dot).parent(".line").draggable("enable")
-// 		//修改dot的位置使其可以从始至终对上
-// 		var line_offset = offsetWithHuabu(line)
-// 		var new_left = line_offset.left - (parseInt($(dot).css("left")) + parseInt($(tile).css("left")))
-// 		var new_top  = line_offset.top - (parseInt($(dot).css("top"))  +  parseInt($(tile).css("top")))
-// 		$(dot).css({
-// 			"left": - new_left,
-// 			"top": - new_top
-// 		})
-// 		$(line).append(dot)
-// 		$(dot).removeClass('connected_dot')
-// 	}
-// }

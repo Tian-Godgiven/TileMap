@@ -1,72 +1,74 @@
 <html>
-    <div id="leftArea_tile_container">
+    <div>
         <div class="button_container">
-            <button class="button" onclick="addNewHuabu()">新建画布</button>
-        </div>
-        <div class="button_container">
-            <button class="button" onclick="createTile()">新建磁贴</button>
-        </div>
-        <div class="button_container">
-            <button class="button" onclick="createStyleLine()">新建线条</button>
-        </div>
-
-        <div id="search_tile">
-            <input value="搜索磁贴类型">
-        </div>
-
-        <div id="memorize_tile" class="slide_title">记忆面包<span>    编辑</span>
-            <div class="slide_inner">
-                <div>记忆体1</div>
-                <div>记忆体2</div>
-                <div>记忆体3</div>
-            </div>
-
-        </div>
-
-        <div id="use_template" class="slide_title slide_closing">套用模板
-            <div class="slide_inner">
-                <div>+导入模板</div>
-                <div>模板1</div>
-                <div>模板2</div>
-                <div>模板3</div>
-            </div>
-        </div>
-
-        <div id="tile_type">
-            <div class="slide_title slide_closing">A种
-                <div class="slide_inner">
-                    <div>A1</div>
-                    <div>A2</div>
-                    <div>A3</div>
-                    <div>A1</div>
-                    <div>A2</div>
-                    <div>A3</div>
-                    <div>A1</div>
-                    <div>A2</div>
-                    <div>A3</div>
-                    <div>A1</div>
-                    <div>A2</div>
-                    <div>A3</div>
-                    <div>A1</div>
-                    <div>A2</div>
-                    <div>A3</div>
+            <div id="create_new_huabu" class="button">新建画布</div>
+            <div id="line_connect_mode">
+                <div id="toggle_lineConnect_mode"  class="button">连线模式</div>
+                <div id="line_connect_style" class="button">
+                </div>
+                <div id="line_connect_style_menu" class="menu flex">
+                    <div class="flex"> 
+                        <!-- 颜色和粗度 -->
+                        <div style="margin-right:8px;">
+                            <div id="line_style_color" class="flex">
+                                <div class="colorpicker">
+                                    <div class="colorpicker_block colorpicker_color" style="background-color: rgba(0, 0, 0, 0);"></div>
+                                    <div class="colorpicker_img"></div>
+                                </div>
+                            </div>
+                            <div id="line_style_width" class="flex" style="margin-top:4px;">
+                                <input class="number_input" unit="px">
+                            </div>
+                        </div>
+                        <!-- 样式与类型 -->
+                        <div style="margin-right:8px;">
+                            <div class="flex">
+                                <select id="line_style_style">
+                                    <option value="solid">实线</option>
+                                    <option value="dashed">虚线</option>
+                                    <option value="dotted">点线</option>
+                                    <option value="dotdash">点虚线</option>
+                                </select>
+                            </div>
+                            <div class="flex" style="margin-top:4px">
+                                <select id="line_style_type">
+                                    <option value="straight">直线连接</option>
+                                    <option value="besier">曲线连接</option>
+                                    <option value="flowchart">折线连接</option>
+                                </select>
+                            </div>  
+                        </div>
+                        <!-- 两端的箭头 -->
+                        <div>
+                            <div id="line_style_startArrow">
+                                <input type="checkbox" name="">源箭头
+                            </div>
+                            <div id="line_style_endArrow" style="margin-top:4px">
+                                <input type="checkbox" name="">尾箭头
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="slide_title slide_closing">B种
-                <div class="slide_inner">
-                    <div>B1</div>
-                    <div>B2</div>
-                    <div>B3</div>
-                </div>
-            </div>
+        </div>
+
+        <div id="leftArea_search_object_type">
+            <input placeholder = "搜索磁贴类型">
+            <div id="leftArea_search_object_type_input_button"></div>
+            <div id="leftArea_fold_all_collection" class="fold_all"></div>
         </div>
     </div>
 
-    <div id="import_tile">
-        <div>分类设置</div>
+    <div id="leftArea_object_collection_container"></div>
+
+    <div id="leftArea_import">
+        <div id="leftArea_insert_collection">导入集合</div>
+        <div id="leftArea_create_collection">新建集合</div>
     </div>
 </html>
 
 <script src="./js/area/area_left.js"></script>
+<script src="./js/area_ability/left_objectCollection.js"></script>
 
 <link rel="stylesheet" href="./css/area/area_left.css">
+<link rel="stylesheet" href="./css/area_ability/left_objectCollection.css">

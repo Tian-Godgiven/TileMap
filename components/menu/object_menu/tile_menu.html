@@ -1,0 +1,187 @@
+<html>
+    <div id="tile_menu" class="menu object_menu">
+        <div>
+            <div id="tile_copy">复制</div>
+            <div id="tile_cut">剪切</div>
+            <div id="tile_delete">删除</div>
+        </div>
+
+        <div>
+            <div id="nest_huabu">进入画布</div>
+            <div id="open_link">打开链接</div>
+            <div id="join_collection" class="side_menu">加入集合
+                <div class="menu object_menu">
+                    <div>显示可以加入的自定义集合</div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div id="tile_color">颜色:
+                <div class="colorpicker">
+                    <div class="colorpicker_block colorpicker_color"></div>
+                    <div class="colorpicker_img"></div>
+                </div>
+            </div>
+
+            <div id="tile_angle_shun">顺时针旋转45度</div>
+            <div id="tile_angle_ni">逆时针旋转45度</div>
+            <div id="tile_up">上浮1层</div>
+            <div id="tile_down">下沉1层</div>
+            <div id="tile_shape">改变形状</div>
+        </div>
+
+        <div>
+            <div id="tile_lock_unlock">锁定/解锁</div>
+            <div id="tile_textblock">显示内容块</div>
+        </div>
+    </div>
+</html>
+
+<script type="text/javascript">
+
+    //显示磁贴菜单
+    function showTileMenu(event,tile){
+        //同步样式和功能
+        changeTileMenu(tile)
+        //将其显示
+        showObjectMenu(event,"tile_menu")
+    }
+
+
+    //磁贴右键子菜单功能
+    var focusing_tile
+    //同步磁贴右键子菜单的样式和内容
+    function changeTileMenu(tile){
+        focusing_tile = tile
+        //同步“背景颜色”与该磁贴的背景颜色相同
+        var color = $(tile).css("background-color")
+        $("#tile_menu #tile_color .colorpicker .colorpicker_block").css("background-color",color)
+        //同步[打开嵌套画布]只有在其存在嵌套画布时有效
+            if($(tile).data("nest_huabu")!=null){
+                //若已经嵌套了画布，则令其点击后打开画布，并且内容更换为进入画布
+                $("#tile_menu #nest_huabu").off("click").on("click",function(){
+                    openNestedHuabu(tile)
+                }).text("进入画布")
+            }
+            else{
+                //否则令其点击后嵌套画布
+                $("#tile_menu #nest_huabu").off("click").on("click",function(){
+                    showHuabuNestMenu(tile)
+                }).text("嵌套画布")
+            }
+
+        //显示“锁定”或“解锁”
+            if($(tile).prop("lock")){
+                $("#tile_menu #tile_lock_unlock").off("click").on("click",function(){
+                    unlockTile(tile)
+                }).text("解锁")
+            }
+            else{
+                $("#tile_menu #tile_lock_unlock").off("click").on("click",function(){
+                    lockTile(tile)
+                }).text("锁定")
+            }
+
+        //显示“隐藏内容块”或“显示内容块”或“移动到内容块”
+            var textblock_state = $(tile).attr("textblock_showState")
+            if(textblock_state == "enternalShow"){
+                $("#tile_menu #tile_textblock").off("click").on("click",function(){
+                    //切换至永久隐藏模式
+                    setTileTextblockShowState(tile,"enternalHide")
+                    changeTileMenu(tile)
+                }).text("永久隐藏内容块")
+            }
+            else if(textblock_state == "enternalHide"){
+                $("#tile_menu #tile_textblock").off("click").on("click",function(){
+                    //切换至永久显示模式
+                    setTileTextblockShowState(tile,"enternalShow")
+                    changeTileMenu(tile)
+                }).text("永久显示内容块")
+            }
+            else if($("#"+$(tile).data("textblock")).length == 0){
+                $("#tile_menu #tile_textblock").off("click").on("click",function(){
+                    showTileTextblock(tile)
+                    changeTileMenu(tile)
+                }).text("显示内容块")
+
+            }
+            else if($("#"+$(tile).data("textblock")).length > 0){
+                $("#tile_menu #tile_textblock").off("click").on("click",function(){
+                    hideTileTextblock(tile)
+                    changeTileMenu(tile)
+                }).text("隐藏内容块")
+            }
+
+            if($(tile).prop("textblock_bindState") == false){
+                $("#tile_menu #tile_textblock").off("click").on("click",function(){
+                    //移动到内容块
+                    var textblock = $("#"+$(tile).data("textblock"))
+                    moveToTile(textblock)
+                }).text("移动到内容块")
+            }
+    }
+
+    //复制该磁贴
+    $("#tile_menu #tile_copy").on("click",function(){
+        copyObject(focusing_tile)
+        hideObjectMenu("tile_menu")
+    })
+    //剪切该磁贴
+    $("#tile_menu #tile_cut").on("click",function(){
+        //先copy再delete
+        copyObject(focusing_tile)
+        deleteObject(focusing_tile)
+        hideObjectMenu("tile_menu")
+    })
+    //删除该磁贴
+    $("#tile_menu #tile_delete").on("click",function(){
+        //直接delete
+        deleteObject(focusing_tile)
+        hideObjectMenu("tile_menu")
+    })
+    //打开链接
+    $("#tile_menu #open_link").on("click",function(){
+        var link = $(focusing_tile).data("tile_link")
+        if(link != undefined){
+            window.open(link)
+        }
+    })
+    //加入集合,点击弹出当前可加入集合的子菜单，
+    $("#tile_menu #join_collection").on("click mouseenter",function(){
+        showChildMenu(this,"right","dblclick","mouseleave")
+    })
+
+    //点击子菜单即可加入
+
+
+
+    //显示与修改背景颜色
+    $("#tile_menu #tile_color .colorpicker").on("click",function(){
+        //在该对象旁调用选色器，传入当前聚焦的tile，修改对象是背景颜色
+        showColorpicker(this,"side",focusing_tile,"background")
+    })
+    //顺时针旋转45度
+    $("#tile_menu #tile_angle_shun").on("click",function(){
+        rotateDom(focusing_tile,45,"plus")
+    })
+    //逆时针旋转45度
+    $("#tile_menu #tile_angle_ni").on("click",function(){
+        rotateDom(focusing_tile,-45,"plus")
+    })
+    //上浮该磁贴
+    $("#tile_menu #tile_up").on("click",function(){
+        ZIndexObject(focusing_tile,"up")
+    })
+    //下沉该磁贴
+    $("#tile_menu #tile_down").on("click",function(){
+        ZIndexObject(focusing_tile,"down")
+    })
+    //显示与改变磁贴形状
+    $("#tile_menu #tile_shape").on("click",function(){
+        hideObjectMenu("tile_menu")
+    })
+
+
+
+</script>

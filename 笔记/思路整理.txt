@@ -86,3 +86,36 @@ clone可以把旧的tile的内容记录下来吗？这样的话我还需要吧ti
 
 
 <svg width="56" height="56" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="56" height="56" patternUnits="userSpaceOnUse"><path d="M 0 14 L 56 14 M 14 0 L 14 56 M 0 28 L 56 28 M 28 0 L 28 56 M 0 42 L 56 42 M 42 0 L 42 56" fill="none" stroke="#d0d0d0" opacity="0.2" stroke-width="1"/><path d="M 56 0 L 0 0 0 56" fill="none" stroke="#d0d0d0" stroke-width="1"/></pattern></defs><rect width="100%" height="100%" fill="url(#grid)"/></svg>
+
+
+
+
+
+
+
+理一下顺序啊，比较发麻烦的几个点：
+
+1.线条对象
+
+2.组合体对象
+
+3.磁贴种类库→9
+我要怎么实现多种不同的默认磁贴的样式？
+1.使用css实现：简单快捷
+2.使用js实现：可以用在一些特殊地方例如text和image
+3.通过左侧实现，保存进去然后导出为lib
+4.lib是一个json文件，保存有不同的css设置，
+
+4.复制粘贴→3
+
+5.左边的菜单→3
+
+6.画布菜单→4,8,2,3
+
+7.磁贴菜单→8
+
+8.撤销重做→10
+
+9.磁贴形状
+
+10.所有操作完成

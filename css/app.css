@@ -1,0 +1,36 @@
+/*应用程序主题颜色*/
+
+/*亮色模式*/
+@media (prefers-color-scheme: dark) {
+	:root{
+		--color--1:white;/*最最浅色，用于内容块和Input*/
+		--color-0:#FBFBFB;/*最浅色，用于画布中心*/
+		--color-1:#F1F3F4;/*基础色，用于整体*/
+		--color-2:#E4E4E4;/*区别色，用于小组件*/
+		--color-3:#CECECE;/*强调色，用于hover等*/
+		--color-4:#9B9B9B;/*禁止色，用于标识禁止*/
+		--color-5:black;/*最深色，仅用于一部分边框*/
+		--focusing-color:blue;/*聚焦色，仅用于边框*/
+		--border-color:#9B9B9B;/*边框色*/
+		--text-color:black;
+		--warning-color-2: #E7CCCC;
+        --warning-color-1:#AE231E;
+		--theme-picture:url("../../img/light_theme.png");
+		--color-unlog:#686868;/*未登录用户名的颜色，比禁止色还要深一点*/
+	}
+    
+}
+
+
+
+/*暗色模式*/
+@media (prefers-color-scheme: light) {
+
+	:root{
+		--theme-picture:url("../../img/dark_theme.png");
+	}
+  	body { 
+  		background: #333; 
+  		color: white; 
+  	}
+}

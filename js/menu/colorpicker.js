@@ -46,15 +46,9 @@ function createColorpicker(dom_id){
 //调用调色盘,在指定位置旁显示该调色盘
 // target:调用调色盘的.colorpicker对象
 // position：调色盘显示的位置，分为side（旁边）和down(下方)
-// dom:调色盘修改颜色的对象
+// dom:调色盘修改颜色的对象，可为空
 // type:调色盘修改颜色的对象的颜色对象，包括background和text，分别对应修改backgroundcolor和color
 function showColorpicker(target,position,dom,type){
-
-	if(! $(target).has('.colorpicker')){
-		console.log("指定对象不是选色器")
-		return false
-	}
-
     //如果调色盘已经显示了，那么就把它隐藏
     if($('#colorpicker').css("display") != "none"){
         hideColorpicker()
@@ -124,9 +118,8 @@ function showColorpicker(target,position,dom,type){
 		top:the_top
 	})
 
-
 	//修改调色盘对象的颜色使其与目标选色器当前的颜色相同
-	var color = $(target).children(".colorpicker_block").css("background-color")
+	var color = $(target).children(".colorpicker_color").css("background-color")
 	changeColorpicker(color)
 
 	//监听点击事件，点击到画布外则直接关闭调色盘
@@ -197,7 +190,7 @@ $("#colorpicker_input_menu").on("click",function(){
     else if($(this).attr("menu") == "up"){
         $(this).find("img").attr("src","./img/menu_up.png")
         $(this).attr("menu","down")
-        $("#colorpicker").animate({height:"400px"},500)
+        $("#colorpicker").animate({height:"390px"},500)
     }
 })
 
@@ -249,20 +242,19 @@ function appendColorpickerSelect(){
 		if( i < 4){
 			var max = 255
 			var min = 64 * (4-i)
-			var mid = (max + min)/2
+			
 		}
 		//第4层即为纯色层
 		else if(i == 4){
 			var max = 255
 			var min = 0
-			var mid = (max + min)/2
 		}
 		//最后两层纯色值减少64，太暗的最后两层(第7，8层）颜色就不要了
 		else if(i > 4){
 			var max = 64 * (8-i)
 			var min = 0
-			var mid = (max + min)/2
 		}
+		var mid = (max + min)/2
 		//每一行中的变化趋势为：红→黄→绿→青→蓝→紫→红，从红色开始
 		r = max
 		g = min
@@ -341,11 +333,14 @@ $("#colorpicker_bottom_confirm").on("click",function(){
 })
 //“应用颜色”函数
 function confirmColorpicker(){
+	
+	pushToUndo(color_target_dom)
+
     var color = returnColorpicker()
     //放进记忆区
     appendColorpickerMemory(color)
     //修改选色器方块的颜色
-    $(color_target_colorpicker).children(".colorpicker_block").css("background-color",color)
+    $(color_target_colorpicker).children(".colorpicker_color").css("background-color",color)
 
     //特殊type的颜色修改,更高优先级
     //huabu_grid的处理
@@ -359,6 +354,19 @@ function confirmColorpicker(){
     }
     else if(color_type == "text_shadow"){
     	textShadowTile(color_target_dom,null,null,null,color)
+    	return 1
+    }
+    else if(color_type == "line_color"){
+    	colorLine(color_target_dom,color)
+    	return 1
+    }
+    else if(color_type == "line_style_color"){
+    	var style = {color : color}
+    	changeLineStyle(style)
+    	return 1
+    }
+    else if(color_type == "composite"){
+    	colorComposite(color_target_dom,color)
     	return 1
     }
     

@@ -1,0 +1,153 @@
+<html>
+	<div id="huabu_nest_menu" class="alert modal_menu over_mask">
+		<div class="modal_menu_title">嵌套画布：</div>
+		<div id="huabu_nest_menu_select">
+			<div id="huabu_nest_menu_select_newHuabu">
+				<input checked="true" value="createNew" type="radio" name="huabu_nest_menu_option">
+				<div>创建新画布</div>
+			</div>
+			<div id="huabu_nest_menu_select_insertHuabu">
+				<input value="insertFile" type="radio" name="huabu_nest_menu_option">
+				<div>导入画布文件：</div>
+				<!-- 备忘录：这个功能还没做完 -->
+				<div id="huabu_nest_menu_insertFile" class="flex">
+				    <div class="file_insert">选择文件</div>
+				    <div class="file_delete"></div>
+				</div>
+			</div>
+			<div id="huabu_nest_menu_select_selectHuabu">
+				<input value="selectOpenning" type="radio" name="huabu_nest_menu_option">
+				<div>选择已创建的画布：</div>
+				<select>
+				</select>
+			</div>
+		</div>
+		<div id="huabu_nest_menu_button" class="modal_menu_button">
+			<div id="huabu_nest_menu_button_confirm" style="margin-right:15px;">确认</div>
+			<div id="huabu_nest_menu_button_quit">取消</div>
+		</div>
+	</div>
+</html>
+
+<script type="text/javascript">
+
+	//在屏幕上显示该菜单
+	function showHuabuNestMenu(tile){
+		//显示该菜单
+		showModalMenu($("#huabu_nest_menu"))
+		//将tile存入菜单对象中
+		$("#huabu_nest_menu").data("tile",tile)
+		//将选择文件内容还原
+		$("#huabu_nest_menu_insertFile .file_insert").text("选择文件")
+		//清空select菜单选项
+		$("#huabu_nest_menu_select_selectHuabu select").empty();
+		//获取当前存在的画布信息填充进菜单内
+		$("#huabu_container").children(".huabu:not('.hide_huabu')").each(function(){
+		    var name = $(this).attr("name");
+		    var id = $(this).attr("id");
+
+		    // 制成option并设置data
+		    var option = $("<option></option>").attr('value', id).text(name).data("huabu", this);
+
+		    // 放入select中
+		    $("#huabu_nest_menu_select_selectHuabu select").append(option);
+		});
+	}
+
+
+	//点击确认，按照所选的方式为磁贴嵌套画布
+	$("#huabu_nest_menu_button_confirm").on("click", function(){
+		//获取所选项
+		var option = $("input[name='huabu_nest_menu_option']:checked").val()
+		//获取菜单绑定的tile
+		var tile = $("#huabu_nest_menu").data("tile")
+
+		//根据所选项调用不同的函数
+		if(option == "createNew"){
+			createNewNestHuabu(tile)
+		}
+		else if(option == "insertFile"){
+			insertFileNestHuabu(tile)
+		}
+		else if(option == "selectOpenning"){
+			//获取选择的画布
+			var value = $("#huabu_nest_menu_select_selectHuabu select").val()
+			var option = $("#huabu_nest_menu_select_selectHuabu select option[value='"+value+"']")
+			var huabu = $(option).data("huabu")
+			//将其变成嵌套画布，并嵌套进tile中
+			nestHuabuToTile(tile,huabu)
+			//通过tile打开画布
+			openNestedHuabu(tile,huabu)
+		}
+		else{
+			throw new Error("选择嵌套画布出现问题！")
+		}
+
+		//修改磁贴的画布嵌套属性,默认为点击按钮进入且不能双击进入
+		$(tile).prop({
+			"nestSet_clickButton":true,
+			"nestSet_dbClick":false,
+			"nestSet_noOpen":false
+		})
+
+		//随后关闭菜单
+		hideModalMenu($("#huabu_nest_menu"))
+		//与右侧操作栏同步数据
+		showTileNest(tile)
+	})
+
+	//点击取消关闭菜单,清除其中的内容
+	$("#huabu_nest_menu_button_quit").on("click", function(){
+		hideModalMenu($("#huabu_nest_menu"))
+	})
+
+	//点击选择文件，弹出文件选择
+	$("#huabu_nest_menu_insertFile .file_insert").on("click",function(){
+		$(this).siblings("input").click()
+	})
+	$("#huabu_nest_menu_insertFile .file_input").on("change",function(){
+		//限定为画布文件，随后修改Insert框的内容，令其显示该文件对应的画布的名称
+		//如果目标文件包含多个画布，则允许用户选择其中一个画布
+	})
+	
+</script>
+
+<style type="text/css" scoped>
+	#huabu_nest_menu{
+		box-sizing: content-box !important;
+		width:300px;
+		height:144px;
+		top:300px !important;
+	}
+
+	/*选项*/
+			#huabu_nest_menu_select > div{
+				display:inline-flex;
+				align-items:center;
+				margin-top:4px;
+			}
+
+			#huabu_nest_menu_newHuabuName{
+				width:100px;
+				font-size:16px
+			}
+
+			#huabu_nest_menu_insertFile .file_insert{
+				display:flex;
+				align-items:center;
+				justify-content:center;
+			}
+
+			#huabu_nest_menu_select_selectHuabu select{
+				width:100px;
+			}
+	/*按键*/
+		#huabu_nest_menu_button{
+	  		top:134px;
+		}
+
+		#huabu_nest_menu_button > div{
+			
+		}
+
+</style>

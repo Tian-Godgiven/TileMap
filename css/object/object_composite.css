@@ -1,7 +1,13 @@
 .composite{
-	position:absolute;
+	z-index:1;
+	position:absolute !important;
 }
 
-.composite_selected{
-	border:2px blue dashed;
+.composite:not(.temp_composite){
+	border:1px dashed var(--color-5);
+}
+
+.composite.focusing{
+	outline:2px blue dashed;
+	outline-offset:2px;
 }

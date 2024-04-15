@@ -1,60 +1,168 @@
-#leftArea_tile_container{
-    width:100%;
-    max-height:calc(100% - 70px);
-    overflow-y:overlay;
-    overflow-x:hidden;
-}
+    /*顶部的按键*/
+    #area_left .button_container{
+        height: 160px;
+        width: 100%;
+        position: relative;
+    }
+        .button_container > div{
+            width: 100%;
+            height: 80px;
+            display:flex;
+            align-items: center;
+            justify-content:center;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 20px;
+        }
 
-#leftArea_tile_container::-webkit-scrollbar{
-    width:10px;
-    height:10px;
-}
+        #area_left .button{
+            background-color: var(--color-2);
+        }
+        #area_left .button:hover{
+            background-color:var(--color-3);
+        }
+    /*连线模式按键*/
+        #line_connect_mode{
+            position:relative;
+        }
+        /*切换模式*/
+        #toggle_lineConnect_mode{
+            display:flex;
+            align-items: center;
+            justify-content:center;
+            width:calc(100% - 35px);
+            height:100%;
+        }
+        #toggle_lineConnect_mode.connecting_mode{
+            outline:2px dashed var(--focusing-color);
+            background-color: var(--color-4);
+            font-weight:bolder;
+        }
+        /*侧键*/
+        #line_connect_style{
+            width:35px;
+            height:100%;
+            position:relative;
+            border-left:1px solid var(--border-color);
+            background-image:url("../../img/simple_arrow_right_darken.png");
+            background-position:center;
+            background-size:25px;
+            background-repeat:no-repeat;
+        }
+        #line_connect_style.open{
+            background-image:url("../../img/simple_arrow_left_disabled.png");
+        }
+        /*侧键菜单*/
+        #line_connect_style_menu{
+            position:absolute;
+            top:-2px;
+            left:100%;
 
-#leftArea_tile_container::-webkit-scrollbar-thumb{
-    background-color:#49494980;
-    background-clip: padding-box;
-    border: solid transparent;
-    border-radius:100px;
-}
+            display:none;
 
-.button_container{
-    float: left;
-    height: 80px;
-    width: 100%;
-    position: relative;
-}
+            width:0px;
+            height:calc(100% + 4px);
+            
+            background-color:var(--color-2);
 
-.button{
-    width: 100%;
-    height: 100%;
-    background-color: #777aff;
-    border: 1px solid #fff;
-    border-radius: 4px;
-    color: #fff;
-    font-size: 8px;
-}
+            z-index:20;
 
-#import_tile{
-    width:100%;
-    height:70px;
-    position:sticky;
-    left:0px;
-    bottom:0px;
-    background-color:inherit;
-}
+            box-sizing: border-box;
+            border:2px solid var(--color-5);
+            border-left:none;
+            border-top-right-radius:5px;
+            border-bottom-right-radius:5px;
 
-#import_tile > div{
-    width:70%;
-    height:50px;
+            overflow:hidden;
+        }
 
-    display:flex;  
-    text-align: center;
-    justify-content: center;
-    align-items:center;
 
-    position:relative;
-    left:15%;
-    top:10px;
-    
-    background-color:#CB93FFFF;
-}
+        #line_connect_style_menu > div{
+            padding:17px;
+            font-size:16px;
+            white-space:nowrap;
+        }
+
+        #line_connect_style_menu > div select{
+            height:22px;
+            width:80px;
+        }
+
+            #line_style_width input{
+                width:50px !important;
+            }
+
+    /*搜索栏的样式*/
+    #leftArea_search_object_type{
+        margin:10px 5px;
+        height:30px;
+        width:calc(100% - 10px);
+        display:flex;
+    }
+        #leftArea_search_object_type > input{
+            width:calc(100% - 60px);
+            border:1px solid var(--border-color);
+        }
+
+        #leftArea_search_object_type > div{
+            border:1px solid var(--border-color);
+            border-left:none;
+            box-sizing: border-box;
+            width:30px;
+            height:30px;
+            background-repeat:no-repeat;
+            background-position:center;
+        }
+        /*搜索键*/
+        #leftArea_search_object_type_input_button{
+            background-image:url("../../img/search.png");
+            background-size:65%;
+            
+        }
+        /*清空模式*/
+        #leftArea_search_object_type_input_button.clear{
+            background-image:url("../../img/delete.svg");
+        }
+
+        #leftArea_fold_all_collection.fold_all{
+            background-size:60%;
+            background-image:url("../../img/menu_up.png");
+        }
+        #leftArea_fold_all_collection.unfold_all{
+            background-size:60%;
+            background-image:url("../../img/menu_down.png");
+        }
+
+    /*collection的放置处*/
+    #leftArea_object_collection_container{
+        overflow-y:auto;
+        overflow-x:hidden;
+        width:100%;
+        max-height:calc(100% - 280px);
+        
+    }
+
+    /*底部的导入*/
+    #leftArea_import{
+        display:flex;
+        justify-content:center;
+        align-items: center;
+        width:100%;
+        height:70px;
+        position:sticky;
+        left:0px;
+        bottom:0px;
+    }
+
+    #leftArea_import > div{
+        width:40%;
+        height:50px;
+
+        display:flex;  
+        text-align: center;
+        justify-content: center;
+        align-items:center;
+
+        position:relative;
+        
+        background-color:var(--color-2);
+    }

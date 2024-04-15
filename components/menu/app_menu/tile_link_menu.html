@@ -1,0 +1,96 @@
+<html>
+	<div id="tile_link_menu" class="app_menu">
+		<div id='tile_link_menu_title'>打开链接：</div>
+		<div id='tile_link_menu_close'></div>
+		<a id='tile_link_menu_openLink' href=''></a> 
+		<div id='tile_link_menu_set'>
+			<input id='tile_link_menu_check' type='checkbox' title='仅能从右键菜单打开磁贴链接'>
+			禁用弹出提示
+		</div>
+	</div>
+</html>
+
+<script type="text/javascript">
+	$("#tile_link_menu_close").on("click",function(){
+		$("#tile_link_menu").hide()
+	})
+
+	$("#tile_link_menu_check").on("change",function(){
+		var value = $(this).prop("checked")
+		//修改对应tile的tile_link_menu属性
+		var tile = $("#tile_link_menu").data("tile")
+		$(tile).prop("tile_link_menu",!value)
+	})
+
+    $("#tile_link_menu_openLink").on('click', function(event){
+        // 取消默认行为，防止在 Electron 窗口中打开链接
+        event.preventDefault();
+        // 打开链接
+        openLink($(this).attr('href'))
+    });
+</script>
+
+<style type="text/css" scoped>
+
+#tile_link_menu{
+    position: absolute;
+
+    display: none;
+    flex-direction: column;
+
+    background-color:var(--color-1);
+
+    width:250px;
+    height:60px;
+
+    border:1px solid var(--color-5);
+    border-radius:2px;
+
+    font-size:14px;
+
+    text-align:center;
+
+    z-index:200;
+
+    padding:10px;
+}
+
+    #tile_link_menu_title{
+        align-self: flex-start;
+        position:relative;
+        left:-5px;
+        top:-5px;
+    }
+
+    #tile_link_menu_close{
+        background-image: url("./img/delete.png");
+        background-repeat: no-repeat;
+        background-size:60%;
+        background-position:center;
+        background-color:var(--color-2);
+        position: absolute;
+        right: 3px;
+        top: 3px;
+        height: 16px;
+        width: 16px;
+        border: 1px solid var(--border-color);
+        border-radius: 3px;
+    }
+
+    #tile_link_menu_close:hover{
+        background-color:var(--color-3);
+    }
+
+    #tile_link_menu a{
+        align-self:center;
+        white-space:nowrap;
+    }
+
+    #tile_link_menu_set{
+        display:flex;
+        align-self:flex-end;
+        position:relative;
+        left:5px;
+        top:5px;
+    }
+</style>

@@ -1,0 +1,321 @@
+/*顶部名字*/
+.rightArea_inner_ability_title{
+    margin-bottom:10px;
+}
+.rightArea_design_inner_block > span{
+    padding:10px;
+    font-size:25px;
+    color:var(--text-color);
+    font-weight:bolder;
+}
+
+/*样式栏内的按钮样式*/
+    /*普通按键*/
+    #rightArea_design_inner .rightArea_button{
+        border:1px solid var(--border-color);
+        background-color:var(--color-2);
+        border-radius:3px;
+        padding:2px 5px;
+        /*令其中心对齐*/
+        display:flex;
+        align-items: center;
+        justify-content:center;
+    }
+    /*方形按键*/
+    #rightArea_design_inner .rightArea_squre_button{
+        width:35px;
+        height:35px;
+
+        border:1px solid var(--border-color);
+        border-radius:3px;
+
+        margin-right:4px;
+
+        box-sizing: border-box;
+        background-color:var(--color-2);
+        background-size:80%;
+        background-repeat: no-repeat;
+        background-position:center center;
+    }
+    #rightArea_design_inner .rightArea_button_clicked{
+        background-color:var(--color-4) !important;
+    }
+
+    #rightArea_design_inner .rightArea_button:hover{
+        background-color:var(--color-3);
+    }
+    #rightArea_design_inner .rightArea_squre_button:hover{
+        background-color:var(--color-3);
+    }
+
+/*样式编辑*/
+
+    /*画布*/
+        /*画布名称*/
+            #huabu_state_name{
+                width:100%;
+                display:flex;
+                text-align:center;
+                align-items: center;
+            }
+            #huabu_state_name_block{
+                overflow:hidden;
+                max-width:calc(80% - 20px);
+                white-space: nowrap;
+            }
+            #huabu_state_name_edit{
+                width:15px;
+                height:15px;
+                text-align:center;
+                justify-content:center;
+                align-items:center;
+            }
+            #huabu_state_name_edit img{
+                width:100%;
+                height:100%;
+            }
+        /*画布尺寸*/
+            #huabu_state_size_select > select{
+                text-align: right;
+                height:100%;
+                width:130px;
+                margin-bottom:2px;
+            }
+            #huabu_state_size_select > select > option{
+                text-align: left;
+            }
+            #huabu_state_size_input > div:first-child{
+                margin-right:10px;
+            }
+        /*画布颜色*/
+            #huabu_display_color{
+                display:flex;
+                text-align:center;
+                align-items: center;
+            }
+        /*画布网格*/
+            #huabu_display_grid{
+                position:relative;
+            }
+            #huabu_display_grid_inner{
+                position:absolute;
+                right:0px;
+                display:none;
+                height:100%;
+            }
+            #huabu_display_grid_size{
+                width:40px;
+            }
+            #huabu_display_grid_inner .colorpicker{
+                margin-left:4px;
+            }
+        /*画布背景*/
+            #huabu_display_background_inner{
+                width:150px;
+            }
+            
+            #huabu_display_background_set{
+                display:none;
+            }
+            #huabu_display_background_position{
+                display: none;
+            }
+
+    /*磁贴*/
+        /*图形*/
+            /*背景*/
+                #tile_background_color{
+                    margin-right:10px;
+                }
+                #tile_background_insert{
+                    margin:4px 0px;
+                }
+                #tile_background_insert_set{
+                    align-items:center;
+                    margin:4px;
+                    display:none;
+                }
+                #tile_background_insert_position{
+                    display:none;
+                }
+                #tile_background_gradient{
+                    align-items:center;
+                }
+            /*位置*/
+                #tile_position > div:first-child{
+                    margin-right:10px;
+                }
+            /*形状*/
+                #tile_size .flex > div:first-child{
+                    margin-right:10px;
+                }
+                #tile_shape{
+                    width:200px;
+                }
+            /*边框*/
+                #tile_border_type{
+                    box-sizing: border-box;
+                    width:52px;
+                    margin-right:10px;
+                }
+                #tile_border_color{
+                    margin-right:10px;
+                }
+            /*层叠*/
+                #tile_zIndex{
+                    margin-bottom:4px;
+                }
+                    #tile_zIndex span , #composite_zIndex span{
+                        text-align: center;
+                        width:29px;
+                    }
+                    #tile_zIndex_up,#composite_zIndex_up{
+                        padding:0 !important;
+                        width:18px;
+                        height:18px;
+                        border:1px solid black;
+                        border-radius:2px;
+
+                        margin-right:4px;
+
+                        background-image: url("../../img/plus.png");
+                        background-size:80%;
+                        background-repeat: no-repeat;
+                        background-position:center center;
+                    }
+                    #tile_zIndex_down,#composite_zIndex_down{
+                        padding:0 !important;
+                        width:18px;
+                        height:18px;
+                        border:1px solid black;
+                        border-radius:2px;
+
+                        background-image: url("../../img/minus.png");
+                        background-size:80%;
+                        background-repeat: no-repeat;
+                        background-position:center center;
+                    }
+                #tile_zIndex_max,#composite_zIndex_max{
+                    text-align: center;
+                    width:70px;
+                    border:1px solid black;
+                    border-radius:3px;
+
+                    margin-right:4px;
+                    border-radius:3px;
+                }
+                #tile_zIndex_min,#composite_zIndex_min{
+                    text-align: center;
+                    width:70px;
+                    border:1px solid black;
+                    border-radius:3px;
+                }
+            /*管理*/
+                #tile_manage_copy{
+                    text-align: center;
+                    width:70px;
+                    border:1px solid black;
+                    border-radius:3px;
+
+                    margin-right:4px;
+                }
+                #tile_manage_paste{
+                    text-align: center;
+                    width:70px;
+                    border:1px solid black;
+                    border-radius:3px;
+                }
+        /*文字*/
+            #tile_title_text{
+                width:150px;
+            }
+            #tile_font_style{
+                text-align:center;
+                width:236px;
+                font-size:16px;
+                height:26px;
+                box-sizing: border-box;
+                margin-bottom:4px;
+            }
+            #tile_font_color{
+                margin-right:2px;
+            }
+            #tile_font_size{
+                width:49px;
+            }
+            #tile_font_bold{
+                background-image:url("../../img/font_bold.png");
+            }
+            #tile_font_italic{
+                background-image:url("../../img/font_italic.png");
+            }
+            #tile_font_overline{
+                background-image:url("../../img/overline.png");
+            }
+            #tile_font_strikeline{
+                background-image:url("../../img/strikeline.png");
+            }
+            #tile_font_underline{
+                background-image:url("../../img/underline.png");
+            }
+            #tile_font_alignLeft{
+                background-image:url("../../img/align_left.png");
+            }
+            #tile_font_alignRight{
+                background-image:url("../../img/align_right.png");
+            }
+            #tile_font_alignCenter{
+                background-image:url("../../img/align_center.png");
+            }
+            #tile_font_shadow_set{
+                display:none;
+            }
+            #tile_font_shadow_input{
+                width:34px;
+            }
+
+        /*内容*/
+            #tile_content_link_set{
+                position:relative;
+                left:40px;
+            }
+            #tile_content_annotation_input{
+                position:relative;
+                left:40px;
+            }
+            /*嵌套画布*/
+                #tile_content_nestHuabu{
+                    width: 100px;
+                    height: 20px;
+                    text-align: center;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    border: 1px solid black;
+                    border-radius: 3px;
+                }
+
+                #tile_content_nestHuabu_delete{
+                    display: none;
+                    width: 20px;
+                    height: 20px;
+                    padding:2px !important;
+                    margin-left: 3px;
+                    text-align: center;
+                    background-image: url("../../img/delete.png");
+                    background-size: 50%;
+                    background-repeat: no-repeat;
+                    background-position: center center;
+                }
+
+                #tile_content_nestSet{
+                    display: none;
+                }
+#tile_manage_add{
+    width:114px;
+}
+#composite_manage_add{
+    width:144px;
+}
+#composite_toggleCompose .rightArea_button{
+    width:180px;
+}

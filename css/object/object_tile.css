@@ -1,6 +1,6 @@
 /*磁贴CSS*/
 .tile{
-    position:absolute;
+    position:absolute !important;
     cursor: default;
     font-size: 30px;
     width: 100px;
@@ -12,51 +12,36 @@
 
 /*聚焦状态的tile*/
 .tile.focusing{
-    box-shadow:0 0 3px 3px #3385FFBB;
+    outline:2px dashed var(--focusing-color);
+    outline-offset:2px;
 }
+
 
 /*tile的标题输入框*/
-.tile .tile_input{
-    position:absolute;
-    width: 100%;
-    height: 100%;
-    font-size: 100%;
-    border: none;
-    background: transparent;
-    display:flex;
-    text-align: center;
-    justify-content: center;
-    align-items:center;
-}
-
-.tile .tile_input:focus{
+.tile .tile_title:focus{
     outline:none;
 }
 
 /*tile的标题*/
 .tile .tile_title{
     font-family:Microsoft YaHei, Arial, sans-serif;
-    color:black;
+
+    position:absolute;
     left:0;
     top:0;
-    position:absolute;
+
+    background-color:transparent;
     height:100%;
     width:100%;
+
     display:flex;
     text-align: center;
     justify-content: center;
     align-items:center;
+
     pointer-events:none;
 }
 
-
-.tile .tile_snap_dot{
-    height:16px;
-    width:16px;
-    background-color:#5DFFFFFF;
-    position:absolute;
-    border-radius:50%
-}
 
 #tile_menu #tile_color{
     display: flex;
@@ -70,14 +55,16 @@
 
 /*显示在磁贴上方，用于进入磁贴嵌套的画布的按键*/
 .openNestedHuabuButton{
-    background-color:white;
+    background-color:var(--color-1);
+
+    white-space:nowrap;
 
     position:absolute;
-    display:flex;
+    display:inline-flex;
     align-items:center;
     justify-content:center;
 
-    border:1px solid black;
+    border:1px solid var(--border-color);
     border-radius:3px;
 
     min-width:100px;
@@ -86,4 +73,8 @@
     padding:0px 15px;
 
     z-index:10;
+}
+
+.openNestedHuabuButton:hover{
+    background-color:var(--color-2);
 }

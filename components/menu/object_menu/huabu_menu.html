@@ -1,0 +1,163 @@
+<html>
+    <div id="huabu_menu" class="menu object_menu">
+        <div>
+            <div id="huabu_paste_here">粘贴到此处</div>
+            <div id="huabu_insert" class="side_menu huabu_menu">插入
+                <div class="object_menu menu">
+                    <div>
+                        <div id="huabu_insert_table">表格</div>
+                        <div id="huabu_insert_picture">图片</div>
+                        <div id="huabu_insert_link">链接</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div id="huabu_undo">撤回</div>
+            <div id="huabu_redo">重做</div>
+        </div>
+
+        <div>
+            <div id="huabu_return_source">返回源画布</div>
+        </div>
+
+        <div>
+            <div id="huabu_select_all">全选</div>
+            <div id="huabu_delete_all">清空</div> 
+        </div>    
+    </div>
+</html>
+
+<script type="text/javascript">
+
+    //显示画布菜单
+    function showHuabuMenu(event,huabu){
+        //修改画布菜单的内容
+        changeHuabuMenu(huabu)
+        //显示画布菜单
+        showObjectMenu(event,"huabu_menu")
+    }
+    /*修改子菜单的显示 ：
+    若剪贴板没有内容，则令“粘贴”键停用，
+    若撤销指针没有内容，则令“撤回”键停用
+    若重做指针没有内容，则令“重做”键停用
+    若没有上一层画布，则令“返回上一层画布”键停用
+    */
+    var focusing_huabu
+    function changeHuabuMenu(huabu){
+        var menu = $("#huabu_menu")
+        focusing_huabu = huabu
+        //判断剪贴板中的是否存在内容，如果不存在则将其disabled
+            if(ifClipboard()){
+                menu.find('#huabu_paste_here').removeClass('disabled')
+            }
+            else{
+                menu.find('#huabu_paste_here').addClass("disabled")
+            }
+        //判断撤销栈是否存在内容，如果不存在则将其disabled
+            var stack = return_undo_length()
+            //不存在则disabled
+            if(stack == 0){
+                menu.find('#huabu_undo').addClass('disabled')
+            }
+            else{
+                menu.find('#huabu_undo').removeClass("disabled")
+            }
+        //判断重做栈是否存在内容，如果不存在则将其disabled
+            var stack = return_redo_length()
+            //不存在则disabled
+            if(stack == 0){
+                menu.find('#huabu_redo').addClass('disabled')
+            }
+            else{
+                menu.find('#huabu_redo').removeClass("disabled")
+            }
+        //判断画布的来源栈是否存在内容，如果不存在则将其disabled
+            var stack = $(huabu).data("sourceHuabu_stack")
+            //不存在则disabled
+            if(stack == undefined || stack.length == 0){
+                menu.find('#huabu_return_source').addClass('disabled')
+            }
+            else{
+                menu.find('#huabu_return_source').removeClass("disabled")
+            }
+    }
+
+    //粘贴功能，将当前剪贴板上的磁贴或内容块或放到鼠标所在的位置
+    $("#huabu_menu #huabu_paste_here").on("click",function(event){
+        var object = pasteObject()
+
+        //把它放进指针所在的位置
+        $(object).offset({
+            left:event.clientX - 10,
+            top:event.clientY - 10
+        })
+
+        hideObjectMenu("huabu_menu")
+    })
+
+    //撤回功能，将画布恢复为撤回队列的上一个状态
+    $("#huabu_menu #huabu_undo").on("click",function(){
+        undo()
+    })
+
+    //重做功能，将画布恢复为撤回队列的下一个状态
+    $("#huabu_menu #huabu_redo").on("click",function(){
+        redo()
+    })
+
+    //插入功能，当移动到“插入”选项时在右侧弹出子菜单
+    $("#huabu_menu #huabu_insert").on("mouseenter click",function(){
+        showChildMenu(this,"right","dblclick","mouseleave")
+    })
+    //插入表格功能:备忘：没做
+    $("#huabu_menu #huabu_insert_table").on("click",function(){
+        console.log("插入了画布")
+    })
+    //插入图片功能
+    $("#huabu_menu #huabu_insert_picture").on("click",function(){
+        console.log("插入了图片")
+    })
+    //插入链接功能
+    $("#huabu_menu #huabu_insert_link").on("click",function(){
+        console.log("插入了链接")
+    })
+
+    //返回源画布
+    $("#huabu_menu #huabu_return_source").on("click",function(){
+        returnNestFrom(focusing_huabu)
+    })
+
+    //全选功能，将当前画布内的所有元素选中生成一个选中体
+    $("#huabu_menu #huabu_select_all").on("click",function(){
+        var huabu = focusing_huabu
+        var all_object = $(huabu).find(".huabu_object")
+        createTempComposite(all_object,huabu)
+        hideObjectMenu("huabu_menu")
+    })
+
+    //清空功能，将当前画布内的所有元素删除，但是会有一个提示框
+    $("#huabu_menu #huabu_delete_all").on("click",function(){
+        var huabu = focusing_huabu
+        //弹出选项框
+        swal.fire({
+            width: 400,
+            backdrop: 'rgba(0,0,0,0.3)',
+            html: '<div id="delete_alert">确认清空画布上的所有内容？',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: '确认',
+            cancelButtonText: '取消'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                //清空huabu内的object_container就行了
+                clearHuabu(focusing_huabu)
+                hideObjectMenu("huabu_menu")
+            }
+        })
+    })
+</script>
+
+<style type="text/css">
+</style>

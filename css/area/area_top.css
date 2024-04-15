@@ -1,0 +1,61 @@
+/*软件图标*/
+    #topArea_icon{
+        color:white;
+        float:left;
+        background-image: url("../../img/icon.png");
+        background-size:80%;
+        background-position:center;
+        background-repeat:no-repeat;
+        height:120px;
+        width:120px;
+    }
+
+/*当前文件名*/
+    #topArea_fileName{
+        height:50px;
+        font-size:40px;
+        font-weight:bold;
+        padding-top:30px;
+    }
+
+/*功能栏*/
+    #topArea_ability{
+        width:100%;
+        height:38px;
+        font-size:20px;
+    }
+
+/*用户头像*/
+    #topArea_user{
+        width:80px;
+        height:80px;
+        position:absolute;
+        right:0;
+        top:0;
+    }
+
+    #topArea_userIcon{
+        margin-top:10px;
+        margin-right:10px;
+        height:65px;
+        width:65px;
+        overflow:hidden;
+
+        border-radius:50%;
+        border:2px solid var(--border-color);
+
+        color:var(--color-unlog);
+        font-weight:bold;
+
+        display:flex;
+        align-items: center;
+        justify-content:center;
+
+        background-repeat:no-repeat;
+        background-position:center;
+        background-size:100%;
+    }
+
+
+
+

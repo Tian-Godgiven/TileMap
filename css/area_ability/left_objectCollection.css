@@ -1,0 +1,140 @@
+/*收集体本体，也就是收集体的标题*/
+.object_collection{
+	width:100%;
+	position:relative;
+	background-color:var(--color-2);
+}
+	/*名字栏，长度做一下限制*/
+		.object_collection .collection_name{
+			width:100%;
+		}
+		.object_collection .collection_name span{
+			max-width:calc(100% - 120px);
+			min-width:50px;
+			text-align:left;
+			overflow: hidden; /* 隐藏溢出部分 */
+	   		text-overflow: ellipsis; /* 显示省略号 */
+	    	white-space:nowrap;
+		}
+
+	/*工具栏*/
+		.objectCollection_toolbar{
+			display:flex;
+			position:absolute;
+			right:0px;
+		}
+		.objectCollection_toolbar div{
+			height:26px;
+			width:20px;
+			opacity:0.5;
+			background-repeat: no-repeat;
+			background-position:center;
+		}
+		.objectCollection_toolbar div:hover{
+			opacity:1;
+		}
+			/*导出*/
+			.objectCollection_export{
+				background-size:70%;
+				background-image:url("../../img/export.png");
+			}
+			/*添加*/
+			.objectCollection_append{
+				background-size:60%;
+				background-image:url("../../img/plus_big.png");
+			}
+			/*编辑*/
+			.objectCollection_edit{
+				background-size:70%;
+				background-image:url("../../img/edit.png");
+			}
+			/*删除*/
+			.objectCollection_delete{
+				background-size:70%;
+				background-image:url("../../img/delete_bin.png");
+			}
+			/*清空*/
+			.objectCollection_clear{
+				background-size:70%;
+				background-image:url("../../img/clear.png");
+			}
+
+/*每个收集体对象容器，也就是收集体的内容*/
+	.objectCollection_container{
+		background-color:var(--color-0);
+		width:100%;
+		display:flex;
+		padding:5px;
+		overflow:hidden;
+		flex-wrap:wrap;
+	}
+
+	/*其中的单个显示的对象块，这些是仅限在左侧栏里的样式，在编辑菜单中是另外的样式*/
+		.objectCollection_container .objectBlock{
+			overflow:hidden;
+			width:66px;
+			min-height:75px;
+
+			padding:5px 0;
+			margin:0px 3px;
+		}
+		/*聚焦时的样式，被搜索时显示，和菜单里是反过来的*/
+		.objectCollection_container .focusing_block{
+			outline:2px dashed blue;
+		}
+
+		.objectCollection_container .objectBlock:hover{
+			background-color:var(--color-3);
+		}
+
+		.objectCollection_container .objectBlock .objectBlock_mini{
+			height:50px;
+		}
+
+		.objectCollection_container .objectBlock span{
+			margin-top:5px;
+			font-size:14px;
+			height:20px;
+		}
+
+	/*这里则是两边通用的样式*/
+		.objectBlock{
+			flex-shrink:0;
+			border-radius:10px;
+			/*竖着放*/
+			display:flex;
+			flex-direction:column;
+			align-items:center;
+		}
+
+		.objectBlock_mini{
+			width:100%;
+			display:flex;
+			flex-direction:row;
+			align-items:center;
+			justify-content:center;
+		}
+
+		/*小型的组合体截图的放置框的样式*/
+		.objectBlock_mini_composite{
+			background-position:center;
+			background-size:90%;
+			background-repeat: no-repeat;
+		}
+
+		/*显示对象块中的对象本体*/
+		.objectBlock .objectBlock_mini > div{
+			flex-shrink:0;
+			position:relative !important;
+			transform-origin: center !important;
+		}
+
+		/*显示对象块中的对象类型名*/
+		.objectBlock span{
+			text-align:center;
+			width:100%;
+			white-space:nowrap;
+			overflow: hidden; /* 隐藏溢出部分 */
+		    text-overflow: ellipsis; /* 显示省略号 */
+			word-wrap: break-word;
+		}

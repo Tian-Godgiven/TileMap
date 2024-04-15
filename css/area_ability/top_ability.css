@@ -1,0 +1,118 @@
+#topArea_ability{
+    position:relative;
+}
+
+#top_ability_left{
+    height:38px;
+    box-sizing: border-box;
+    float:left;
+    border-top-left-radius:5px;
+    border-top-right-radius:5px;
+    overflow:hidden;
+}
+
+#top_ability_right{
+    margin-top:10px;
+    height:28px;
+    box-sizing: border-box;
+    float:right;
+    border-top-left-radius:5px;
+    border-top-right-radius:5px;
+    overflow:hidden;
+}
+
+
+/*保存提示*/
+    #topAbility_saveReminder.saved{
+        height:34px;
+        font-size:16px;
+        border:1px solid var(--border-color);
+        border-radius:5px;
+        background-color: var(--color-2);
+        color:var(--text-color);
+        font-style:italic;
+    }
+    #topAbility_saveReminder.unsave{
+        height:34px;
+        font-size:16px;
+        border:1px solid var(--border-color);
+        border-radius:5px;
+        background-color: var(--warning-color-2);
+        color:var(--warning-color-1);
+        font-weight:bold;
+    }
+
+        .topAbility_block{
+            background-color:var(--color-2);
+            text-align:center;
+            padding:0 5px;
+            height:100%;
+            float:left;
+            display: flex; 
+            align-items: center;
+        }
+        .topAbility_block:hover{
+            background-color:var(--color-3);
+        }
+
+        /*自动保存，在后面打个勾勾*/
+        #topAbility_autoSave.autoSaving{
+            position:relative;
+        }
+        #topAbility_autoSave.autoSaving:after {
+            content: "";
+            display: block;
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            height: 15px;
+            width: 15px;
+            background-image: url("../../img/check.png");
+            background-position: center;
+            background-size: 100%;
+            background-repeat: no-repeat;
+            transform: translate(0px, -50%);
+        }
+
+
+
+        
+
+    #top_ability_right > div{
+        height:30px;
+        width:30px;
+        background-position:center;
+        background-repeat: no-repeat;
+    }
+
+    /*切换textblock显示状态*/
+        #topAbility_toggleTextblockShow{
+            background-size:80%;
+        }
+        #topAbility_toggleTextblockShow.show_textblock{
+            background-image:url("../../img/textblock.png");
+        }
+        #topAbility_toggleTextblockShow.hide_textblock{
+            background-image:url("../../img/hide_textblock.png");
+        }
+    /*搜索*/
+        #topAbility_search{
+            background-size:50%;
+            background-image:url("../../img/search.png");
+        }
+    /*切換主題*/
+        #topAbility_toggleTheme{
+            background-size:60%;
+            background-image:var(--theme-picture);
+        }
+    /*全屏*/
+        #topAbility_toggleFullScreen{
+            background-size:50%;
+        }
+        #topAbility_toggleFullScreen.full_screen{
+            background-image:url("../../img/full_screen.png");
+        }
+        #topAbility_toggleFullScreen.unfull_screen{
+            background-image:url("../../img/unfull_screen.png");
+        }
+

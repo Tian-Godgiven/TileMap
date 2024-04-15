@@ -1,22 +1,54 @@
+.tile.line_connect_start{
+    box-shadow:0px 0px 10px 3px red;
+}
+
+.tile.line_connect_end{
+    box-shadow:0px 0px 10px 3px green;
+}
+
 .line{
 	position:absolute;
-	box-sizing: border-box;
+    font-size: 20px;
+    z-index:0;
 }
 
-.lineInner{
-	position:absolute;
-	transform-origin:0 50%;
-	z-index:0;
+.line.focusing > .line_path{
+    outline:2px dashed var(--focusing-color);
+    /*outline-offset:-40px;*/
 }
 
-	.line_arrow{
-		user-select: none;
-		width:0px;
-		height:0px;
-		position:absolute;
-	}
+.line_text{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform: translate(-50%, -50%);
+    background-color:var(--color-0);
+}
 
-		.line_arrow_right{
-			right:0px;
-		}
 
+
+.focusing_lineText{
+    outline:2px dashed var(--focusing-color);
+    outline-offset:2px;
+}
+
+svg{
+    pointer-events: none;
+    overflow:visible;
+}
+
+svg path{
+    pointer-events: visiblePainted;
+}
+
+svg path:hover{
+    cursor: pointer;
+}
+
+svg foreignObject {
+    pointer-events: none;
+}
+svg foreignObject div{
+    pointer-events: visiblePainted;
+    cursor: pointer;
+}

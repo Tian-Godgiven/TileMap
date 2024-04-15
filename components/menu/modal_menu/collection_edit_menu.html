@@ -1,0 +1,327 @@
+<html>
+    <!-- 一个显示对左侧磁贴收集体的操作的菜单 -->
+    <div id="collection_edit_menu" class="alert modal_menu over_mask">
+        <div id="collection_edit_menu_title" class="modal_menu_title">集合名：
+            <div></div>
+        </div>
+        <div id="collection_edit_menu_container"></div>
+        <div id="collection_edit_menu_button">
+            <div id="collection_edit_menu_button_export_collection" class="button">导出本集合</div>
+            <div>
+                <div id="collection_edit_menu_button_close" class="button">取消</div>
+                <div id="collection_edit_menu_button_export" class="button">导出</div>
+                <div id="collection_edit_menu_button_insert" class="button">导入</div>
+                <div id="collection_edit_menu_button_save" class="button">保存</div>
+            </div>
+        </div>
+    </div>
+</html>
+
+<script type="text/javascript">
+
+    var collection
+    var the_lib
+    var block_num
+
+    //打开这个菜单，显示其lib对应的内容
+        function showCollectionEditMenu(collection){
+            //清空container
+            $("#collection_edit_menu_container").empty()
+            //获取lib
+            var type = $(collection).attr("type")
+            var file_name = $(collection).attr("file_name")
+            //获取菜单需要使用的变量
+            the_collection = collection
+            the_lib = return_collection_lib(file_name,type)
+
+            //在标题同步名称
+            var collection_name = the_lib["collection_name"]
+            $("#collection_edit_menu .modal_menu_title div").text(collection_name)
+
+            //block的id起始
+            block_num = 1
+            //遍历lib文件的内容，以此加上id
+            var collection_objects = the_lib["collection_objects"]
+            for(i in collection_objects){
+                var block_type = collection_objects[i]
+                var block = createCollectionEditMenuBlock(block_type)
+                //加入到container
+                $("#collection_edit_menu_container").append(block)
+            }
+            //打开菜单
+            showModalMenu($("#collection_edit_menu"))
+        }
+
+    //生成该菜单中的block，其包含了object本体展示，一个删除键，一个名称栏
+        function createCollectionEditMenuBlock(type){
+            //先创建一个100px的block
+            var block = createObjectBlock(type,88)
+            $(block).addClass("collection_edit_menu_block")
+            //加上删除键
+            $(block).append("<div class='deleteCollectionEditMenuBlock'></div>")
+            //加上id,class,data
+            $(block).attr("id","collectionEditMenuBlock_"+block_num)
+            //加上class和type
+            $(block).addClass('collectionEditMenuBlock')
+            $(block).data("type",type)
+            block_num += 1
+            //就可以返回啦
+            return block
+        }
+
+        //移动顺序:可以通过拖动block来改变顺序
+        $("#collection_edit_menu_container").sortable({
+            revert:"300",
+            zIndex:"10",
+            opacity:"0.7",
+            //输入名字时不能拖动
+            cancel:".name_inputing"
+        })
+            
+
+        //赋予菜单内的block对象一些功能
+        //1.点击可以选中，再次点击取消,同一时间只能选中一个
+        $("#collection_edit_menu").on("click",".collectionEditMenuBlock",function(){
+            if($(this).is(".block_focusing")){
+                $(this).removeClass('block_focusing')
+            }
+            else{
+                //一次选中一个
+                $('.block_focusing').removeClass('block_focusing')
+                $(this).addClass('block_focusing')
+            } 
+        })
+
+        //2.改名：点击名字处可以改名
+        $("#collection_edit_menu").on("click",".objectBlock_name",function(event){
+            event.stopPropagation()
+            //输入名称时不能拖动
+            $(this).parents('.collectionEditMenuBlock').addClass('name_inputing')
+            $(this).attr('contenteditable', 'true');
+            $(this).focus(); // 将焦点设置在可编辑元素上
+        });
+        // 失去焦点时应用其中的内容修改对应的collection的name
+        $("#collection_edit_menu").on("blur",".objectBlock_name",function(){
+            $(this).attr('contenteditable', 'false');
+            var new_name = $(this).text()
+            //修改这个block中保存的block_type中的type也就是名称
+            var the_block = $(this).parents('.collectionEditMenuBlock')
+            //可以拖动了
+            $(the_block).removeClass('name_inputing')
+            var block_type = $(the_block).data("type")
+            block_type["type"] = new_name
+            //再将它保存回去
+            $(the_block).data("type",block_type)
+        });
+
+        //3.删除点击删除键将block删除
+        $("#collection_edit_menu").on("click",".deleteCollectionEditMenuBlock",function(){
+            //把对应的block删除
+            $(this).parents(".collectionEditMenuBlock").remove()
+        })
+
+        //4.点击collection名称栏使其可以通过输入修改名称
+        $("#collection_edit_menu_title div").on('click', function(event) {
+            //只能修改自定义类型的
+            var collection = the_collection
+            if($(collection).attr("type") == "customize"){
+                event.stopPropagation()
+                $(this).attr('contenteditable', 'true');
+                $(this).focus(); // 将焦点设置在可编辑元素上
+            }
+        });
+        // 失去焦点时应用其中的内容修改对应的collection的name
+        $("#collection_edit_menu_title div").on('blur', function() {
+            $(this).attr('contenteditable', 'false');
+            var collection = the_collection
+            var new_name = $(this).text()
+            changeCollectionName(collection,new_name)
+        });
+
+    //点击导出当前collection
+    $("#collection_edit_menu_button_export_collection").on("click",function(){
+        var collection = the_collection
+        //导出
+        exportCollectionToFile(collection)
+    })
+
+    //点击取消关闭菜单
+    $("#collection_edit_menu_button_close").on("click",function(){
+        //关闭菜单
+        hideModalMenu($("#collection_edit_menu"))
+    })
+
+    //点击导出将选中的object导出为文件
+    $("#collection_edit_menu_button_export").on("click",function(){
+        //获得当前选中的object的type
+        var focusing_block = $("#collection_edit_menu_container").find(".block_focusing")
+        if(focusing_block.length > 0){
+            var type = focusing_block.data("type")
+            exportObjectFile(type)
+            .then(result=>{
+                if(result){
+                    alert("导出磁贴文件成功！")
+                }
+            })
+        }
+    })
+
+    //点击导入打开文件选择器，将选中的object文件导入到这个菜单
+    $("#collection_edit_menu_button_insert").on("click",function(){
+        //导入一个objectFile，获得其中的block_type内容
+        insertObjectFile()
+        .then(block_type=>{
+            if(block_type){
+                //创建新的block
+                var block = createCollectionEditMenuBlock(block_type)
+                //加入到container中
+                $("#collection_edit_menu_container").append(block)
+            }
+            
+        })
+    })
+
+    //点击保存将当前内容保存进对应的lib文件中随后在collection中重新加载一次
+    $("#collection_edit_menu_button_save").on("click",function(){
+        //获取当前container中的元素序列，并以此修改lib中的collection_objects序列
+        var array = $( "#collection_edit_menu_container" ).sortable( "toArray" )
+        //遍历这个数组，以此将对应id的block所对应的block_type放入一个对象中
+        var new_lib_collection_objects = []
+        for(i in array){
+            var id = array[i]
+            var type = $("#"+id).data("type")
+            new_lib_collection_objects.push(type)
+        }
+        //修改the_lib
+        var new_lib = the_lib
+            new_lib["collection_objects"] = new_lib_collection_objects
+        //用这个新的lib修改文件
+        var collection = the_collection
+        var file_name = collection.attr("file_name")
+        var type = collection.attr("type")
+        //修改all_lib和对应的lib文件
+        changeAllLib(file_name,type,new_lib)
+        changeLibFile(file_name,type,new_lib)
+        //删掉collection中的内容
+        $(collection).find('.objectCollection_container').empty()
+
+        //然后再用这个新的lib来加载的collection
+        loadLibToCollection(new_lib,type,collection)
+        //关闭菜单
+        hideModalMenu($("#collection_edit_menu"))
+    })
+</script>
+
+<style type="text/css">
+    /*菜单本体*/
+        #collection_edit_menu {
+            width: 620px;
+            height:420px;
+        }
+        /*标题*/
+            #collection_edit_menu_title{
+                position: relative;
+                display: flex;
+                flex-wrap: nowrap;
+            }
+            /*实际标题存放位置，可以输入内容哦*/
+            #collection_edit_menu .modal_menu_title > div{
+                background-color:var(--color-1);
+                border-radius:5px;
+                border:1px solid var(--border-color);
+                width:calc(100% - 70px);
+            }
+            #collection_edit_menu .modal_menu_title > div:focus{
+                outline:1px solid var(--focusing-color);
+            }
+
+        /*block的存放处*/
+            #collection_edit_menu_container{
+                height: calc(100% - 70px);
+                margin: 10px 0px;
+                width: 100%;
+                border-top:1px solid gray;
+                border-bottom:1px solid gray;
+                box-sizing:border-box;
+                display: flex;
+                flex-wrap: wrap;
+                overflow-y: auto;
+                padding:10px;
+            }
+ 
+            
+
+            /*菜单内的block的一些专属css*/
+                #collection_edit_menu_container .objectBlock{
+                    position:relative;
+                    width:104px;
+                    max-height:113px;
+                    padding:5px 0;
+                    margin:0px 3px;
+                    background-color:var(--color-0);
+                }
+                #collection_edit_menu_container .objectBlock .objectBlock_mini{
+                    height:88px;
+                }
+
+                #collection_edit_menu_container .objectBlock span{
+                    margin-top:5px;
+                    font-size:16px;
+                    height:25px;
+                }
+
+                #collection_edit_menu_container .block_focusing{
+                    outline:2px dashed blue;
+                }
+
+                /*block右上角的删除键*/
+                .deleteCollectionEditMenuBlock{
+                    position: absolute;
+                    height: 24px;
+                    width: 24px;
+                    right: -4px;
+                    top: -4px;
+                    z-index: 2;
+                    background-color:inherit;
+                    border-radius: 50%;
+                    background-size: 70%;
+                    background-position:center;
+                    background-repeat: no-repeat;
+                    background-image: url(././img/remove.png);
+                    cursor: pointer;
+                }
+
+    /*按键*/
+    #collection_edit_menu_button{
+        position:relative;
+    }
+
+    #collection_edit_menu_button .button{
+        border-radius:5px;
+        border:1px solid var(--border-color);
+        background-color:var(--color-2);
+        padding:0 10px;
+        display:flex;
+        align-items:center;
+        height:35px;
+    }
+    #collection_edit_menu_button .button:hover{
+        background-color:var(--color-3);
+    }
+
+    /*左边的按键*/
+    #collection_edit_menu_button_export_collection{
+        position:absolute;
+        left:0px;
+    }
+    /*右边的按键*/
+    #collection_edit_menu_button > div:nth-child(2){
+        position:absolute;
+        display:flex;
+        right:0px;
+    }
+    #collection_edit_menu_button > div:nth-child(2) > div{
+        margin-left:10px;
+    }
+    
+</style>

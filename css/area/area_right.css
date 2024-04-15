@@ -1,5 +1,3 @@
-
-
 /*右侧区域顶部标题样式*/
     #rightArea_top{
         display: flex;
@@ -18,401 +16,68 @@
             height: 50px;
             float: right;
 
-            border-bottom:2px solid black;
             box-sizing: border-box;
+
+            background-color:var(--color-2);
+            border-bottom:1px solid var(--border-color);
+        }
+        /*聚焦状态*/
+        .rightArea_model_focusing{
+            background-color:var(--color-1);
+            border-bottom:none;
         }
 
+
 /*在模式之间加入分割的竖线*/
-    #tile_design{
-        border-right: 2px solid black;
-        background-color: white;
-        border-bottom: none;
-        color: black,
-    }
-    #tile_edit{
-        background-color: lightseagreen;
-        border-bottom: 2px solid black;
-        color: #404040FF,
+    #rightArea_design_model{
+        border-right: 1px solid var(--border-color);
     }
 
 /*右侧区域内部样式*/
     .rightArea_inner{
-        background-color: white;
         position:relative;
         width: 100%;
         height: calc(100% - 50px);
         overflow-y: overlay;
+        overflow-x:hidden;
     }
-    .rightArea_inner::-webkit-scrollbar{
-        width:8px;
-        height:4px;
-    }
-    .rightArea_inner::-webkit-scrollbar-thumb{
-        background-color:#49494980;
-        background-clip:border-box;
 
-        border-right:4px solid white;
-        border-radius:0px;
-    }
-        #tile_design_inner{
-            display:block;
-        }
-        #tile_edit_inner{
-            display:none;
-        }
 
 /*内部的单元块样式*/
-    .rightArea_edit_inner_block,.rightArea_design_inner_block{
-        font-size:20px;
-        text-align: center;
-        font-weight:bolder;
+    .rightArea_inner > div{
         display:none;
-    }
-
-    .rightArea_edit_inner_block > div{
-        text-align:left;
-        font-size:15px;
-    }
-
-    .rightArea_design_inner_block > div{
-        text-align:left;
-        font-size:15px;
     }
 
         /*二级单元块*/
         .rightArea_inner_ability{
             font-weight: normal;
             padding:8px 8px;
-            border-bottom:1.5px solid #0000003A;
             white-space: nowrap;
+            position:relative;
+        }
+        /*单元块之间的间隔线条*/
+         .rightArea_inner .rightArea_inner_ability:not(:last-child):after{
+            content:"";
+            display: block;
+            position:relative;
+            width:100%;
+            top:8px;
+            height:1px;
+            background-color:var(--border-color);
         }
         /*二级单元块标题*/
-        .rightArea_inner_ability_title{
-            font-size:15px;
-            color:#333333D7;
+        .rightArea_inner_ability_title , .rightArea_inner .slide_title{
+            font-size:17px;
+            color:var(--text-color);
             text-align:left;
             font-weight:bold;
-            margin-bottom:2px;
         }
-
-/*右侧工具栏按钮样式*/
-.rightArea_button{
-    width:35px;
-    height:35px;
-
-    border:1px solid black;
-    border-radius:3px;
-
-    margin-right:4px;
-
-    box-sizing: border-box;
-
-    background-size:80%;
-    background-repeat: no-repeat;
-    background-position:center center;
-}
-.rightArea_button_clicked{
-    background-color:blue;
-}
-
-/*样式编辑*/
-
-    /*画布*/
-        /*画布名称*/
-            #huabu_state_name{
-                width:100%;
-                display:flex;
-                text-align:center;
-                align-items: center;
-            }
-            #huabu_state_name_block{
-                overflow:hidden;
-                max-width:calc(80% - 20px);
-                white-space: nowrap;
-            }
-            #huabu_state_name_edit{
-                width:15px;
-                height:15px;
-                text-align:center;
-                justify-content:center;
-                align-items:center;
-            }
-            #huabu_state_name_edit img{
-                width:100%;
-                height:100%;
-            }
-        /*画布尺寸*/
-            #huabu_state_size_select > select{
-                text-align: right;
-                height:100%;
-                width:130px;
-                margin-bottom:2px;
-            }
-            #huabu_state_size_select > select > option{
-                text-align: left;
-            }
-            #huabu_state_size_input > div:first-child{
-                margin-right:10px;
-            }
-        /*画布颜色*/
-            #huabu_display_color{
-                display:flex;
-                text-align:center;
-                align-items: center;
-            }
-        /*画布网格*/
-            #huabu_display_grid{
-                position:relative;
-            }
-            #huabu_display_grid_inner{
-                position:absolute;
-                right:0px;
-                display:none;
-                height:100%;
-            }
-            #huabu_display_grid_size{
-                width:40px;
-            }
-            #huabu_display_grid_inner .colorpicker{
-                margin-left:4px;
-            }
-        /*画布背景*/
-            #huabu_display_background_inner{
-                width:150px;
-            }
-            
-            #huabu_display_background_set{
-                display:none;
-            }
-            #huabu_display_background_position{
-                display: none;
-            }
-
-    /*磁贴*/
-        /*图形*/
-            /*背景*/
-                #tile_background_color{
-                    margin-right:10px;
-                }
-                #tile_background_insert{
-                    margin:5px 0px;
-                }
-                #tile_background_insert_set{
-                    align-items:center;
-                    margin:4px;
-                    display:none;
-                }
-                #tile_background_insert_position{
-                    display:none;
-                }
-                #tile_background_gradient{
-                    align-items:center;
-                }
-            /*位置*/
-                #tile_position > div:first-child{
-                    margin-right:10px;
-                }
-            /*形状*/
-                #tile_size .flex > div:first-child{
-                    margin-right:10px;
-                }
-            /*边框*/
-                #tile_border_type{
-                    box-sizing: border-box;
-                    width:52px;
-                    margin-right:10px;
-                }
-                #tile_border_color{
-                    margin-right:10px;
-                }
-            /*层叠*/
-                #tile_zIndex{
-                    margin-bottom:4px;
-                }
-                    #tile_zIndex span{
-                        text-align: center;
-                        width:29px;
-                    }
-                    #tile_zIndex_up{
-                        width:18px;
-                        height:18px;
-                        border:1px solid black;
-                        border-radius:2px;
-
-                        margin-right:4px;
-
-                        background-image: url("../../img/plus.png");
-                        background-size:80%;
-                        background-repeat: no-repeat;
-                        background-position:center center;
-                    }
-                    #tile_zIndex_down{
-                        width:18px;
-                        height:18px;
-                        border:1px solid black;
-                        border-radius:2px;
-
-                        background-image: url("../../img/minus.png");
-                        background-size:80%;
-                        background-repeat: no-repeat;
-                        background-position:center center;
-                    }
-                #tile_zIndex_max{
-                    text-align: center;
-                    width:70px;
-                    border:1px solid black;
-                    border-radius:3px;
-
-                    margin-right:4px;
-                    border-radius:3px;
-                }
-                #tile_zIndex_min{
-                    text-align: center;
-                    width:70px;
-                    border:1px solid black;
-                    border-radius:3px;
-                }
-            /*管理*/
-                #tile_manage_copy{
-                    text-align: center;
-                    width:70px;
-                    border:1px solid black;
-                    border-radius:3px;
-
-                    margin-right:4px;
-                }
-                #tile_manage_paste{
-                    text-align: center;
-                    width:70px;
-                    border:1px solid black;
-                    border-radius:3px;
-                }
-        /*文字*/
-            #tile_font_style{
-                text-align:center;
-                width:236px;
-                font-size:16px;
-                height:26px;
-                box-sizing: border-box;
-                margin-bottom:4px;
-            }
-            #tile_font_color{
-                margin-right:2px;
-            }
-            #tile_font_size{
-                width:49px;
-            }
-            #tile_font_bold{
-                background-image:url("../../img/font_bold.png");
-            }
-            #tile_font_italic{
-                background-image:url("../../img/font_italic.png");
-            }
-            #tile_font_overline{
-                background-image:url("../../img/overline.png");
-            }
-            #tile_font_strickline{
-                background-image:url("../../img/strickline.png");
-            }
-            #tile_font_underline{
-                background-image:url("../../img/underline.png");
-            }
-            #tile_font_alignLeft{
-                background-image:url("../../img/align_left.png");
-            }
-            #tile_font_alignRight{
-                background-image:url("../../img/align_right.png");
-            }
-            #tile_font_alignCenter{
-                background-image:url("../../img/align_center.png");
-            }
-            #tile_font_shadow{
-
-            }
-            #tile_font_shadow_set{
-                display:none;
-            }
-            #tile_font_shadow_input{
-                width:34px;
-            }
-
-        /*内容*/
-            #tile_content_link_set{
-                position:relative;
-                left:40px;
-            }
-            /*嵌套画布*/
-                #tile_content_nestHuabu{
-                    width: 100px;
-                    height: 20px;
-                    text-align: center;
-                    white-space: nowrap;
-                    overflow: hidden;
-                    border: 1px solid black;
-                    border-radius: 3px;
-                }
-
-                #tile_content_nestHuabu_delete{
-                    display: none;
-                    width: 20px;
-                    height: 20px;
-                    margin-left: 3px;
-                    text-align: center;
-                    border: 1px solid black;
-                    border-radius: 3px;
-                    background-image: url("../../img/delete.png");
-                    background-size: 60% 60%;
-                    background-repeat: no-repeat;
-                    background-position: center center;
-                }
-
-                #tile_content_nestSet{
-                    display: none;
-                }
+ 
 
 
 
-/*内容编辑*/
-#rightArea_tile_edit{
-    position: relative;
-    width: calc(100% - 8px);
-    padding:0px 4px;
-}
 
-#rightArea_tile_edit_title{
-    height: 50px;
 
-    font-size: 30px;
-    color: black;
-    font-weight: bold;
 
-    display: flex;  
-    text-align: center;
-    justify-content: center;
-    align-items:center;
 
-    box-sizing: border-box;
 
-    border: 2px solid black;
-}
-#rightArea_tile_edit_text{
-    min-height:300px;
-    max-height:400px;
-
-    margin-top:4px;
-    margin-bottom:4px;
-
-    text-justify:2em;
-    font-size: 20px;
-
-    box-sizing: border-box;
-
-    border: 2px solid black;
-    overflow-y:overlay;
-    overscroll-behavior:contain;
-    overflow-x:hidden;
-}
-
-#rightArea_tile_edit_text::-webkit-scrollbar{
-    width:0px;
-}

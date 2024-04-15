@@ -1,36 +1,80 @@
 <html>
-    <!-- 放大 -->
-    <div id="huabu_ability_ScaleUp" class="draw_block"></div>
-    <!-- 显示缩放度 -->
-    <div id="huabu_ability_ScaleShow" class="draw_block">
-        <div>100%</div>
+    <div>
+        <!-- 放大 -->
+        <div id="huabu_ability_ScaleUp" class="draw_block"></div>
+        <!-- 显示缩放度 -->
+        <div id="huabu_ability_ScaleShow" class="draw_block">
+            <div>100%</div>
+        </div>
+        <!-- 缩小 -->
+        <div id="huabu_ability_ScaleDown" class="draw_block"></div>
     </div>
-    <!-- 缩小 -->
-    <div id="huabu_ability_ScaleDown" class="draw_block"></div>
 
-    <!-- 撤销 -->
-    <div id="huabu_ability_Undo" class="draw_block"></div>
-    <!-- 重做 -->
-    <div id="huabu_ability_Redo" class="draw_block"></div>
+    <div>
+        <!-- 撤销 -->
+        <div id="huabu_ability_Undo" class="draw_block"></div>
+        <!-- 重做 -->
+        <div id="huabu_ability_Redo" class="draw_block"></div>
+    </div>
 
-    <!-- 删除 -->
-    <div id="huabu_ability_Delete" class="draw_block" ></div>
+    <div>
+        <!-- 删除 -->
+        <div id="huabu_ability_Delete" class="draw_block" ></div>
+    </div>
 
-    <!-- 下沉 -->
-    <div id="huabu_ability_ZIndexDown" class="draw_block"></div>
-    <!-- 上浮 -->
-    <div id="huabu_ability_ZIndexUp" class="draw_block"></div>
+    <div>
+        <!-- 下沉 -->
+        <div id="huabu_ability_ZIndexDown" class="draw_block"></div>
+        <!-- 上浮 -->
+        <div id="huabu_ability_ZIndexUp" class="draw_block"></div>
+    </div>
 
-    <!-- 颜色 -->
-    <div class="draw_block"></div>
+    <div>
+        <!-- 颜色 -->
+        <div id="huabu_ability_color" class="draw_block"></div>
+    </div>
 
-    <!-- 连线样式 -->
-    <div class="draw_block"></div>
-    <!-- 连线规则 -->
-    <div class="draw_block"></div>
+    <div>
+        <!-- 连线样式 -->
+        <div id="huabu_ability_lineStyle" class="down_menu draw_block">
+            <div class="menu">
+                <div id="huabu_ability_lineStyle_option">
+                    <div id="huabu_ability_solid_line" class="huabu_ability_button checked" value="solid"></div>
+                    <div id="huabu_ability_dashed_line" class="huabu_ability_button " value="dashed"></div>
+                    <div id="huabu_ability_dotted_line" class="huabu_ability_button " value="dotted"></div>
+                    <div id="huabu_ability_dotdash_line" class="huabu_ability_button" value="dotdash"></div>
+                </div>
+                <div id="huabu_ability_lineArrow">
+                    <div id="huabu_ability_startArrow" class="huabu_ability_button">源箭头</div>
+                    <div id="huabu_ability_endArrow" class="huabu_ability_button checked">尾箭头</div>
+                </div>
+            </div>
+        </div>
+        <!-- 连线规则 -->
+        <div id="huabu_ability_lineType" class="down_menu draw_block">
+            <div class="menu">
+                <div id="huabu_ability_lineType_option">
+                    <div value="straight" class="huabu_ability_button">直线</div>
+                    <div value="besier" class="huabu_ability_button checked">曲线</div>
+                    <div value="flowchart" class="huabu_ability_button">折线</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <!-- 快捷添加 -->
-    <div class="draw_block"></div>
+    <div>
+        <!-- 快捷添加 -->
+        <div id="huabu_ability_append" class="down_menu draw_block">
+            <div class="menu">
+                <div>
+                    <div>图片</div>
+                    <div>表格</div>
+                    <div>画布</div>
+                    <div>超链接</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- 返回上一层画布 -->
     <div id="huabu_ability_returnNestFrom" class="nest_block">返回</div>
@@ -41,8 +85,31 @@
 <script src="./js/area_ability/huabu_ability.js"></script>
 
 <style type="text/css">
+
+
+/*组块*/
+    #huabu_ability > div:not(.nest_block){
+        display:flex;
+    }
+    /*分割各个组块的线条*/
+    #huabu_ability > div:not(.nest_block):after{
+        content:"";
+        height:100%;
+        width:1px;
+        display: block;
+        background-color:var(--border-color);
+        position:relative;
+        right:0px;
+    }
+    /*各个组块之间的距离*/
+    #huabu_ability > div:not(.nest_block) > .draw_block:first-child{
+        padding-left:15px;
+    }
+    #huabu_ability > div:not(.nest_block) > .draw_block:last-child{
+        padding-right:15px;
+    }
     
-    /*基础块样式*/
+/*画布区顶部工具栏基础块样式*/
     .draw_block{
         text-align:center;
         padding:0px 5px;
@@ -50,8 +117,6 @@
         width:25px;
 
         font-size:25px;
-
-        background-color:#1F9098D2;
         
         flex-shrink:0;
 
@@ -60,19 +125,65 @@
         align-items: center;
 
         background-repeat:no-repeat;
-        background-size:80%;
+        background-size:30px 30px;
         background-position:center;
     }
-    /*嵌套画布块样式*/
-    .nest_block{
-        display:none;
-        position:absolute;
-        background-color:white;
-        width:40px;
-        height:40px;
+
+
+    /*按键hover*/
+        .draw_block:hover , .huabu_ability_button:hover , .nest_block:hover{
+            background-color:var(--color-3);
+        }
+
+    #huabu_ability .menu{
+        box-sizing: border-box;
+        background-color:var(--color-2);
+        border:1px solid var(--border-color);
+        border-bottom-left-radius:5px;
+        border-bottom-right-radius:5px;
+        transform: translate(-1px,0);
+        text-align:left;
+        font-size:18px;
     }
 
-    /*draw_block*/
+    #huabu_ability .menu > div > div{
+        padding:5px;
+    }
+
+    #huabu_ability .menu > div:not(:last-child):after{
+        content: "";
+        display: block;
+        position: relative;
+        left: 2%;
+        width: 96%;
+        height: 1px;
+        background-color: var(--border-color);
+    }
+
+/*一些按键的确认状态样式*/
+    #huabu_ability .checked{
+        background-color:var(--color-3);
+        position:relative;
+    }
+/*打个钩*/
+    #huabu_ability .checked:after{
+        content:"";
+        display:block;
+        position:absolute;
+        right:10px;
+        top:50%;
+        height:15px;
+        width:15px;
+        background-image:url("./img/check.png");
+        background-position:center;
+        background-size:100%;
+        background-repeat:no-repeat;
+        transform: translate(0px, -50%);;
+    }
+
+/*draw_block功能*/
+
+    /*画布缩放程度*/
         #huabu_ability_ScaleUp{
             background-image:url("./img/ScaleUp.png");
         }
@@ -85,24 +196,98 @@
             background-image: url("./img/ScaleDown.png");
         }
 
+    /*撤回重做*/
         #huabu_ability_Undo{
             background-image:url("./img/undo.png");
         }
         #huabu_ability_Redo{
             background-image:url("./img/redo.png");
         }
-
+    /*删除*/
         #huabu_ability_Delete{
             background-image: url("./img/delete_bin.png");
         }
-    /*nest_block*/
+    /*上浮，下成*/
+        #huabu_ability_ZIndexDown{
+            background-image:url("./img/to_back.png");
+        }
+
+        #huabu_ability_ZIndexUp{
+            background-image:url("./img/to_front.png");
+        }
+    /*颜色*/
+        #huabu_ability_color{
+            background-image:url("./img/color_all.png");
+        }
+
+    /*线条样式*/
+        #huabu_ability_lineStyle{
+            background-image:url("./img/solid_line.png");
+        }
+        /*样式选项*/
+        #huabu_ability_lineStyle_option > div{
+            width:90px;
+            padding-right:40px;
+            height:20px;
+            background-position:10px center; 
+            background-size:55px;
+            background-repeat: no-repeat;
+        }
+
+            #huabu_ability_solid_line{
+                background-image:url("./img/solid_line.png");
+            }
+            #huabu_ability_dashed_line{
+                background-image:url("./img/dashed_line.png");
+            }
+            #huabu_ability_dotted_line{
+                background-image:url("./img/dotted_line.png");
+            }
+            #huabu_ability_dotdash_line{
+                background-image:url("./img/dotdash_line.png");
+            }
+
+    /*线条类型*/
+        #huabu_ability_lineType{
+            background-image:url("./img/line_type.png");
+        }
+
+            #huabu_ability_lineType_option > div{
+                width:65px;
+            }
+
+    /*插入元素*/
+        #huabu_ability_append{
+            background-image:url("./img/insert.svg");
+        }
+
+
+/*嵌套画布块使用的按键样式*/
+        .nest_block{
+            display:none;
+            position:absolute;
+            border:0px 1px 1px 0px solid var(--border-color);
+            background-color:var(--color-2);
+            width:40px;
+            height:40px;
+        }
+
         #huabu_ability_returnNestFrom{
             left:0px;
             top:100%;
+            background-image:url("./img/back_to_source.png");
+            border-top:1px solid var(--border-color);
+            border-right:1px solid var(--border-color);
+            border-bottom:1px solid var(--border-color);
+            border-bottom-right-radius:5px;
         }
         #huabu_ability_closeNestHuabu{
             right:0px;
             top:100%;
+            border-top:1px solid var(--border-color);
+            border-left:1px solid var(--border-color);
+            border-bottom:1px solid var(--border-color);
+            border-bottom-left-radius:5px;
         }
 
 </style>

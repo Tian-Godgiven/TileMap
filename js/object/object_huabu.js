@@ -1,4 +1,3 @@
-var huabu_id = 1; //为画布分配id的初值，用以唯一标识画布对象
 var default_huabu_num = 1; //为默认画布分配的画布名的编号，与id无关
 
 var focusing_huabu; //当前正在聚焦的画布，即当前显示的画布
@@ -65,7 +64,7 @@ function createHuabu(name,width,height) {
 	//创建画布元素
 	let huabu = $("<div></div>", {
 		"class": "huabu",
-		"id": "huabu_" + huabu_id,
+		"id": "huabu_" + createRandomId(15),
 		"scale": 1,
 		"name": name,
 		"z_index_max":1,
@@ -75,10 +74,8 @@ function createHuabu(name,width,height) {
 	$(huabu).css({
 		"width": width,
 		"height": height,
-		"position": "absolute",
 		"background-color": "white",
 		"transform":"scale(1)",
-		"transform-origin":"center"
 	})
 
 	$(huabu).attr({
@@ -87,38 +84,41 @@ function createHuabu(name,width,height) {
 
 	$("#huabu_container").append(huabu);
 
-	//使得huabu的中心位于container的中心
-	$(huabu).offset({
-		left:$("#huabu_container").offset().left + $("#huabu_container").width()/2 - $(huabu).width()/2,
-		top:$("#huabu_container").offset().top + $("#huabu_container").height()/2 - $(huabu).height()/2
-	})
+	backCenterHuabu(huabu)
+	
+	useHuabu(huabu)
 
-	//为画布赋予功能
-	abilityHuabu(huabu)
-
-	//画布包含：一个放置object或dot的container
-	//　　　　　　　内部包含object_conatiner和dot_container
-	//		   一个放置tile_text的textblock
-	var container = $("<div>",{class:"container"})
-		var object_container = $("<div>", {"class": "object_container container"});
-		var textblock_container = $("<div>",{"class": "textblock_container container"})
-	    var dot_container = $("<div>", {"class": "dot_container container"});
-    	$(container).append(object_container,textblock_container,dot_container);
-    $(huabu).append(container)
-
-	createHuabuButton(huabu) //创建对应画布的button
-
-	//画布id递增
-	huabu_id++;
+	pushToUndo(huabu,"create")
 
 	//返回一个生成的画布id，可能会有用
 	return huabu
+}
+
+//启用一个画布
+function useHuabu(huabu){
+	//为画布赋予功能
+	abilityHuabu(huabu)
+
+	//画布包含：一个放置object的object_container
+	//		   一个放置tile_text的textblock_container
+	var container = $("<div>",{class:"container"})
+		var object_container = $("<div>", {"class": "object_container container"});
+		var textblock_container = $("<div>",{"class": "textblock_container container"})
+    	$(container).append(object_container,textblock_container);
+
+    $(huabu).append(container)
+
+    //创建对应画布的button
+	createHuabuButton(huabu) 
 }
 
 //画布的功能
 function abilityHuabu(huabu) {
 	//大小调整
 	$(huabu).resizable({
+		start:function(){
+			pushToUndo(huabu)
+		},
 		resize:function(event,ui) {
 			showHuabuSize(huabu)
 		},
@@ -157,6 +157,44 @@ function abilityHuabu(huabu) {
 		autoHide: true
 	});
 
+	//对象块放置在画布上时，令其加入画布
+	$(huabu).droppable({
+		accept:".objectBlock:not('.collection_edit_menu_block')",
+		drop:function(event,ui){
+			//如果它还没有进入画布area，则不能放进来
+			if(!ui.helper.hasClass("in_huabu_area")){
+				ui.draggable.draggable('option', 'revert', true);
+			}
+			//否则把他放进来
+			else{
+				ui.draggable.draggable('option', 'revert', false);
+				var huabu = return_focusing_huabu()
+				var scale = return_huabu_scale(huabu)
+				//放置位置为：（元素当前所在的offset - container偏移量） / 缩放
+			    var top = (ui.helper.offset().top - $(huabu).children('.container').offset().top)/scale 
+			    var left = (ui.helper.offset().left- $(huabu).children('.container').offset().left)/scale
+				
+				//获取对象的json
+				var object_json = ui.helper.data("object_json")
+				//通过这个type生成一个新的对象
+				createObject(object_json,"json","new")
+				.then(object=>{
+			        // 调整放置位置，放进了画布以后就不需要scale了
+			        $(object).css({
+			      	  	transform:"none",
+			      	  	"transform-origin": "none",
+			      	  	opacity:"1",
+			      	  	//放置的位置受到画布的scale影响
+			          	top: top,
+			        	left: left
+			        });
+			        //放进画布中
+			        objectIntoHuabu(object,huabu,"new")
+				})
+			}
+		}
+	})
+
 	//右键点击显示huabu_menu
 	var startX, startY
 	$(huabu).on("mousedown",function(event){
@@ -169,26 +207,47 @@ function abilityHuabu(huabu) {
 			startX = event.clientX;
 			startY = event.clientY;
 		}
-		hideHuabuMenu("all")
+		hideObjectMenu("all")
 	})
 	$(huabu).on("mouseup",function(event){
 		if(startX == event.clientX && startY == event.clientY && event.button == 2){
-			//显示子菜单
-			showHuabuMenu(event,"huabu_menu")
-			changeHuabuMenu()
+			//显示画布菜单
+			showHuabuMenu(event,huabu)
 		}
 	})
 }
 
-//加载画布，会将画布对象内的tile依次生成，这个过程会为所有tile附加新的tile_id
-//！！！待修改：预计使用随机ID
-function loadHuabu(huabu){
-	var name = $(huabu).attr("name");
-	var width = $(huabu).css("width");
-	var height = $(huabu).css("height");
+//将一个对象加入到画布中
+//mode: new:创建一个新对象
+//		load:从文件中读取得到的这个新对象
+function objectIntoHuabu(object,huabu,mode){
 
-	var new_huabu = createHuabu(name,width,height);
-	changeHuabu(new_huabu)
+	if($(object).is(".huabu")){
+		return false
+	}
+
+	//删除其临时类
+	$(object).removeClass('in_huabu_area')
+	//为其添加huabu_object类
+	$(object).addClass('huabu_object')
+	//放入指定的画布中
+	$(huabu).find('.object_container').append(object)
+
+	//如果是组合体
+	if($(object).is(".composite")){
+		//为其子元素添加huabu_object类
+		$(object).children(".object").addClass('huabu_object')
+		//刷新其中的线条子元素
+		$(object).children(".line").each(function(){
+			refreshLinePosition(this,"new")
+		})
+	}
+
+	//在非读取的情况下，进入撤销重做栈
+	if(mode != "file"){
+		pushToUndo(object,"create")
+	}
+	
 }
 
 //聚焦画布
@@ -203,26 +262,34 @@ function focusingHuabu(huabu){
 
 //切换至指定画布，令其聚焦
 function changeHuabu(huabu) {
+	//如果当前画布就是目标画布，则退出
+	if(focusing_huabu == huabu){
+		return 0
+	}
+	else if(huabu == null){
+		focusing_huabu = null
+	}
+
 	//隐藏其他画布
 	$("#huabu_container .huabu").hide()
 	$(huabu).show()
 	//切换到对应按钮
 	changeHuabuButton(huabu)
 
-	//如果这是一个嵌套画布
-	if($(huabu).is(".nested_huabu")){
-		//显示画布顶部操作栏的返回和关闭
-		$("#huabu_ability_returnNestFrom").show()
-		$("#huabu_ability_closeNestHuabu").show()
-	}
-	else{
-		//否则不显示
+	//如果这个画布能够返回到某一个画布中(也就是其源头栈不为空)
+	var stack = $(huabu).data("sourceHuabu_stack")
+	//如果源头栈为空
+	if(stack == undefined || stack.length == 0){
+		//不显示画布顶部操作栏的返回和关闭
 		$("#huabu_ability_returnNestFrom").hide()
 		$("#huabu_ability_closeNestHuabu").hide()
 	}
+	else{
+		//否则显示
+		$("#huabu_ability_returnNestFrom").show()
+		$("#huabu_ability_closeNestHuabu").show()
+	}
 	
-	//附加事件
-	rightArea_clearContent()//清空右侧功能区中的内容栏并关闭编辑权限
 	//聚焦画布
 	focusingHuabu(huabu)
 }
@@ -241,7 +308,7 @@ $("#huabu_container").on("mousedown", function(event) {
 	if (event.button === 2) {
 		huabu_dragging = true;
 		//令所有画布内菜单隐藏
-		hideHuabuMenu("all")
+		hideObjectMenu("all")
 		startX = lastX = event.clientX;
 		startY = lastY = event.clientY;
 	}
@@ -308,6 +375,7 @@ function deleteHuabu(huabu) {
 		cancelButtonText: '取消'
 	}).then((result) => {
 		if (result.isConfirmed) {
+			pushToUndo(huabu)
 			//获取画布对应的按钮
 			var button = $("#" + $(huabu).attr("id") +"_button")
 			//按画布按钮对应顺序的顺延到下一个画布
@@ -326,12 +394,6 @@ function deleteHuabu(huabu) {
 				var next_huabu = $("#" + $(next_button).attr("huabu"))
 			}
 
-			//获取画布的下一层嵌套画布
-			var next_nested_huabu = $(huabu).data("next_nested_huabu")
-			//将当前画布的下一层嵌套画布删除
-			for(nested_huabu in next_nested_huabu){
-				deleteHuabu(nested_huabu)
-			}
 			//将当前画布与其对应的按钮删除
 			$(huabu).remove()
 			deleteHuabuButton(huabu)
@@ -362,11 +424,6 @@ function copyHuabu(huabu,type){
 	//如果type为不拷贝拷贝画布内元素，则删除huabu>conatiner>div中的元素
 	if(type == "no_copy_tile"){
 		$(clone_huabu).children(".container > div").empty()
-		//同时也会删除嵌套画布
-	}
-	//如果type为不拷贝嵌套，则删除画布对应的嵌套画布
-	else if(type == "no_copy_nest"){
-
 	}
 	//否则，还要将画布对应的嵌套画布分别进行拷贝，并绑定到对应的元素上
 	else{
@@ -379,10 +436,16 @@ function copyHuabu(huabu,type){
 		$(clone_huabu).removeClass(".nest_huabu .nesting .nested")
 		$(clone_huabu).removeAttr("nest_from")
 	}
-
-	//最后加载这个clone_huabu
-	loadHuabu(clone_huabu)
 }
+
+//清除该画布内的所有元素
+function clearHuabu(huabu){
+	//保存下这个画布
+	pushToUndo(huabu,"clear")
+	$(huabu).find(".object_container").empty()
+	$(huabu).find(".textblock_container").empty()
+}
+
 
 //滑轮修改画布大小
 $(document).ready(function scrollHuabu(){
@@ -407,6 +470,16 @@ $(document).ready(function scrollHuabu(){
 	})
 })
 
+//使得huabu的中心位于container的中心
+function backCenterHuabu(huabu){
+	var left = $("#huabu_container").width()/2 - $(huabu).width()/2
+	var top = $("#huabu_container").height()/2 - $(huabu).height()/2
+	$(huabu).css({
+		left:left,
+		top:top
+	})
+}
+
 //修改指定画布的名称
 function renameHuabu(huabu){
 	swal.fire({
@@ -420,6 +493,7 @@ function renameHuabu(huabu){
 		cancelButtonText: '取消'
 	}).then((result) => {
 		if (result.isConfirmed) {
+			pushToUndo(huabu)
 			//获取重命名画布和他的按钮
 			let button = $("#" + $(huabu).attr("id") +"_button")
 			//根据输入值修改画布和按钮的id，以及按钮显示的内容
@@ -465,59 +539,6 @@ function UngridHuabu(huabu){
 	$(huabu).prop("grid",false)
 }
 
-//通过tile打开嵌套画布
-function openNestedHuabu(tile,nested_huabu){
-	//若tile设置了禁止打开画布
-	if($(tile).prop("nestSet_noOpen")){
-		return false
-	}
-	if(nested_huabu == null){
-		nested_huabu = $(tile).data("nest_huabu")
-	}
-	//令其显示
-	$(nested_huabu).removeClass("hide")
-	$(nested_huabu).show()
-	//保存这个Tile，在返回上一层画布时使用
-	$(nested_huabu).data("nest_from",tile)
 
-	//为嵌套画布生成一个底部button，该函数内置重复判定，不会重复生成
-	createHuabuButton(nested_huabu)
-	//聚焦到这个画布上
-	changeHuabu(nested_huabu)
-
-	//动画：由tile为源点，嵌套画布逐渐扩大
-
-}
-//返回上一层画布
-function returnNestFrom(nested_huabu){
-	//获取画布来源
-	var tile = $(nested_huabu).data("nest_from")
-	if(tile){
-		//获取来源所在的画布
-		var nest_from_huabu = $(tile).parents(".huabu")
-		//如果这个画布是一个嵌套画布，并且正在被隐藏
-		if($(nest_from_huabu).is(".hide")){
-			//则令来源画布去除hide
-			console.log("去除了hide")
-			$(nest_from_huabu).removeClass("hide")
-			//并产生按键
-			createHuabuButton(nest_from_huabu)
-		}
-		changeHuabu(nest_from_huabu)
-	}
-}
-//关闭嵌套画布，返回其来源的上一层画布
-function closeNestedHuabu(nested_huabu){
-	//令其隐藏
-	$(nested_huabu).addClass("hide")
-	$(nested_huabu).hide()
-	
-	//删除这个画布的底部button
-	deleteHuabuButton(nested_huabu)
-	//返回上一层画布
-	returnNestFrom(nested_huabu)
-	//动画：嵌套画布逐渐缩
-
-}
 
 

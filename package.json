@@ -1,5 +1,5 @@
 {
-  "name": "dull-creator-beat-zesk7",
+  "name": "tilemap",
   "productName": "dull-creator-beat-zesk7",
   "description": "My Electron application description",
   "keywords": [],
@@ -7,10 +7,26 @@
   "version": "1.0.0",
   "author": "Tian天恩",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@jsplumb/browser-ui": "^6.2.10",
+    "electron": "^29.2.0",
+    "image-size": "^1.1.1",
+    "jsplumb": "^2.15.6"
+  },
   "devDependencies": {
-    "electron": "22.0.2"
-  }
+    "electron": "latest",
+    "electron-packager": "^17.1.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tian-Godgiven/Tile-map.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Tian-Godgiven/Tile-map/issues"
+  },
+  "homepage": "https://github.com/Tian-Godgiven/Tile-map#readme"
 }

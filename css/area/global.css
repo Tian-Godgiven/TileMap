@@ -1,3 +1,4 @@
+
 #pointer{
 	position:absolute;
 	width:24px;
@@ -12,31 +13,6 @@
 
 .bold{
     font-weight:bold;
-}
-
-/*覆盖整个网页的蒙版样式*/
-.mask_overlay_background{
-    position: absolute; 
-    background: black; 
-    height: 100%;
-    width:100%; 
-    right: 0px; 
-    z-index: 10002; 
-    opacity: 0.3; 
-    left: 0px; 
-    top: 0px;
-}
-
-/*在蒙版之上的元素样式*/
-.over_mask{
-    position:absolute;
-
-    z-index:10003;
-
-    top:50%;
-    left:50%;
-
-    transform: translate(-50%, -80%);
 }
 
 /*input按键统一样式*/
@@ -81,11 +57,11 @@
 
         text-align: center;
 
+        display:block !important;
+
         white-space: nowrap;
         overflow:hidden;
-
-        border:1px solid black;
-        border-radius:3px;
+        text-overflow:ellipsis;
     }
     .file_delete{
         display:none;
@@ -95,23 +71,34 @@
 
         margin-left:3px;
 
-        text-align: center;
-
-        border:1px solid black;
-        border-radius:3px;
+        padding:2px !important;
 
         background-image:url("../../img/delete.png");
-        background-size:60% 60%;
+        background-size:50%;
         background-repeat:no-repeat;
-        background-position:center center;
+        background-position:center;
     }
     .file_input{
         display:none;
     }
 
+/*统一拖动条*/
+    ::-webkit-scrollbar{
+        width:8px;
+        height:4px;
+    }
+    ::-webkit-scrollbar-thumb{
+        background-color:var(--color-4);
+        background-clip:border-box;
+
+        border-right:4px solid var(--color-1);
+        border-radius:0px;
+    }
+
 /*拾色器统一样式*/
     .colorpicker{
-        border:1px solid black;
+        background-color:var(--color-2);
+        border:1px solid var(--border-color);
         border-radius:3px;
         display:flex;
         text-align: center;
@@ -120,11 +107,15 @@
         width:46px;
         height:20px;
     }
+    .colorpicker:hover{
+        background-color:var(--color-3);
+    }
     .colorpicker_block{
         width:24px;
         height:16px;
-        border:1px solid black;
+        border:1px solid var(--color-5);
         box-sizing:border-box;
+        background-color:var(--color-5);
     }
     .colorpicker_img{
         margin-left:2px;
@@ -138,22 +129,65 @@
         background-position:center center;
     }
 
+/*覆盖整个网页的蒙版样式*/
+.mask_overlay_background{
+    position: absolute; 
+    background: var(--color-0); 
+    height: 100%;
+    width:100%; 
+    right: 0px; 
+    z-index: 10002; 
+    opacity: 0.7; 
+    left: 0px; 
+    top: 0px;
+}
+
 
 /*滑块标题样式*/
     .slide_title{
-        background-color: #0BFFFFFF;
-        font-size: 15px;
+        background-color:var(--color-2);
+        display:flex;
+        align-items:center;
+        height:auto;
+        font-size: 18px;
+        padding:4px 0px;
+    }
+    .slide_title:hover{
+        background-color:var(--color-3);
+    }
+    /*滑块标题前面加一个标志*/
+    .slide_menu > .slide_title.folding::before {
+        content: "";
+        background-image:url('../../img/simple_arrow_right_darken.png');
+        background-size:20px 16px;
+        background-repeat:no-repeat;
+        background-position:center;
+        display: inline-block; /* 将伪元素变成行内元素，以便它出现在文本之前 */
+        width:20px;
+        height:24px;
+        position:relative;
+    }
+    /*展开时换成另一个标志*/
+    .slide_menu > .slide_title.unfolding::before {
+        content: "";
+        background-image:url('../../img/simple_arrow_down.png');
+        background-size:16px 16px;
+        background-repeat:no-repeat;
+        background-position:center;
+        display: inline-block; /* 将伪元素变成行内元素，以便它出现在文本之前 */
+        width:20px;
+        height:24px;
+        position:relative;
     }
 /*滑块内容样式*/
-    .slide_inner > div{
-        background-color: white;
-        font-size: 15px;
+    .slide_inner{
+        font-size: 16px;
+    }
+    /*默认为折叠的菜单*/
+    .slide_menu.folding > .slide_inner{
+        display:none;
     }
 
-/*关闭滑块的样式*/
-.slide_closing > .slide_inner{
-	display:none;
-}
 
 /*中心标识元素统一样式*/
 .center{

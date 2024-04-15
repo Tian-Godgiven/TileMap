@@ -1,0 +1,141 @@
+/*内容栏内的按钮样式*/
+#rightArea_edit_inner .rightArea_button{
+    width:35px;
+    height:35px;
+
+    border-radius:5px;
+
+    box-sizing: border-box;
+    
+    background-size:23px 23px;
+    background-repeat: no-repeat;
+    background-position:center center;
+}
+
+/*mce相关配置*/
+	.mce-content-body [contentEditable=false]{
+		cursor:pointer;
+	}
+	/*工具栏*/
+	.tox .tox-toolbar{
+		background-color:var(--color-1) !important;
+	}
+	/*工具栏按键*/
+	.tox .tox-tbtn{
+		background-color:var(--color-2) !important;
+	}
+	.tox .tox-number-input{
+		background-color:var(--color-2) !important;
+	}
+	.tox .tox-tbtn:hover , .tox .tox-number-input:hover{
+		background-color:var(--color-3) !important;
+	}
+
+/*特殊的底部选色按钮*/
+	#rightArea_edit_inner .down_color_select{
+		display:flex;
+		align-items: center;
+		justify-content:center;
+	}
+	#rightArea_edit_inner .down_color_select > div{
+		width:20px;
+		height:20px;
+	}
+	/*底部选色按钮的图标*/
+	#rightArea_edit_inner .down_color_select .button_icon{
+		height:15px;
+		width:15px;
+		margin:0 auto;
+		background-size:100%;
+		background-position:center;
+		background-repeat:no-repeat;
+		margin-bottom:2px;
+	}
+	/*底部有着选色按钮的色盘，初始默认为黑色*/
+	#rightArea_edit_inner .down_color_select .button_down_colorBar{
+		height:4px;
+		width:20px;
+		border-radius:10px;
+		background-color:black;
+	}
+
+/*内容编辑*/
+    /*磁贴*/
+    	/*内容修饰*/
+    		.tox.tox-tinymce-inline .tox-editor-header{
+    			border:none !important;
+    		}
+    		#tiletext_color .button_icon{
+    			background-image:url("../../img/text.png");
+            }
+            #tiletext_background .button_icon{
+            	background-image:url("../../img/text_background.png");
+            }
+            #tiletext_insert{
+            	background-image:url("../../img/insert.svg");
+            }
+            #tiletext_clear{
+            	background-image:url("../../img/delete.svg");
+            }
+
+
+	            
+    	/*内容展示*/
+	        #rightArea_tile_edit{
+	            position: relative;
+	            width: calc(100% - 8px);
+	            padding:4px 4px;
+	            font-weight:normal;
+	            
+	        }
+	        #rightArea_tile_edit_title{
+	            height: 50px;
+
+	            font-size: 30px;
+	            color: var(--text-color);
+	            font-weight: bold;
+
+	            display: flex;  
+	            text-align: center;
+	            justify-content: center;
+	            align-items:center;
+
+	            overflow:hidden;
+	            text-overflow:ellipsis;
+
+	            box-sizing: border-box;
+
+	            background-color:var(--color-0);
+
+	            border: 2px solid var(--border-color);
+	            border-radius:3px;
+	        }
+	        #rightArea_tile_edit_text{
+	        	margin-top:4px;
+	            margin-bottom:4px;
+
+	            min-height:350px;
+	            max-height:400px;
+
+	            color: var(--text-color);
+	            font-size: 20px;
+
+	            border: 2px solid var(--border-color);
+	            border-radius:3px;
+	            box-sizing: border-box;
+
+	            background-color:var(--color-0);
+
+	            overflow-y:overlay;
+	            overscroll-behavior:contain;
+	        }
+
+	        #rightArea_tile_edit_title:focus , #rightArea_tile_edit_text:focus{
+	        	outline:none;
+	        	border:2px solid var(--focusing-color);
+	        	
+	        }	
+
+	        #rightArea_tile_edit_text::-webkit-scrollbar{
+	            width:0px !important;
+	        }

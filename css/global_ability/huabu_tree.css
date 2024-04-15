@@ -1,0 +1,50 @@
+.tree_row{
+	width:100%;
+    height:22px;
+}
+
+
+.tree_row > .miniObject{
+    position:relative;
+    left:20px;/*留出展开收起标志的空间*/
+}
+
+.tree_container .tree_row:hover{
+	background-color:var(--color-3);
+}
+
+/*内容树中子行的样式，子行不断向右，形成阶梯状*/
+.tree_row_container{
+	margin-left:10px;
+}
+
+/*可折叠行的内容行样式*/
+.tree_fold_row > .tree_row{
+	background-color:var(--color-2);
+    position:relative;
+}
+
+/*可折叠行前面加一个标志*/
+.tree_fold_row.folding > .tree_row::before {
+    content: "";
+    background-image:url('../../img/simple_arrow_right_darken.png');
+    background-size:20px 16px;
+    background-repeat:no-repeat;
+    background-position:center;
+    display: inline-block; /* 将伪元素变成行内元素，以便它出现在文本之前 */
+    width:20px;
+    height:20px;
+    position:absolute;
+}
+/*展开时换成另一个标志*/
+.tree_fold_row.unfolding > .tree_row::before {
+    content: "";
+    background-image:url('../../img/simple_arrow_down.png');
+    background-size:16px 16px;
+    background-repeat:no-repeat;
+    background-position:center;
+    display: inline-block; /* 将伪元素变成行内元素，以便它出现在文本之前 */
+    width:20px;
+    height:20px;
+    position:absolute;
+}

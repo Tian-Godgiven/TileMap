@@ -1,0 +1,51 @@
+<html>
+</html>
+
+
+<!-- 文件读取 -->
+<script src="./js/file/file_ipc.js"></script>
+<!-- 功能 -->
+<script src="./js/global_ability/global_ability.js"></script>
+<script src="./js/global_ability/mini_block.js"></script>
+<script src="./js/global_ability/huabu_nest.js"></script>
+<script src="./js/global_ability/huabu_tree.js"></script>
+<script src="./js/global_ability/clipboard.js"></script>
+<script src="./js/global_ability/undo_redo.js"></script>
+
+<!-- 菜单 -->
+<script src="./js/menu/menu_all.js"></script>
+
+<!-- 文件系统 -->
+<script src="./js/file/file_ability/tilemap_file_ability.js"></script>
+<script src="./js/file/file_ability/object_file_ability.js"></script>
+<script src="./js/file/file_ability/lib_file_ability.js"></script>
+<script src="./js/file/file_ability/object_to_json.js"></script>
+
+<script type="text/javascript">
+	//加载菜单们
+   	$("#global")
+   		//软件菜单
+	    .append($("<div>").load("./components/menu/app_menu/colorpicker.html"))
+	   	.append($("<div>").load("./components/menu/app_menu/tile_link_menu.html"))
+	    //对象菜单
+	    .append($("<div>").load("./components/menu/object_menu/huabu_button_menu.html"))
+	    .append($("<div>").load("./components/menu/object_menu/huabu_menu.html"))
+	    .append($("<div>").load("./components/menu/object_menu/tile_menu.html"))
+	    .append($("<div>").load("./components/menu/object_menu/line_menu.html"))
+	    //弹窗 
+	    .append($("<div>").load("./components/menu/modal_menu/huabu_nest_menu.html"))
+	    .append($("<div>").load("./components/menu/modal_menu/tree_select_menu.html"))
+	    .append($("<div>").load("./components/menu/modal_menu/collection_edit_menu.html"))
+	    .append($("<div>").load("./components/menu/modal_menu/file_saveAs_menu.html"))
+	    .append($("<div>").load("./components/menu/modal_menu/file_insert_menu.html"))
+	    .append($("<div>").load("./components/menu/modal_menu/file_export_menu.html"))
+</script>
+
+<!-- 最后加载的应用程序文件 -->
+<script src="./js/app/start.js" defer></script>
+<script src="./js/app/preload.js" defer></script>
+<script src="./js/app/keyboard.js" defer></script>
+
+<link rel="stylesheet" href="./css/area/global.css">
+<link rel="stylesheet" href="./css/global_ability/mini_block.css">
+<link rel="stylesheet" href="./css/global_ability/huabu_tree.css">
