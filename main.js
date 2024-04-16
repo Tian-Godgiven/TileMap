@@ -6,10 +6,11 @@ require('./js/file/file_by_node.js');
 
 module.exports.ipcRenderer = ipcRenderer;
 
+
 //窗口定义，包含监听和快捷键
 const createWindow = () => {
   	// 创建浏览窗口
-      	const mainWindow = new BrowserWindow({
+       var mainWindow = new BrowserWindow({
         	width: 800, // 窗口宽度
         	height: 600, // 窗口高度
     		autoHideMenuBar:true,//隐藏菜单栏
@@ -34,22 +35,24 @@ const createWindow = () => {
     	})
 
     //监听
-        // 切换亮色or暗色主题
-            ipcMain.handle('toggle_appTheme', () => {
-                if (nativeTheme.shouldUseDarkColors) {
+        //切换亮色or暗色主题
+            ipcMain.handle('toggle_appTheme', (event,theme) => {
+                if (theme == "light") {
                     nativeTheme.themeSource = 'light'
                 } 
-                else {
+                else if(theme == "dark"){
+
                     nativeTheme.themeSource = 'dark'
+                }
+                else if(theme == "auto"){
+                    nativeTheme.themeSource =  system_theme ? 'dark':'light';
                 }
                 return nativeTheme.shouldUseDarkColors
             })
-
         //打开开发者工具
             ipcMain.on('open_devTool', () => {
                 mainWindow.webContents.openDevTools();
             });
-
         //在用户的默认浏览器打开一个链接
             ipcMain.on("open_link",(event,href)=>{
                 require('electron').shell.openExternal(href);
@@ -72,20 +75,19 @@ const createWindow = () => {
                     clearInterval(saveInterval);
                 }
             });
-    //注册快捷键
-        //ctrl+S保存工程文件
-            globalShortcut.register('CommandOrControl+S', () => {
-                if (mainWindow.isFocused()) {
-                    mainWindow.webContents.send('keyboard_saveFile');
-                }
+        //切换全屏or退出全屏
+            ipcMain.on('toggle_fullScreen', () => {
+                // 切换窗口的全屏状态
+                mainWindow.setFullScreen(!mainWindow.isFullScreen());
             });
-        //ctrl+F搜索
-
-        //ctrl+
+        
+        return mainWindow
 }
 
+let system_theme
 app.whenReady().then(() => {
-  	createWindow()
+  	var mainWindow = createWindow()
+    system_theme = nativeTheme.shouldUseDarkColors
 })
 
 // 在应用程序关闭时取消注册所有全局快捷键

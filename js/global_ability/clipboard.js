@@ -42,7 +42,25 @@ function copyObject(object){
 	})
 }
 //在当前画布中粘贴剪切板中的对象
+var paster = null
+var left_plus = 20
+var top_plus = 20
 function pasteObject(){
+
+	if(clipboard == null){
+		return 0
+	}
+
+	if(paster == clipboard){
+		left_plus += 20
+		top_plus += 20
+	}
+	else{
+		paster = clipboard
+		left_plus = 20
+		top_plus = 20
+	}
+
 	var object = jsonToObject(clipboard,"new")
 	//放进画布中
 	var huabu = return_focusing_huabu()
@@ -51,8 +69,8 @@ function pasteObject(){
 	var left = parseInt($(object).css("left"))
 	var top = parseInt($(object).css("top"))
 	$(object).css({
-		left:left + 30,
-		top:top + 30
+		left:left + left_plus,
+		top:top + top_plus
 	})
 	//聚焦它
 	focusingObject(object)

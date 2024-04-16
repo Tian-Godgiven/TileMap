@@ -294,6 +294,18 @@ function changeHuabu(huabu) {
 	focusingHuabu(huabu)
 }
 
+//选中画布上的一切元素，组成一个组合体
+function selectHuabuAll(huabu){
+	if(huabu == undefined){
+		var huabu = focusing_huabu
+	}
+	
+    var all_object = $(huabu).find(".object_container").children(".huabu_object")
+    createTempComposite(all_object,huabu)
+
+    hideObjectMenu("huabu_menu")
+}
+
 
 
 //画布右键拖动,原理是在container内的鼠标移动会改变huabu的left和top

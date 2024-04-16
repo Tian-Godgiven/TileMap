@@ -1,8 +1,6 @@
 //当前打开的工程文件
 var focusing_tilemap = null
 var focusing_tilemap_information
-//最近10次加载的工程文件
-var recently_tilemaps = []
 
 function return_focusing_tilemap(){
 	return focusing_tilemap
@@ -48,6 +46,9 @@ async function createTilemapFile(huabus_json){
 	var file = openFileSaveDialog("tilemap","未命名工程文件.tilemap",tilemap_json)
 	if(file){
 		return file
+	}
+	else{
+		return false
 	}
 }
 
@@ -107,6 +108,8 @@ async function loadTilemapFile(tilemap_file){
     try {
     	//清空当前画布内容
     	clearHuabuContainer()
+    	//保存文件数据
+    	saveFileLog(tilemap_file)
 		//获得文件数据
         const file_data = await getFileData(tilemap_file.path,"tilemap");
         if(file_data){
@@ -161,8 +164,12 @@ async function saveTilemapFile(){
 	//如果当前没有打开的工程文件，则使用当前画布内的数据，生成一个新的文件
 	if(focusing_tilemap == null){
 		var file = await createTilemapFile(huabus)
-		//随后打开这个新的文件
-		loadTilemapFile(file)
+		if(file){
+			//随后打开这个新的文件
+			showFileName(file.name)
+			focusing_tilemap = file
+		}
+		
 	}
 	//否则修改当前的focusing_tilemap
 	else{
@@ -174,8 +181,6 @@ async function saveTilemapFile(){
 		var file_path = focusing_tilemap.path
 		//用新的文件内容修改原本的文件
 		changeFile(file_path,file_json,"tilemap")
-		//备忘：保存完成时，修改保存提示的状态
-		alert("保存成功")
 	}
 
 	//修改保存提示的状态
@@ -196,4 +201,40 @@ function toggleAutoSave(bool){
 	}
 	//向主进程发送请求
 	toggleAutoSaveMode(bool)
+}
+
+//最近10次加载的工程文件
+var recently_tilemaps = []
+
+function return_recently_tilemaps(){
+	return recently_tilemaps
+}
+//读取Log文件中保存的“上一次打开的工程文件”
+function readFileLog(){
+	readLog("file_log").then(data=>{
+		recently_tilemaps = data
+	})
+}
+
+//保存这一次打开的工程文件,最多保存10个，并且不会重复
+function saveFileLog(file){
+	//长度最多为10
+	if(recently_tilemaps.length >= 10){
+		recently_tilemaps.shift()
+	}
+	//不会重复判断的是路径而不是文件名
+	for(var i = 0; i < recently_tilemaps.length; i++) {
+	    if (recently_tilemaps[i].path === file.path) {
+	        // 移除旧对象
+	        recently_tilemaps.splice(i, 1);
+	        break;
+	    }
+	}
+
+	console.log(recently_tilemaps)
+
+	// 将新对象添加到 recently_tilemaps 数组的末尾
+	recently_tilemaps.push(file);
+	//保存
+	saveLog("file_log",recently_tilemaps)
 }

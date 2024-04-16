@@ -90,12 +90,12 @@
         z-index:10;
     }
 
-    #topArea_ability .menu > div{
+    #topArea_ability .menu > div:not(.selection){
         white-space: nowrap;
         padding:2px 10px;
     }
 
-    #topArea_ability .menu > div:hover{
+    #topArea_ability .menu .hover:hover{
         background-color:var(--color-3);
     }
 

@@ -48,15 +48,16 @@ function checkAppFile(file,type){
     //将文件变回json
     var file = JSON.parse(file)
 
-    //备忘：文件头的检查,如果格式不对则报错
-    var file_head = file.file_head
-    if(file_head == undefined || file_head["app"] != "tilemap"){
-         dialog.showErrorBox('Error', `文件错误或文件内容损坏！`);
-    }
-    else{
-        const file_type = file.file_type
-        const file_data = file.file_data
-        if(type != null){
+    if(type != null){
+        //备忘：文件头的检查,如果格式不对则报错
+        var file_head = file.file_head
+        if(file_head == undefined || file_head["app"] != "tilemap"){
+             dialog.showErrorBox('Error', `文件错误或文件内容损坏！`);
+        }
+        else{
+            const file_type = file.file_type
+            const file_data = file.file_data
+            
             if(file_type != type){
                 dialog.showErrorBox('Error', `文件不正确！可能是选择了错误的文件或文件内容损坏！`);
                 return false
@@ -65,9 +66,10 @@ function checkAppFile(file,type){
                 return file_data
             }
         }
-        else{
-            return {type:file_type,data:file_data}
-        }
+    }
+    else{
+        dialog.showErrorBox('Error', `非内部的读取方式！`);
+        return false
     }
 }
 

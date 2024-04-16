@@ -8,4 +8,10 @@ $(document).ready(function(){
 	loadObjectLibDirectory("customize_lib","customize")
 	//修改保存提示状态图
 	changeSaveReminder("saved")
+	//开局默认为样式模式
+	changeModel("design")
+	//开局默认切换为auto主题
+	toggleAppTheme("auto")
+	//读取log文件
+	readFileLog()
 })

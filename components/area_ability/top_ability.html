@@ -2,84 +2,98 @@
     <div id="top_ability_left">
         <div id="file" class="topAbility_block down_menu">文件
             <div id="file_menu" class="menu">
-                <div id="topAbility_createNewTilemapFile">新建</div>
-                <div id="topAbility_openTilemapFile">打开</div>
-
-                <div id="topAbility_openRecentlyTilemapFile"  class="side_menu" >最近使用的工程文件
-                    <div class="menu">
-                        最近使用的10个文件
-                    </div>
+                <div id="topAbility_createNewTilemapFile" class="hover">新建
+                    <div class="keyboard_hint">Ctrl+N</div>
+                </div>
+                <div id="topAbility_openTilemapFile" class="hover">打开
+                    <div class="keyboard_hint">Ctrl+O</div>
                 </div>
 
-                <div id="topAbility_saveTilemapFile">保存</div>
-                <div id="topAbility_saveTilemapFileToAccont">保存到账户</div>
-                <div id="topAbility_saveTilemapFileAs">另存为</div>
-                <div id="topAbility_insertFileToApp">导入</div>
-                <div id="topAbility_exportFileFromApp">导出</div>
-                <div id="topAbility_closeTilemapFile">关闭当前工程文件</div>
+                <div id="topAbility_openRecentlyTilemapFile"  class="side_menu hover" >最近使用的工程文件
+                    <div class="menu"></div>
+                </div>
+
+                <div id="topAbility_saveTilemapFile" class="hover">保存
+                    <div class="keyboard_hint">Ctrl+S</div>
+                </div>
+                <div id="topAbility_saveTilemapFileToAccont" class="hover"> 保存到账户</div>
+                <div id="topAbility_saveTilemapFileAs" class="hover">另存为</div>
+                <div id="topAbility_insertFileToApp" class="hover">导入</div>
+                <div id="topAbility_exportFileFromApp" class="hover">导出</div>
+                <div id="topAbility_closeTilemapFile" class="hover">关闭当前工程文件</div>
             </div>
         </div>
 
         <div id="edit" class="topAbility_block down_menu">编辑
             <div id="edit_menu" class="menu">
-                <div id="topAbility_undo">撤销</div>
-                <div id="topAbility_redu">重做</div>
-                <div id="topAbility_cut">剪切</div>
-                <div id="topAbility_copy">复制</div>
-                <div id="topAbility_paste">粘贴</div>
-                <div id="topAbility_delete">删除</div>
+                <div id="topAbility_undo" class="hover">撤销
+                    <div class="keyboard_hint">Ctrl+Z</div>
+                </div>
+                <div id="topAbility_redu" class="hover">重做
+                    <div class="keyboard_hint">Ctrl+Y</div>
+                </div>
+                <div id="topAbility_cut" class="hover">剪切
+                    <div class="keyboard_hint">Ctrl+X</div>
+                </div>
+                <div id="topAbility_copy" class="hover">复制
+                    <div class="keyboard_hint">Ctrl+C</div>
+                </div>
+                <div id="topAbility_paste" class="hover">粘贴
+                    <div class="keyboard_hint">Ctrl+V</div>
+                </div>
+                <div id="topAbility_delete" class="hover">删除
+                    <div class="keyboard_hint">Ctrl+D</div>
+                </div>
             </div>
         </div>
 
         <div id="display" class="topAbility_block down_menu">界面
-            <div id="topAbility_displayAreaSet" class="menu">
-                <div id="display_show">界面显示
-                    <div>
-                        <div>显示左侧功能栏</div>
-                        <div>显示右侧工具栏</div>
-                        <div>显示顶部工具栏</div>
-                    </div>
+            <div id="topAbility_areaSet" class="menu">
+                <div>界面显示</div>
+                <div id="topAbility_showArea" class="selection">
+                    <div class="selected hover" value="topArea">显示顶部工具栏</div>
+                    <div class="selected hover" value="leftArea">显示左侧功能栏</div>
+                    <div class="selected hover" value="rightArea">显示右侧编辑栏</div>
                 </div>
-                <div id="topAbility_divideAreaSet">界面分离
-                    <div>
-                        <div>分离左侧功能栏</div>
-                        <div>分离记忆面包</div>
-                        <div>分离右侧工具栏</div>
-                        <div>分离磁贴内容</div>
-                    </div>
+                <div>界面分离</div>
+                <div id="topAbility_divideArea" class="selection">
+                    <div class="hover" value="leftArea">分离左侧功能栏</div>
+                    <div class="hover" value="quickUse">分离快捷使用</div>
+                    <div class="hover" value="rightArea">分离右侧编辑栏</div>
+                    <div class="hover" value="rightEdit">分离内容编辑</div>
                 </div>
             </div>
         </div>
 
         <div id="other" class="topAbility_block down_menu">其他
             <div id="other_menu" class="menu">
-                <div class="side_menu" >语言
+                <div class="side_menu hover" >语言
                     <div class="menu">
-                        <div>自动</div>
-                        <div>中文</div>
-                        <div>英文</div>
+                        <div class="hover">自动</div>
+                        <div class="hover">中文</div>
+                        <div class="hover">英文</div>
                     </div>
                 </div>
 
-                <div class="side_menu" >主题
-                    <div class="menu">
-                        <div>自动</div>
-                        <div>浅色</div>
-                        <div>深色</div>
+                <div class="side_menu hover" >主题
+                    <div id="topAbility_changeAppTheme" class="menu">
+                        <div value="auto" class="hover">自动</div>
+                        <div value="light" class="hover">浅色</div>
+                        <div value="dark" class="hover">深色</div>
                     </div>
                 </div>
 
-                <div id="topAbility_autoSave">自动保存</div>
+                <div id="topAbility_autoSave" class="hover">自动保存</div>
 
             </div>
         </div>
 
         <div id="about" class="topAbility_block down_menu">关于
             <div id="about_menu" class="menu">
-                <div id="topAbility_openDevTool">打开开发者工具</div>
-                <div>关于本软件</div>
-                <div>鸣谢</div>
-                <div>在此处显示版本号</div>
+                <div id="topAbility_openDevTool" class="hover">打开开发者工具</div>
+                <div class="hover">关于本软件</div>
+                <div class="hover">鸣谢</div>
+                <div class="hover">在此处显示版本号</div>
             </div>
         </div>
     
@@ -91,7 +105,7 @@
         <div id="topAbility_toggleTextblockShow" class="show_textblock topAbility_block"></div>
         <div id="topAbility_search" class="topAbility_block"></div>
         <div id="topAbility_toggleTheme" class="topAbility_block"></div>
-        <div id="topAbility_toggleFullScreen" class="full_screen topAbility_block"></div>
+        <div id="topAbility_toggleFullScreen" class="fullScreen topAbility_block"></div>
     </div>
 
 </html>

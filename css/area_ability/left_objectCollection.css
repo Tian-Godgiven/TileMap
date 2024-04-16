@@ -2,7 +2,6 @@
 .object_collection{
 	width:100%;
 	position:relative;
-	background-color:var(--color-2);
 }
 	/*名字栏，长度做一下限制*/
 		.object_collection .collection_name{
@@ -67,6 +66,7 @@
 		padding:5px;
 		overflow:hidden;
 		flex-wrap:wrap;
+		box-sizing: border-box;
 	}
 
 	/*其中的单个显示的对象块，这些是仅限在左侧栏里的样式，在编辑菜单中是另外的样式*/

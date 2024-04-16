@@ -24,8 +24,18 @@
         #line_connect_mode{
             position:relative;
         }
+
+        #lineConnect_keyboard_hint{
+            display:flex;
+            align-items: center;
+            justify-content:center;
+            color:var(--color-4);
+            font-size:16px;
+        }
+
         /*切换模式*/
         #toggle_lineConnect_mode{
+            position:relative;
             display:flex;
             align-items: center;
             justify-content:center;
@@ -35,7 +45,12 @@
         #toggle_lineConnect_mode.connecting_mode{
             outline:2px dashed var(--focusing-color);
             background-color: var(--color-4);
+        }
+        #toggle_lineConnect_mode.connecting_mode #toggle_lineConnect_mode_title{
             font-weight:bolder;
+        }
+        #toggle_lineConnect_mode.connecting_mode #lineConnect_keyboard_hint{
+            color:var(--color-1);
         }
         /*侧键*/
         #line_connect_style{

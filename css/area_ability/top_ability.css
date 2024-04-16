@@ -21,6 +21,66 @@
     overflow:hidden;
 }
 
+.keyboard_hint{
+    font-size:16px;
+    color:var(--color-4);
+    position:absolute;
+    right:10px;
+    top:4px;
+}
+
+#top_ability_left .hover{
+    position:relative;
+}
+
+/*左侧*/
+    #top_ability_left .selection > div{
+        padding-left:20px;
+    }
+        #top_ability_left .selected{
+            position:relative;
+        }
+
+        #top_ability_left .selected:after{
+            content: "";
+            display: block;
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            height: 15px;
+            width: 15px;
+            background-image: url("../../img/check.png");
+            background-position: center;
+            background-size: 100%;
+            background-repeat: no-repeat;
+            transform: translate(0px, -50%);
+        }
+
+/*分离的窗口的css*/
+    .separate_window{
+        height:420px;
+        width:200px;
+        border:2px solid var(--color-4);
+        position:absolute !important;
+        z-index: 2;
+    }
+    .separate_window > .window_title{
+        height:20px;
+        width:100%;
+        background-color:var(--color-4);
+    } 
+
+    .separate_window > .window_inner{
+        width:100%;
+        height:calc(100% - 20px);
+        background-color:var(--color-1);
+        overflow-y:overlay;
+    }
+
+    .separate_window > .window_inner > div{
+        width:100% !important;
+        height:100% !important;
+    }
 
 /*保存提示*/
     #topAbility_saveReminder.saved{
@@ -73,11 +133,8 @@
             background-repeat: no-repeat;
             transform: translate(0px, -50%);
         }
-
-
-
-        
-
+       
+/*右侧*/
     #top_ability_right > div{
         height:30px;
         width:30px;
@@ -109,10 +166,10 @@
         #topAbility_toggleFullScreen{
             background-size:50%;
         }
-        #topAbility_toggleFullScreen.full_screen{
+        #topAbility_toggleFullScreen.fullScreen{
             background-image:url("../../img/full_screen.png");
         }
-        #topAbility_toggleFullScreen.unfull_screen{
+        #topAbility_toggleFullScreen.unfullScreen{
             background-image:url("../../img/unfull_screen.png");
         }
 

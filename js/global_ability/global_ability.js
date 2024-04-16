@@ -109,9 +109,6 @@ function rotatePositionChange(X, Y, a) {
 
 
 
-
-
-
 //点击对应的上下按钮修改与其相邻的input的值
 $("body").on("click",".input_button .input_button_up",function(){
 	//获取改变值
@@ -205,7 +202,7 @@ async function domToPicture(dom,type){
     var dom_top = $(dom).css("top")
 
     //将其临时放进global中，这里没有大小，overflow为0,并设定left和top为0
-    $("#gloabl").append(dom)
+    $("#global").append(dom)
     $(dom).css({
         "left":0,
         "top":0,
@@ -251,15 +248,5 @@ function byteToSize(bytes) {
     return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
 }
 
-// // 讲一个dom保存为一个图片并返回base64编码
-// async function domToBase64(dom){
-// 	var dom = $(dom).get(0)
-// 	var canvas = await html2canvas(dom)
-//     // 将生成的 Canvas 元素转换为 PNG 图片
-//     const imgData = canvas.toDataURL('image/png');
-//     // 将 PNG 图片数据转换为 base64 格式
-//     const base64 = imgData.replace(/^data:image\/(png|jpg);base64,/, '');
-//     return base64
-	
-// }
+
 

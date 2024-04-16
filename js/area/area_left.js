@@ -14,18 +14,23 @@ $("#area_left #create_new_huabu").on("click",function(){
 
 //切换连线模式
 $("#area_left #toggle_lineConnect_mode").on("click",function(){
+	toggleConnectMode()
+})
+
+function toggleConnectMode(){
+	var dom = $("#toggle_lineConnect_mode")
 	//如果处于连线模式，则关闭
-	if($(this).is(".connecting_mode")){
+	if($(dom).is(".connecting_mode")){
 		endConnectingMode()
-		$(this).text("连线模式")
+		$("#toggle_lineConnect_mode_title").text("连线模式")
 	}
 	//否则打开
 	else{
 		startConnectingMode()
-		$(this).text("退出连线")
+		$("#toggle_lineConnect_mode_title").text("退出连线")
 	}
-	$(this).toggleClass("connecting_mode")
-})
+	$(dom).toggleClass("connecting_mode")
+}
 
 //点击展开或收起连线设定
 $("#area_left #line_connect_style").on("click",function(){

@@ -209,9 +209,14 @@
 			var prop = {
 				size_limit:$(composite).prop("size_limit")
 			}
-		//获得这个composite的base64图片
+
+		composite_img = ""
+		if(mode == "new"){
+			//获得这个composite的base64图片
 			var base64_img = await domToPicture(composite,"base64")
 			composite_img = base64_img
+		}
+
 		//随后是composite内部的子元素的json内容
 		var components = []
 		$(composite).children(".huabu_object").each(async function(){
@@ -241,7 +246,7 @@
 		return type
 	}
 
-		//不带图片的函数
+		//不带图片的函数,是一个非异步函数
 		function compositeToJson_2(composite,mode){
 			//获得composite自身的样式属性,很少,只包括上下左右，比例限制
 			var type = getCompositeState(composite)

@@ -91,7 +91,8 @@ $(document).on("click",".miniTile",function(){
 
 
 //生成内容块缩略块
-function createMiniTextBlock(tile,textblock){
+function createMiniTextBlock(textblock){
+	var tile = $("#"+$(textblock).data("tile"))
 	//获取对应的磁贴的标题
 	var title = $(tile).children(".tile_title").text()
 	if(title == ""){
@@ -123,4 +124,39 @@ $(document).on("mouseenter",".miniTextBlock",function(){
 $(document).on("click",".miniTextBlock",function(){
 	var target = getMiniBlockTarget(this)
 	moveToTile(target)
+})
+
+//生成特殊的内容块缩略块，指向磁贴，并会打开这个磁贴的内容
+function createMiniTileText(tile){
+	var title = $(tile).children(".tile_title").text()
+	if(title == ""){
+		title = "磁贴"
+	}
+	//生成缩略内容块，包含一个表示内容块的miniBlock_textblock和磁贴名称的span
+	var miniTileText = $("<span class='miniTileText miniObject'>\
+						 <span class='miniBlock_textblock'></span>\
+						 <span class='miniBlock_title'>"+title+"</span>\
+					   </span>")
+	//绑定内容块和id
+	$(miniTileText).data("target",tile)
+	$(miniTileText).attr("target_id",$(tile).attr("id"))
+	//返回磁贴缩略块
+	return miniTileText
+}
+//当鼠标移到缩略块上时，更新缩略块的数据
+$(document).on("mouseenter",".miniTileText",function(){
+	var target = getMiniBlockTarget(this)
+	//更新名称
+	var title = $(tile).children(".tile_title").text()
+	if(title == ""){
+		title = "磁贴"
+	}
+	$(this).children(".miniBlock_title").text(title)
+})
+//点击内容块缩略块，移动到对应的内容块所在的位置
+$(document).on("click",".miniTileText",function(){
+	var target = getMiniBlockTarget(this)
+	moveToTile(target)
+	//显示其磁贴内容
+	showTileTextblock(target)
 })

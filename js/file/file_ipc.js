@@ -17,7 +17,7 @@ async function getFileData(file_path,file_type){
 	}
 }
 
-//将新数据【覆写进】指定文件,要求绝对路径
+//将新数据【覆写进】指定文件,要求绝对路径,新数据，文件类型
 function changeFile(file_path,new_data,file_type){
 	ipcRenderer.send('change_file', file_path,new_data,file_type);
 }

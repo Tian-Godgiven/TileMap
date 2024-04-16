@@ -25,5 +25,28 @@ function changeModel(model_name){
 	}
 }
 
-//开局默认为样式模式
-changeModel("design")
+//让“内容编辑”回来
+function unseparateEdit(){
+	//把顶部显示
+	$("#rightArea_top").css("display","flex")
+	//切换到内容编辑模式
+	changeModel("edit")
+	//让他们的高度为100%
+	$(".rightArea_inner").css({
+		height:"calc(100% - 50px)",
+	})
+}
+
+//
+function separateEdit(){
+	//把顶部弄没
+	$("#rightArea_top").hide()
+	//让两个模式都显示
+	$(".rightArea_inner").show()
+	//让他们的高度为100%
+	$(".rightArea_inner").css({
+		height:"100%",
+	})
+}
+
+

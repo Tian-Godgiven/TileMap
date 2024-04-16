@@ -188,6 +188,17 @@
         display:none;
     }
 
+/*弹出提示信息*/
+.alert_message{
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #333;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    display: none; /* 初始状态隐藏 */
+}
 
 /*中心标识元素统一样式*/
 .center{

@@ -130,10 +130,7 @@
 
     //全选功能，将当前画布内的所有元素选中生成一个选中体
     $("#huabu_menu #huabu_select_all").on("click",function(){
-        var huabu = focusing_huabu
-        var all_object = $(huabu).find(".huabu_object")
-        createTempComposite(all_object,huabu)
-        hideObjectMenu("huabu_menu")
+        selectHuabuAll(focusing_huabu)
     })
 
     //清空功能，将当前画布内的所有元素删除，但是会有一个提示框

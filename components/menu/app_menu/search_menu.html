@@ -1,0 +1,230 @@
+<html>
+	<div id="search_menu">
+		<div id="search_menu_top">
+			<span>搜索</span>
+			<div id="search_menu_close"></div>
+		</div>
+		<div id="search_menu_input" class="flex">
+			<input type="" name="" placeholder="搜索磁贴或磁贴内容">
+			<div id="search_menu_search"></div>
+		</div>
+
+		<div id="search_menu_down">
+			
+		</div>
+	</div>
+</html>
+
+<script type="text/javascript">
+
+	$("#search_menu").draggable()
+
+	//显示这个菜单
+	function showSearchMenu(){
+		$("#search_menu").show()
+	}
+	//关闭这个菜单
+	$("#search_menu_close").on("click",function(){
+		$("#search_menu").hide()
+	})
+
+	//点击搜索键，在当前文件中搜索拥有对应的标题或内容的磁贴
+	$("#search_menu_search").on("click",function(){
+		//先清空
+		$("#search_menu_down").empty()
+		var input = $(this).siblings("input").val()
+		if(input == ""){
+			return false
+		}
+		//遍历当前画布空间
+		for( huabu of $("#huabu_container").children(".huabu")){
+			var huabu_row = ifHuabuIncludes(huabu,input)
+			if(huabu_row){
+				//放进bottom里
+				$("#search_menu_down").append(huabu_row)
+			}
+		}
+	})
+
+	//查询画布是否包含搜索对象
+	function ifHuabuIncludes(huabu,input){
+		//生成这个画布的画布行
+		var huabu_row = createSearchRow(huabu)
+		//如果画布名称包含
+		var huabu_container = $("<div class='searchRow_container'></div>")
+		//遍历画布中的磁贴
+		for( tile of $(huabu).find(".tile")){
+			var tile_row = ifTileIncludes(tile,input)
+			//如果这个磁贴包含对象,则将这个磁贴row加入画布行中
+			if(tile_row){
+				$(huabu_container).append(tile_row)
+			}
+		}
+		// 存在包含对象的磁贴,则返回这个画布row
+		if($(huabu_container).children().length > 0){
+			$(huabu_row).append(huabu_container)
+			return huabu_row
+		}
+		//如果画布名称包含也返回
+		else if($(huabu).attr("name") && $(huabu).attr("name").includes(input)){
+			return huabu_row
+		}
+		else{
+			return false
+		}
+	}
+
+	//查询磁贴是否包含搜索对象
+	function ifTileIncludes(tile,input){
+		//获得一个磁贴row 
+		var tile_row = createSearchRow(tile)
+
+		//获得磁贴的标题
+		var tile_title = $(tile).children(".tile_title").text()
+		var title = $(tile).attr("title")
+
+		//获得磁贴的内容
+		var tile_text = $(tile).data("tiletext")
+		if(tile_text && tile_text.includes(input)){
+			var tile_container = $("<div class='searchRow_container'></div>")
+			//如果这个textblock与磁贴解绑
+			if(!$(tile).prop("textblock_bindState")){
+				//生成普通的textblock块
+				var textblock = $("#"+$(tile).data("textblock"))
+				var textblock_row = createSearchRow(textblock)
+			}
+			//如果还没有解锁，则生成一个比较特殊的textblock块
+			else{
+				var textblock_row = createSearchRow(tile,"tiletext")
+			}
+			//放进去
+			$(tile_container).append(textblock_row)
+			$(tile_row).append(tile_container)
+			return tile_row
+		}
+		//如果磁贴的标题包含了对应的内容，那么也返回
+		else if((tile_title && tile_title.includes(input)) || (title && title.includes(input))){
+			return tile_row
+		}
+		else{
+			return false
+		}
+	}
+
+	//创造搜索结果中的行
+	function createSearchRow(object,type){
+		var search_row = $("<div class='search_row'></div>")
+
+		//特殊的搜索行，生成一个点击后会移动到对应磁贴为止，并打开textblock的mini_block
+		if(type == "tiletext"){
+			var mini_block = createMiniTileText(object)
+		}
+		else {
+			if($(object).is(".huabu")){
+				//生成迷你画布
+				var mini_block = createMiniHuabu(object)
+			}
+			else if($(object).is(".tile")){
+				//生成迷你磁贴
+				var mini_block = createMiniTile(object,type)
+			}
+			else if($(object).is(".textblock")){
+				//生成迷你内容块
+				var mini_block = createMiniTextBlock(object)
+			}
+		}
+		
+		//加入画布行中
+		$(search_row).append(mini_block)
+
+		return search_row
+	}
+</script>
+
+<style type="text/css">
+/*菜单本身*/
+	#search_menu{
+		width:200px;
+		height:300px;
+		position: absolute;
+		top:118px;
+		right:20px;
+
+	    display: none;
+
+	    background-color:var(--color-1);
+
+	    border:2px solid var(--color-5);
+	    border-radius:5px;
+
+	    font-size:14px;
+
+	    text-align:center;
+
+	    z-index:200;
+
+	    padding:5px;
+	}
+/*顶部*/
+		#search_menu_top{
+			position:relative;
+			height:25px;
+			font-size:20px;
+			text-align:left;
+		}
+			#search_menu_close{
+				position:absolute;
+				height:25px;
+				width:25px;
+				top:-5px;
+				right:-5px;
+				background-image:url("././img/delete.png");
+				background-size:50%;
+				background-repeat: no-repeat;
+				background-position:center;
+			}
+/*输入部分*/
+	#search_menu_input{
+		position:relative;
+		height:30px;
+		margin:5px 0px;
+	}
+		#search_menu_input input{
+			width:160px;
+		}
+
+		#search_menu_input #search_menu_search{
+			position:absolute;
+			height:28px;
+			width:28px;
+			right:0px;
+			top:0px;
+			border:1px solid var(--border-color);
+			border-radius:5px;
+			background-image:url("././img/search.png");
+			background-size:80%;
+			background-repeat: no-repeat;
+			background-position:center;
+		}
+
+/*底部，内容*/
+	#search_menu_down{
+		height:calc(100% - 67px);
+		background-color:var(--color-0);
+		border:1px solid var(--border-color);
+		border-radius:5px;
+		padding:5px;
+		overflow:overlay;
+		box-sizing: border-box;
+	}
+
+	.search_row{
+		position:relative;
+		text-align:left;
+	}
+
+	.search_row > .searchRow_container{
+		padding-left:20px;
+	}
+
+</style>

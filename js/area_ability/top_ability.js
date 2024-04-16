@@ -32,7 +32,9 @@ $("#area_top .menu").on("click",".side_menu",function(event){
 		//新建文件
 			$("#topAbility_createNewTilemapFile").on("click",function(){
 				createTilemapFile().then(file=>{
-					loadTilemapFile(file)
+					if(file){
+						loadTilemapFile(file)
+					}
 				})
 				hideMenu(this,"parent")
 			})
@@ -43,14 +45,40 @@ $("#area_top .menu").on("click",".side_menu",function(event){
 			})
 		//点击后在子菜单中显示最近加载的10个文件
 			$("#topAbility_openRecentlyTilemapFile").on("click",function(){
-				//备忘：没做哦
+				var menu = $(this).children(".menu")
+				//清空
+				$(menu).empty()
+				//读取log文件中保存的文件路径
+				var data = return_recently_tilemaps()
+				if(data.length == 0){
+					$(menu).prepend("<div class='hover'>无最近加载的文件</div>")
+				}
+				else{
+					for(file of data){
+						//生成一个div，添加到子菜单中
+						var file_div = $("<div class='hover'>"+file.name+"</div>")
+						$(file_div).data("file",file)
+						//越后面的文件越往前
+						$(menu).prepend(file_div)
+					}
+				}
+				
+			})
+
+			$("#topAbility_openRecentlyTilemapFile > .menu").on("click","div",function(){
+				var file = $(this).data("file")
+				if(file){
+					//加载这个文件
+					loadTilemapFile(file)
+				}
+				
 			})
 		//保存当前文件
 			$("#topAbility_saveTilemapFile").on("click",function(){
 				saveTilemapFile()
 				hideMenu(this,"parent")
 			})
-		//保存到账户
+		//保存到账户:备忘
 		//另存为
 			$("#topAbility_saveTilemapFileAs").on("click",function(){
 				showFileSaveAsMenu()
@@ -99,7 +127,140 @@ $("#area_top .menu").on("click",".side_menu",function(event){
 				deleteFocusingObject()
 			})
 	//界面
+		//界面显示
+			$("#topAbility_showArea > div").on("click",function(){
+				var value = $(this).attr("value")
+				//取消显示
+				if($(this).is(".selected")){
+					if(value == "leftArea"){
+						$("#area_left").hide()
+						//把他的宽度加给画布
+						var width = $("#area_left").width()
+						var huabu_width = $("#area_huabu").width()
+						$("#area_huabu").width(huabu_width + width)
+					}
+					else if(value == "topArea"){
+						$("#area_top").height("38px")
+						$("#topArea_user").hide()
+						$("#topArea_icon").hide()
+						$("#topArea_fileName").hide()
+						$("#area_bottom").height("calc(100% - 40px)")
+					}
+					else if(value == "rightArea"){
+						var width = $("#area_right").width()
+						$("#area_right").hide()
+						//把他的宽度加给画布
+						var huabu_width = $("#area_huabu").width()
+						$("#area_huabu").width(huabu_width + width)
+					}
+				}
+				//显示
+				else{
+					if(value == "leftArea"){
+						$("#area_left").show()
+						//把画布的宽度还回来
+						var width = $("#area_left").width()
+						var huabu_width = $("#area_huabu").width()
+						$("#area_huabu").width(huabu_width - width)
+					}
+					else if(value == "topArea"){
+						$("#area_top").height("118px")
+						$("#topArea_user").show()
+						$("#topArea_icon").show()
+						$("#topArea_fileName").show()
+						$("#area_bottom").height("calc(100% - 120px)")
+					}
+					else if(value == "rightArea"){
+						$("#area_right").show()
+						var width = $("#area_right").width()
+						//把他的宽度减给画布
+						var huabu_width = $("#area_huabu").width()
+						$("#area_huabu").width(huabu_width - width)
+					}
+				}
+				$(this).toggleClass("selected")
+			})
+		//界面分离
+			$("#topAbility_divideArea > div").on("click",function(){
+				var value = $(this).attr("value")
+				// 取消分离
+				if($(this).is(".selected")){
+					if(value == "leftArea"){
+						unseparateWindow($("#area_left"),$("#area_bottom"),"before")
+						//把画布的宽度还回来
+						var width = $("#area_left").width()
+						var huabu_width = $("#area_huabu").width()
+						$("#area_huabu").width(huabu_width - width)
+					}
+					else if(value == "rightArea"){
+						unseparateWindow($("#area_right"),$("#area_bottom"),"after")
+						//把画布的宽度还回来
+						var width = $("#area_right").width()
+						var huabu_width = $("#area_huabu").width()
+						$("#area_huabu").width(huabu_width - width)
+					}
+					else if(value == "quickUse"){
+						//回来
+						var dom = $(".object_collection[type='quickUse']")
+						unseparateWindow(dom,$("#leftArea_object_collection_container"),"before")
+					}
+					else if(value == "rightEdit"){
+						//回来
+						unseparateEdit()
+						var dom = $("#rightArea_edit_inner")
+						console.log(dom)
+						unseparateWindow(dom,$("#area_right"),"after")
+					}
+
+				}
+				// 分离
+				else{
+					if(value == "leftArea"){
+						//把他的宽度加给画布
+						var width = $("#area_left").width()
+						var huabu_width = $("#area_huabu").width()
+						$("#area_huabu").width(huabu_width + width)
+						//分离
+						separateWindow($("#area_left"),"left")
+					}
+					else if(value == "rightArea"){
+						//把他的宽度加给画布
+						var width = $("#area_right").width()
+						var huabu_width = $("#area_huabu").width()
+						$("#area_huabu").width(huabu_width + width)
+						//分离
+						separateWindow($("#area_right"),"right")
+					}
+					else if(value == "quickUse"){
+						//分离
+						var dom = $("#leftArea_object_collection_container > div[type=quickUse]")
+						var container = separateWindow(dom,"left")
+						//改下高宽
+						$(container).css({
+							height:"400px",
+							width:"250px"
+						})
+					}
+					else if(value == "rightEdit"){
+						//分离
+						var dom = $("#rightArea_edit_inner")
+						separateEdit()
+						var container = separateWindow(dom,"right")
+						//改下高宽
+						$(container).css({
+							height:"70%",
+							width:"280px"
+						})
+					}
+				}
+				$(this).toggleClass("selected")
+			})
 	//其他
+		//切换主题颜色
+			$("#topAbility_changeAppTheme > div").on("click",function(){
+				var value = $(this).attr("value")
+				toggleAppTheme(value)
+			})
 		//切换自动保存，默认是开启的
 			$("#topAbility_autoSave").on("click",function(){
 				//如果当前已经开启，则关闭
@@ -153,10 +314,74 @@ $("#area_top .menu").on("click",".side_menu",function(event){
 		})
 		
 
+	//搜索
+	$("#topAbility_search").on("click",function(){
+		showSearchMenu()
+	})
+
 	//主题颜色切换
 	$("#topAbility_toggleTheme").on('click', function(){
-	  	toggleAppTheme()
+		//切换回亮色模式
+		if($(this).is(".dark_mode")){
+			toggleAppTheme("light")
+		}
+		else if($(this).is(".light_mode")){
+			toggleAppTheme("dark")
+		}
+	})
+
+	//全屏
+	$("#topAbility_toggleFullScreen").on("click",function(){
+		toggleFullScreen()
+		$(this).toggleClass("fullScreen unfullScreen")
 	})
 
 
 
+//将一个dom变成分离的窗口
+function separateWindow(dom,position){
+	//制作一个window container
+	var container = $("<div class='separate_window'>\
+							<div class='window_title'></div>\
+							<div class='window_inner'></div>\
+						</div>")
+	//将其放入
+	$(container).children(".window_inner").append(dom)
+	//使得窗口可以拖动和缩放
+	$(container).draggable({
+		handle: ".window_title",
+	})
+	$(container).resizable({
+		handles: "n, e, s, w",
+	})
+	//窗口放在body下
+	$("body").append(container)
+
+	if(position == "left"){
+		$(container).css({
+			left:20,
+			top:"20%"
+		})
+	}
+	else if(position == "right"){
+		$(container).css({
+			right:20,
+			top:"20%"
+		})
+	}
+
+	return container
+}
+
+//把分离窗口放回去
+function unseparateWindow(dom,parent,where){
+	var container = $(dom).parents(".separate_window")
+	if(where == "before"){
+		$(parent).prepend(dom)
+	}
+	else if(where == "after"){
+		$(parent).append(dom)
+	}
+	
+	$(container).remove()
+}

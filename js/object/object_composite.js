@@ -6,6 +6,7 @@ var focusing_composite = undefined
 function createTempComposite(doms,huabu){
 	//没有选中对象，或者只选中了一个对象时直接返回false
 	if($(doms).length <= 1){
+		focusingObject(doms)
 		return false
 	}
 	//如果doms只有.line对象，则不会生成组合体

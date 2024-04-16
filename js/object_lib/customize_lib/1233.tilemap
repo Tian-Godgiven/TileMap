@@ -2,17 +2,17 @@
   "file_head": {
     "app": "tilemap",
     "app_version": "1.0.0",
-    "create_time": "2024-04-16T12:03:39.070Z",
+    "create_time": "2024-04-16T03:05:33.606Z",
     "github": "https://github.com/Tian-Godgiven/TileMap"
   },
   "file_type": "object_lib",
   "file_data": {
-    "collection_name": "快捷使用",
+    "collection_name": "1233",
     "collection_objects": [
       {
         "object_type": "tile",
         "object_inner": {
-          "id": "tile_N18rDXueJsVoJKfluU5H",
+          "id": "tile_WqKJpu5hTwJdQn6F6pov",
           "css": {
             "font-size": "24px",
             "border": "2px solid var(--color-5)",

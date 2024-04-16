@@ -94,7 +94,7 @@ function showChildMenu(dom,position,type1,type2){
 	}
 	else if(position == "right"){
 		var left = $(dom).position().left + $(dom).outerWidth()
-		var top  = $(dom).position().top
+		var top  = 0 - 2
 	}
 
 	$(menu).css({
@@ -118,7 +118,6 @@ function showChildMenu(dom,position,type1,type2){
 		}
 	});
 }
-
 //隐藏菜单，选择type以隐藏同级别dom下的其他or一切菜单(包括dom自身的菜单和菜单的菜单)
 function hideMenu(dom,type){
 	//type的可选值

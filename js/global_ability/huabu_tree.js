@@ -107,7 +107,7 @@ function createHuabuTree(huabu){
 				//获得这个独立的内容块
 				var textblock = $("#"+$(tile).data("textblock"))
 				//做成一个内容块行，不展开
-				var textblock_row = createTreeOfTextBlockRow(tile,textblock)
+				var textblock_row = createTreeOfTextBlockRow(textblock)
 				//塞进折叠容器中
 				$(fold_row).children(".tree_row_container").append(textblock_row)
 			}
@@ -166,12 +166,12 @@ function createTreeOfTileRow(tile){
 	}
 }
 //生成内容树中的独立内容块行
-function createTreeOfTextBlockRow(tile,textblock){
+function createTreeOfTextBlockRow(textblock){
 	//生成独立内容行
 	var textblock_row = $("<div class='tree_row tree_textblock_row'></div>")
 
 	//生成迷你内容块
-	var mini_textblock = createMiniTextBlock(tile,textblock)
+	var mini_textblock = createMiniTextBlock(textblock)
 	//加入行中
 	$(textblock_row).append(mini_textblock)
 		
