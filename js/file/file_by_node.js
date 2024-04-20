@@ -5,6 +5,13 @@ const path = require('path');
 const ipcMain = require('electron').ipcMain;
 const imageSize = require('image-size')
 
+//软件数据地址
+let appDir = __dirname;
+if (process.mainModule.filename.indexOf('app.asar') !== -1) {
+    // 如果处于 asar 打包模式下，需要调整路径
+    appDir = path.dirname(process.mainModule.filename);
+}
+
 //创建文件时，确保其文件名不重复，若重复则加数字后缀
 function getUniqueFileName(directory_path, fileName) {
     let newFileName = fileName;
@@ -170,7 +177,7 @@ app.on('ready', () => {
         //如果没有指定new_file的信息,则用原file的信息来创建new_file
         if(new_file == null){
             //构建到文件夹的路径
-            var Directory_path = path.join(__dirname,directory_path)
+            var Directory_path = path.join(appDir,directory_path)
                 Directory_path = path.normalize(Directory_path)
             // 用独一化的file_name构建对应的文件
             var File_name = file.name
@@ -197,11 +204,8 @@ app.on('ready', () => {
 
     //删除指定路径的文件
     ipcMain.on('delete_file', (event,file_path) => {
-        // 生成路径
-        var Path = path.join(__dirname,file_path);
-            Path = path.normalize(Path)
         // 删除文件
-        fs.unlink(Path, (err) => {
+        fs.unlink(file_path, (err) => {
           if (err) {
             console.error('Error deleting file:', err);
             return;
@@ -351,7 +355,7 @@ app.on('ready', () => {
         // 解码Base64字符串
         const buffer = Buffer.from(base64, 'base64');
         // 获取临时文件夹的路径（tilemap/data/temp）
-        var tempDir = path.join(__dirname, '../../data/temp');
+        var tempDir = path.join(appDir, '../../data/temp');
             tempDir = path.normalize(tempDir);
 
         // 确保临时文件夹存在，如果不存在则创建

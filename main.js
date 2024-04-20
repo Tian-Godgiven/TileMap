@@ -5,6 +5,7 @@ const path = require('path');
 
 require('./js/file/file_by_node.js');
 require('./js/server/server_by_node.js')
+require('./js/file/file_ability/lib_file_ability.js')
 
 module.exports.ipcRenderer = ipcRenderer;
 

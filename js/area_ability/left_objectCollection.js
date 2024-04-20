@@ -48,6 +48,7 @@ function searchCollectionLib(object_type_name){
 function readObjectLib(file,type,callback){
 	var file_path = file.path
 	var file_name = file.name
+	console.log(file_path)
 	//获得该文件中的数据
 	getFileData(file_path,"object_lib").then(file_data=>{
 		if(file_data){

@@ -1,25 +1,36 @@
 {
-  "name": "tilemap",
-  "productName": "dull-creator-beat-zesk7",
+  "name": "Tilemap",
+  "productName": "Tilemap",
   "description": "My Electron application description",
   "keywords": [],
   "main": "./main.js",
   "version": "1.0.0",
   "author": "Tian天恩",
   "scripts": {
-    "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "electron-forge start",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
   "dependencies": {
     "@jsplumb/browser-ui": "^6.2.10",
     "cropperjs": "^1.6.1",
     "electron": "^30.0.0",
+    "electron-squirrel-startup": "^1.0.0",
     "fetch": "^1.1.0",
     "gridmanager": "^3.2.1",
     "image-size": "^1.1.1",
     "jsplumb": "^2.15.6"
   },
   "devDependencies": {
+    "@electron-forge/cli": "^7.4.0",
+    "@electron-forge/maker-deb": "^7.4.0",
+    "@electron-forge/maker-rpm": "^7.4.0",
+    "@electron-forge/maker-squirrel": "^7.4.0",
+    "@electron-forge/maker-zip": "^7.4.0",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.4.0",
+    "@electron-forge/plugin-fuses": "^7.4.0",
+    "@electron/fuses": "^1.8.0",
     "electron": "latest",
     "electron-packager": "^17.1.2"
   },
@@ -31,5 +42,12 @@
   "bugs": {
     "url": "https://github.com/Tian-Godgiven/Tile-map/issues"
   },
-  "homepage": "https://github.com/Tian-Godgiven/Tile-map#readme"
+  "homepage": "https://github.com/Tian-Godgiven/Tile-map#readme",
+  "config": {
+    "forge": {
+      "electronPackagerConfig": {
+        "extraResource": "./js/object_lib"
+      }
+    }
+  }
 }
