@@ -1,0 +1,629 @@
+<html>
+    <!-- 一个显示指定范围内的内容树的菜单 -->
+	<div id="login_regist_menu" class='alert modal_menu over_mask'>
+        <!-- 登录页面 -->
+        <div id="login_menu">
+            <div id="login_menu_title">登录</div>
+            <div id="change_to_regist">转至注册</div>
+            <div class="login_regist_menu_inner">
+                <div id="login_menu_email" class="login_regist_menu_input">
+                    <div>邮箱</div>
+                    <input placeholder="请输入邮箱" maxlength="32" type="text">
+                </div>   
+                <div class="separate_line"></div>
+                <div id="login_menu_password" class="login_regist_menu_input">
+                    <div>密码</div>
+                    <input placeholder="请输入密码" maxlength="32" type="password">
+                </div>
+            </div>
+            <div id="login_menu_findPassword">找回密码</div>
+            <div id="login_menu_login" class="login_regist_menu_button">登录</div>
+        </div> 
+        <!-- 注册页面 -->
+        <div id="regist_menu">
+            <div id="regist_menu_title">注册</div>
+            <div id="change_to_login">转至登录</div>
+
+            <div class="login_regist_menu_inner">
+                <div id="regist_menu_email" class="login_regist_menu_input">
+                    <div>邮箱</div>
+                    <input placeholder="请输入注册邮箱" maxlength="32" type="text">
+                </div>   
+                <div class="separate_line"></div>
+                <div id="regist_menu_userName" class="login_regist_menu_input">
+                    <div>用户名</div>
+                    <input placeholder="请输入用户名，您可以在之后修改" maxlength="32" type="text">
+                </div>   
+                <div class="separate_line"></div>
+                <div id="regist_menu_password" class="login_regist_menu_input">
+                    <div>密码</div>
+                    <input placeholder="请输入注册密码" maxlength="32" type="password">
+                </div>
+                <div class="separate_line"></div>
+                <div id="regist_menu_password2" class="login_regist_menu_input">
+                    <div>确认密码</div>
+                    <input placeholder="请再次输入注册密码" maxlength="32" type="password">
+                </div>   
+                <div class="separate_line"></div>
+                <div id="regist_menu_code" class="login_regist_menu_input">
+                    <div>验证码</div>
+                    <input placeholder="请输入验证码" maxlength="10" type="text">
+                    <div id="regist_menu_getCode">获取验证码</div>
+                </div>
+            </div>
+            <div id="regist_menu_regist" class="login_regist_menu_button">注册</div>
+        </div> 
+        <!-- 找回密码页面 -->
+        <div id="findPassword_menu">
+            <div id="findPassword_menu_title">找回密码</div>
+            <div id="return_to_login">返回登录</div>
+            <div class="login_regist_menu_inner">
+                <div id="findPassword_menu_email" class="login_regist_menu_input">
+                    <div>邮箱</div>
+                    <input placeholder="请输入邮箱" maxlength="32" type="text">
+                </div>   
+                <div class="separate_line"></div>
+                <div id="findPassword_menu_password" class="login_regist_menu_input">
+                    <div>新密码</div>
+                    <input placeholder="请输入新密码" maxlength="32" type="password">
+                </div>
+                <div class="separate_line"></div>
+                <div id="findPassword_menu_password2" class="login_regist_menu_input">
+                    <div>确认密码</div>
+                    <input placeholder="请再次输入新密码" maxlength="32" type="password">
+                </div>
+                <div class="separate_line"></div>
+                <div id="findPassword_menu_code" class="login_regist_menu_input">
+                    <div>验证码</div>
+                    <input placeholder="请输入验证码" maxlength="10" type="text">
+                    <div id="findPassword_menu_getCode">获取验证码</div>
+                </div>
+            </div>
+            <div id="findPassword_menu_findPassword" class="login_regist_menu_button">确认</div>
+        </div> 
+    </div>
+</html>
+
+<script type="text/javascript" scoped>
+    //显示菜单，指定范围（文件或画布）和选择类型，根据范围显示其中的内容树
+    function showLoginRegistMenu(){
+        showModalMenu($("#login_regist_menu"))
+        changeToLogin()
+    }
+    function showChangePassword(){
+        showModalMenu($("#login_regist_menu"))
+        changeToFindPassword("changePassword")
+    }
+
+//登录
+    $("#login_menu_login").on("click",async function(){
+        //判断输入
+        var email = $("#login_menu_email input").val()
+        var password = $("#login_menu_password input").val()
+        var temp = true
+       
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if(email == ""){
+            $("#login_menu_email input").attr("placeholder","邮箱不能为空！").addClass("input_warning")
+            temp = false
+        }
+        // 使用正则表达式进行验证
+        else if(!emailRegex.test(email)){
+            alert("输入的邮箱格式不正确！")
+            temp = false
+        }
+
+        
+        if(password == ""){
+            $("#login_menu_password input").attr("placeholder","密码不能为空！").addClass("input_warning")
+            temp = false
+        }
+
+        //将邮箱和密码传至服务器进行验证
+        if(temp){
+            var bool = await checkUserlogin({email : email, password : password})
+            if(bool == "no_such_user"){
+                alert("邮箱错误或该邮箱尚未注册！")
+            }
+            else if(bool == 'password_wrong'){
+                alert("密码错误！")
+            }
+            else if(bool){
+                alert("登录成功！")
+                hideModalMenu($("#login_regist_menu"))
+            }
+        }
+    })
+
+//找回密码
+    //获取验证码
+    $("#findPassword_menu_getCode").on("click",async function(){
+        //获取用户输入的邮箱并判断输入
+        var email = $("#findPassword_menu_email input").val()
+        var temp = true
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if(email == ""){
+            $("#regist_menu_email input").attr("placeholder","邮箱不能为空！").addClass("input_warning")
+            temp = false
+        }
+        // 使用正则表达式进行验证
+        else if(!emailRegex.test(email)){
+            alert("输入的邮箱格式不正确！")
+            temp = false
+        }
+
+        //将邮箱传至服务器并尝试发送验证码邮件
+        if(temp){
+            var bool = await userFindPasswordGetCode(email)
+            if(bool == "email_not_registed"){
+                alert("该邮箱尚未被注册，请确认是否输入正确，或使用该邮箱进行注册")
+            }
+            else if(bool){
+                unableGetCode($("#findPassword_menu_getCode"))
+            }
+            else{
+                alert("验证码发送失败！")
+            }
+        }
+    })
+    //找回密码
+    $("#findPassword_menu_findPassword").on("click",async function(){
+        //判断输入
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            var email = $("#findPassword_menu_email input").val()
+            var password = $("#findPassword_menu_password input").val()
+            var password2 = $("#findPassword_menu_password2 input").val()
+            var code = $("#findPassword_menu_code input").val()
+            var temp = true
+
+            if(email == ""){
+                $("#findPassword_menu_email input").attr("placeholder","邮箱不能为空！").addClass("input_warning")
+                temp = false
+            }
+            // 使用正则表达式进行验证
+            else if(!emailRegex.test(email)){
+                alert("输入的邮箱格式不正确！")
+                temp = false
+            }
+            if(password == ""){
+                $("#findPassword_menu_password input").attr("placeholder","密码不能为空！").addClass("input_warning")
+                temp = false
+            }
+            else if(password.length < 8){
+                alert("密码长度不低于8位！")
+                temp = false
+            }
+            if(password != password2){
+                $("#findPassword_menu_password2 input").attr("placeholder","两次输入的密码必须相同！").addClass("input_warning").val("")
+                temp = false
+            }
+            if(code == ""){
+                $("#findPassword_menu_code input").attr("placeholder","验证码不能为空！").addClass("input_warning")
+                temp = false
+            }
+
+
+        //将邮箱和密码传至服务器进行验证
+        if(temp){
+            var findPassword_data = {
+                email:email,
+                password:password,
+                code:code
+            }
+            checkUserFindPassword(findPassword_data).then(result=>{
+                //验证码错误
+                if(result == "code_wrong"){
+                    $("#findPassword_menu_code input").attr("placeholder","验证码错误！").addClass("input_warning").val("")
+                }
+                //成功的情况下，跳转到登陆页，并自动填充邮箱和密码
+                else if(result){
+                    returnToLogin()
+                    $("#login_menu_email input").val(email)
+                    $("#login_menu_password").val("")
+                    alert("重设密码成功！请进行登录！")
+                }  
+                else{
+                    alert("找回密码失败，请联系服务器管理员：2791467611@qq.com！")
+                }
+            })
+        }
+    })
+
+
+//注册获取验证码
+    $("#regist_menu_getCode").on("click",async function(){
+        //获取用户输入的邮箱并判断输入
+        var email = $("#regist_menu_email input").val()
+        var temp = true
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if(email == ""){
+            $("#regist_menu_email input").attr("placeholder","邮箱不能为空！").addClass("input_warning")
+            temp = false
+        }
+        // 使用正则表达式进行验证
+        else if(!emailRegex.test(email)){
+            alert("输入的邮箱格式不正确！")
+            temp = false
+        }
+
+        //将邮箱传至服务器并尝试发送验证码邮件
+        if(temp){
+            var bool = await userRegistGetCode(email)
+            if(bool == "email_registed"){
+                alert("该邮箱已被注册！如果您忘记了密码，请使用登录页面的[找回密码]功能！")
+                return false
+            }
+            if(bool){
+                unableGetCode($("#regist_menu_getCode"))
+            }
+            else{
+                alert("验证码发送失败！")
+            }
+        }
+    })
+        //将验证码按键无效60秒
+        function unableGetCode(dom){
+            let count_down = 60
+            $(dom).addClass("unable_getCode")
+            var timer = setInterval(function() {
+                count_down--;
+                //60秒以后重新启用
+                if (count_down <= 0) {
+                    clearInterval(timer);
+                    $(dom).removeClass("unable_getCode").text("获取验证码")
+                } 
+                else {
+                    $(dom).text(`请等待 ${count_down} 秒`)
+                }
+            }, 1000); // 每秒更新一次倒计时
+        }
+
+//注册
+    $("#regist_menu_regist").on("click",function(){
+        //判断输入
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            var email = $("#regist_menu_email input").val()
+            var password = $("#regist_menu_password input").val()
+            var password2 = $("#regist_menu_password2 input").val()
+            var code = $("#regist_menu_code input").val()
+            var user_name = $("#regist_menu_userName input").val()
+            var temp = true
+
+            if(email == ""){
+                $("#regist_menu_email input").attr("placeholder","邮箱不能为空！").addClass("input_warning")
+                temp = false
+            }
+            // 使用正则表达式进行验证
+            else if(!emailRegex.test(email)){
+                alert("输入的邮箱格式不正确！")
+                temp = false
+            }
+            if(password == ""){
+                $("#regist_menu_password input").attr("placeholder","密码不能为空！").addClass("input_warning")
+                temp = false
+            }
+            else if(password.length < 8){
+                alert("密码长度不低于8位！")
+                temp = false
+            }
+            if(password != password2){
+                $("#regist_menu_password2 input").attr("placeholder","两次输入的密码必须相同！").addClass("input_warning").val("")
+                temp = false
+            }
+            if(code == ""){
+                $("#regist_menu_code input").attr("placeholder","验证码不能为空！").addClass("input_warning")
+                temp = false
+            }
+            if(user_name == ""){
+                $("#regist_menu_userName input").attr("placeholder","用户名不能为空！").addClass("input_warning")
+                temp = false
+            }
+
+        //将邮箱和密码传至服务器进行验证
+        if(temp){
+            var regist_data = {
+                email:email,
+                user_name:user_name,
+                password:password,
+                code:code
+            }
+            checkUserRegist(regist_data).then(result=>{
+                //验证码错误
+                if(result == "code_wrong"){
+                    $("#regist_menu_code input").attr("placeholder","验证码错误！").addClass("input_warning").val("")
+                }
+                //注册成功的情况下，跳转到登陆页，并自动填充邮箱和密码
+                else if(result){
+                    changeToLogin()
+                    $("#login_menu_email input").val(email)
+                    $("#login_menu_password").val(password)
+                }  
+                else{
+                    alert("注册失败，请联系服务器管理员：2791467611@qq.com！")
+                }
+            })
+        }
+    })
+
+//转至注册或登录，使得这个菜单从左/右滑动出来
+    $("#change_to_regist").on("click",function(){
+        $("#login_menu").hide().css("left",-400)
+        $("#regist_menu").show().animate({
+            left:0
+        },500)
+    })
+    $("#change_to_login").on("click",function(){
+        changeToLogin()
+    })
+    function changeToLogin(){
+        $("#regist_menu").hide().css("left",400)
+        $("#findPassword_menu").hide().css("top",-190)
+        $("#login_menu").show().animate({
+            left:0,
+            top:0
+        },500)
+    }
+    //找回密码页面
+    $("#login_menu_findPassword").on("click",function(){
+        changeToFindPassword("findPassword")
+    })
+    function changeToFindPassword(type){
+        if(type == "findPassword"){
+            //把登录菜单隐藏，同时显示返回登录键
+            $("#login_menu").hide().css("top",270)
+            $("#return_to_login").show()
+            $("#findPassword_menu_title").text("找回密码")
+            $("#findPassword_menu").show().animate({
+                top:0
+            },500)
+        }
+        else if(type == "changePassword"){
+            //把其他菜单和返回键隐藏
+            $("#regist_menu").hide()
+            $("#login_menu").hide()
+            $("#return_to_login").hide()
+            $("#findPassword_menu_title").text("修改密码")
+            $("#findPassword_menu").show().animate({
+                top:0
+            },500)
+        }
+    }
+    //回到登录页面
+    $('#return_to_login').on("click",function(){
+        returnToLogin()
+    })
+    function returnToLogin(){
+        $("#findPassword_menu").hide().css("top",-190)
+        $("#login_menu").show().animate({
+            top:0
+        },500)
+    }
+
+
+</script>
+
+<style type="text/css" scoped>
+/*总的菜单*/
+    #login_regist_menu{
+        background-color:var(--color-2);
+        overflow:hidden;
+    }
+    #login_regist_menu > div{
+        position:relative;
+    }
+    #login_menu{
+        width:400px;
+        height:190px;
+        position:relative;
+        left:0;
+    }
+    #regist_menu{
+        width:400px;
+        height:320px;
+        position:relative;
+        left:400px;
+        display:none;
+    }
+    #findPassword_menu{
+        width:400px;
+        height:270px;
+        position:relative;
+        top:270px;
+        display:none;
+    }
+
+/*标题*/
+    #login_menu_title{
+        font-size:30px;
+        position:relative;
+        text-align:left;
+        top:-5px;
+    }
+    #regist_menu_title{
+        font-size:30px;
+        position:relative;
+        text-align: right;
+        top:-5px;
+    }
+    #findPassword_menu_title{
+        font-size:30px;
+        position:relative;
+        text-align: center;
+        top:-5px;
+    }
+    #change_to_regist{
+        position: absolute;
+        right: 0px;
+        top: 0px;
+        background-color: var(--color-0);
+        border: 1px solid var(--border-color);
+        border-radius: 5px;
+        width: 100px;
+        height: 30px;
+        display: flex;
+        justify-content: center;
+        padding: 3px;
+        box-sizing: border-box;
+        cursor: pointer;
+    }
+    #change_to_login,#return_to_login{
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        background-color: var(--color-0);
+        border: 1px solid var(--border-color);
+        border-radius: 5px;
+        width: 100px;
+        height: 30px;
+        display: flex;
+        justify-content: center;
+        padding: 3px;
+        box-sizing: border-box;
+        cursor: pointer;
+    }
+    #change_to_login:hover , #change_to_regist:hover,#return_to_login:hover{
+        background-color:var(--color-3);
+    }
+
+/*输入栏统一样式*/
+    #login_menu .login_regist_menu_inner{
+        width:100%;
+        height:90px;
+        border:1px solid var(--border-color);
+        border-radius:5px;
+        background-color:var(--color-0);
+    }
+    #regist_menu .login_regist_menu_inner{
+        width:100%;
+        height:227px;
+        border:1px solid var(--border-color);
+        border-radius:5px;
+        background-color:var(--color-0);
+    }
+    #findPassword_menu .login_regist_menu_inner{
+        width:100%;
+        height:181px;
+        border:1px solid var(--border-color);
+        border-radius:5px;
+        background-color:var(--color-0);
+    }
+
+    .login_regist_menu_input{
+        position:relative;
+        display:flex;
+        width:100%;
+        height:45px;
+        padding:10px;
+        box-sizing: border-box;
+    }
+    /*聚焦样式*/
+        .login_regist_menu_inner .login_regist_menu_input:focus-within{
+            border:1px solid var(--focusing-color);
+        }
+        .login_regist_menu_inner .login_regist_menu_input:first-child:focus-within{
+            border:1px solid var(--focusing-color);
+            border-radius:5px;
+            border-bottom-left-radius:0px;
+            border-bottom-right-radius:0px;
+        }
+        .login_regist_menu_inner .login_regist_menu_input:last-child:focus-within{
+            border:1px solid var(--focusing-color);
+            border-radius:5px;
+            border-top-left-radius:0px;
+            border-top-right-radius:0px;
+        }
+    .login_regist_menu_input > div{
+        width:78px;
+        height:100%;
+        display:flex;
+        font-size:18px;
+        justify-content:center;
+    }
+    .login_regist_menu_input > input{
+        margin-left:10px;
+        width:calc(100% - 78px);
+        border:none;
+        outline: none; 
+        box-sizing: border-box;
+        font-size:18px;
+        background-color:inherit;
+    }
+    .login_regist_menu_input > input:focus{
+        outline:none;
+    }
+
+/*按键*/
+    .login_regist_menu_button{
+        background-color:var(--color-0);
+        border:1px solid var(--border-color);
+        border-radius:5px;
+
+        font-size:20px;
+
+        width:100px;
+        height:45px;
+
+        display:flex;
+        align-items: center;
+        justify-content:center;
+
+        position:relative;
+
+        left:50%;
+
+        cursor: pointer;
+    }
+    #login_menu .login_regist_menu_button{
+        transform: translate(-50%, -5px);
+    }
+    #regist_menu .login_regist_menu_button{
+        top:10px;
+        transform: translate(-50%, 0px);
+    }
+    #findPassword_menu .login_regist_menu_button{
+        top:10px;
+        transform: translate(-50%, 0px);
+    }
+    .login_regist_menu_button:hover{
+        background-color:var(--color-3);
+    }
+
+/*其他*/
+    input.input_warning::placeholder{
+        color:var(--warning-color-0);
+    }
+
+    #login_menu_findPassword{
+        width:70px;
+        position:relative;
+        left:10px;
+        font-size:16px;
+        color:var(--color-4);
+        cursor: pointer;
+    }
+    #login_menu_findPassword:hover{
+        color:var(--color-5);
+    }
+    #regist_menu_getCode , #findPassword_menu_getCode{
+        font-size: 16px;
+        box-sizing: border-box;
+        padding: 8px;
+        width: 120px;
+        height: 37px;
+        position: absolute;
+        top: 3px;
+        background-color: var(--color-1);
+        right: 2px;
+        border: 1px solid var(--border-color);
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    #regist_menu_getCode:hover,#findPassword_menu_getCode:hover{
+        background-color:var(--color-3);
+    }
+    #regist_menu_getCode.unable_getCode,#findPassword_menu_getCode.unable_getCode{
+        pointer-events:none;
+        background-color:var(--color-0);
+        color:var(--color-4);
+    }
+</style>

@@ -48,6 +48,8 @@ function createTempComposite(doms,huabu){
 	//将composite加入画布中并聚焦
 	objectIntoHuabu(temp_composite,huabu)
 	focusingObject(temp_composite,"click")
+
+	return temp_composite
 }
 
 //创建组合体对象，将目标元素塞进这个组合体当中

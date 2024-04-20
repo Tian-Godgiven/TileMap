@@ -26,6 +26,30 @@ $("#topArea_fileName span").on("click",function(){
 	}
 })
 
+//点击用户头像，
+$("#topArea_user").on("click",function(){
+	//若已登录在下方滑动显示选项
+	if($(this).is(".logged_in")){
+		$("#topArea_userMenu").slideToggle(300)
+	}
+	// 若未登录则弹出登录/注册菜单
+	else{
+		showLoginRegistMenu()
+	}
+})
+
+//个人主页
+$("#topArea_userPage").on("click",function(event){
+	event.stopPropagation()
+	showUserArea()
+	$("#topArea_userMenu").hide()
+})
+
+//退出登陆
+$("#topArea_userQuit").on("click",function(){
+	event.stopPropagation()
+	userQuit()
+})
 
 
 

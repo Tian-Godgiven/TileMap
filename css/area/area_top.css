@@ -56,6 +56,47 @@
         background-size:100%;
     }
 
+    /*用户头像菜单*/
+    #topArea_userMenu{
+        display: none;
+        width: 85px;
+        position: relative;
+        top: 13px;
+        left: -10px;
+        background-color: var(--color-1);
+        z-index: 5;
+        border: 1px solid var(--color-5);
+        border-radius: 5px;
+    }
+
+    #topArea_userMenu > .button{
+        display:flex;
+        align-items: center;
+        justify-content:center;
+        padding:5px 10px;
+    }
+
+    #topArea_userMenu > .button:hover{
+        background-color:var(--color-3);
+    }
+
+
+    #topArea_userMenu .arrow_top {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+        top: -99px;
+        left: 38px;
+        z-index: -1;
+        border: 1px solid var(--color-5);
+        width: 10px;
+        height: 10px;
+        background: inherit;
+        transform: rotate(45deg);
+        border-right: transparent;
+        border-bottom: transparent;
+    }
 
 
 

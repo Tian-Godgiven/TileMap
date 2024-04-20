@@ -15,8 +15,10 @@
 		--text-color:black;
 		--warning-color-2: #E7CCCC;
         --warning-color-1:#AE231E;
+        --warning-color-0:red;
 		--theme-picture:url("../../img/light_theme.png");
 		--color-unlog:#686868;/*未登录用户名的颜色，比禁止色还要深一点*/
+		--no-icon-:url("././img/default_icon_light.png");/*没有头像时使用的用户头像*/
 	}
     
 }

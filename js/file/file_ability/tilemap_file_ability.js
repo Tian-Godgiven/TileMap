@@ -231,8 +231,6 @@ function saveFileLog(file){
 	    }
 	}
 
-	console.log(recently_tilemaps)
-
 	// 将新对象添加到 recently_tilemaps 数组的末尾
 	recently_tilemaps.push(file);
 	//保存

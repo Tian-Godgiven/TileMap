@@ -1,0 +1,254 @@
+<html>
+    <!-- 上传菜单 -->
+    <div id="object_upload_menu" class='alert modal_menu over_mask'>
+        <div class="flex">
+            <!-- 侧边栏 -->
+            <div id="object_upload_menu_left">
+                <div>
+                    <div id="object_upload_menu_title">上传</div>
+                    <div id="object_upload_menu_selectType" class="block">
+                        <div value="collection">集合</div>
+                    </div>
+                </div>
+            </div>
+            <!-- 主内容 -->
+            <div id="object_upload_menu_right">
+                <div id="object_upload_menu_information" class="block">   
+                    <div id="object_upload_menu_collectionInformation">
+                        <div class="object_upload_menu_information_title">选择一个集合：</div>
+                        <div id="object_upload_menu_collectionContainer"></div>
+
+                        <div class="object_upload_menu_information_end">
+                            备注：<input id="object_upload_menu_input"><br>
+                            将该集合上传到该账户
+                        </div>
+                    </div>
+                </div>
+                <div id="object_upload_menu_bottom" class="flex">
+                    <div id="object_upload_menu_confirm" class="block button">确认</div>
+                    <div id="object_upload_menu_cancel" class="block button">取消</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</html>
+
+<script type="text/javascript" scoped>
+    var selecting_type = "huabu"
+    var select_data = null
+
+    //显示这个菜单
+    function showObjectUploadMenu(){
+        //加载内容
+        loadObjectUploadMenuInformation()
+        //显示菜单
+        showModalMenu($("#object_upload_menu"))
+    }
+
+
+    //加载对应的informationBlock的内容
+    function loadObjectUploadMenuInformation(){
+        //磁贴集合信息栏
+        //清空
+        $("#object_upload_menu_collectionContainer").empty()
+        //遍历当前的collection
+        $("#leftArea_object_collection_container > div:not([type=default])").each(function(){
+            //获得其名称，生成div
+            var name = $(this).find(".slide_title").text()
+            var div= $("<div class='object_upload_menu_collectionBlock'> "+name+" </div>")
+            $(div).data("select_collection",this)
+            //将对应的这个option放进select中
+            $("#object_upload_menu_collectionContainer").append(div)
+        })
+    }
+
+
+    //信息块可以点击以选择
+    $("#object_upload_menu_collectionContainer").on("click",".object_upload_menu_collectionBlock",function(){
+        $("#object_upload_menu_collectionContainer > .selected").removeClass("selected")
+        $(this).addClass("selected")
+    })
+
+    //按下确认时.获取对应的collection的数据，并将其上传到服务器
+    $("#object_upload_menu_confirm").on("click",async function(){
+        //获取当前选中的collection
+        var collectionBlock = $("#object_upload_menu_collectionContainer .selected")
+        if(collectionBlock.length==0){
+            return false
+        }
+        var collection = $(collectionBlock).data("select_collection")
+        let type = $(collection).attr("type")
+        let file_name = $(collection).attr("file_name")
+        //获取其文件内容
+        var file_data = return_collection_lib(file_name,type)
+        //获取用户输入的备注
+        var upload_info = $("#object_upload_menu_input").val()
+        //上传到服务器
+        var bool = await uploadUserData({
+            name:file_name,
+            data:file_data,
+            type:"collection",
+            info:upload_info,
+        })
+        if(bool){
+            alert("文件上传成功！")
+        }
+        else{
+            alert("文件上传失败！")
+        }
+    })
+
+    $("#object_upload_menu_cancel").on("click",function(){
+        //关闭这个菜单
+        hideModalMenu($("#object_upload_menu"))
+    })
+</script>
+
+<style type="text/css" scoped>
+    /*整个菜单*/
+        #object_upload_menu{
+            width:475px;
+            height:300px;
+            background-color:var(--color-2);
+            padding:15px;
+            box-sizing: content-box;
+        }
+
+        #object_upload_menu .button:hover{
+            background-color:var(--color-3);
+        } 
+
+        #object_upload_menu > div{
+            width:100%;
+            height:100%;
+        }
+
+        #object_upload_menu div{
+            box-sizing: border-box;
+        }
+
+    /*通用*/
+        #object_upload_menu .block{
+            background-color:var(--color-1);
+            border:1px solid var(--border-color);
+            border-radius:3px;
+        }
+
+    /*左侧栏*/
+        #object_upload_menu_left{
+            width:135px;
+            margin-right:5px;
+            height:100%;
+        }
+
+        #object_upload_menu_title{
+            width:100%;
+            height:40px;
+            font-size:30px;
+            font-weight:bold;
+            text-align:left;
+        }
+
+        #object_upload_menu_selectType{
+            width:100%;
+            height: 40px;
+            margin-bottom: 5px;
+            padding:5px;
+        }
+            #object_upload_menu_selectType > div{
+                font-size: 21px;
+            } 
+
+            #object_upload_menu_selectType > div.selecting{
+                position:relative;
+                background-color:var(--color-3);
+                border-radius:5px;
+                border:1px solid var(--border-color);
+            }
+
+    /*右侧*/
+
+        #object_upload_menu_right{
+            width:calc(100% - 120px);
+        }
+
+        #object_upload_menu_information{
+            padding:5px 10px;
+            height:calc(100% - 45px);
+            width:100%;
+            border:1px solid var(--border-color);
+            margin-bottom:5px;
+        }
+
+        /*默认为画布选项*/
+        #object_upload_menu_information > div:nth-child(2){
+            display:none;
+        }
+
+        #object_upload_menu_information > div{
+            position:relative;
+            height:100%;
+            width:100%;
+        }
+
+            .object_upload_menu_information_title{
+                font-size:20px;
+            }
+            .object_upload_menu_information_end{
+                font-size:20px;
+            }
+
+    /*集合信息*/
+            #object_upload_menu_collectionContainer{
+                margin: 10px 0px;
+                max-height: 170px;
+                width: 100%;
+                overflow: overlay;
+            }
+
+            #object_upload_menu_collectionContainer > div{
+                border-radius:3px;
+                background-color:var(--color-2);
+                padding-left:20px;
+            }
+
+            #object_upload_menu_collectionContainer > div.selected{
+                background-color:var(--color-3);
+                border:1px solid var(--border-color);
+            }
+            /*打个钩钩*/
+            #object_upload_menu_collectionContainer > div.selected:before{
+                
+            }
+
+
+
+    /*右下*/
+
+        #object_upload_menu_bottom{
+            align-items:center;
+            justify-content:center;
+        }
+        
+        #object_upload_menu_confirm{
+            font-size: 25px;
+            justify-content: center;
+            align-items: center;
+            display: flex;
+            height: 42px;
+            width: 90px;
+            margin-right:5px;
+        }
+
+        #object_upload_menu_cancel{
+            font-size: 25px;
+            justify-content: center;
+            align-items: center;
+            display: flex;
+            height: 42px;
+            width: 90px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+
+</style>

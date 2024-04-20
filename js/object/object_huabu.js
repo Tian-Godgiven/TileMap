@@ -452,10 +452,11 @@ function copyHuabu(huabu,type){
 
 //清除该画布内的所有元素
 function clearHuabu(huabu){
-	//保存下这个画布
-	pushToUndo(huabu,"clear")
-	$(huabu).find(".object_container").empty()
-	$(huabu).find(".textblock_container").empty()
+	//将所有元素变成一个组合体
+	var all_object = $(huabu).find(".object_container").children(".huabu_object")
+    var composite = createTempComposite(all_object,huabu)
+	//将这个组合体删除
+	deleteObject(composite)
 }
 
 

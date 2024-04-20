@@ -2,22 +2,24 @@
     <div id="area_left"></div>
     <div id="area_huabu"></div>
     <div id="area_right"></div>
+    <div id="area_user"></div>
 </html>
     
 <script type="text/javascript">
     $('#area_left').load("./components/area/area_left.html")
     $('#area_right').load("./components/area/area_right.html")
     $('#area_huabu').load("./components/area/area_huabu.html")
+    $('#area_user').load("./components/area/area_user.html")
 </script>
 
 <style type="text/css">
-    /*左侧操作面版CSS*/
+/*左侧操作面版CSS*/
     #area_left{
         flex-shrink:0;
         width: 21%;
         height: 100%;
     }
-    /*画布区域CSS*/
+/*画布区域CSS*/
     #area_huabu{
         flex-shrink:0;
         width: 59%;
@@ -32,12 +34,20 @@
 
         border-top:none;
     }
-
-    /*右侧栏CSS*/
+/*右侧栏CSS*/
     #area_right{
         flex-shrink:0;
         width: 20%;
         height: 100%;
         overflow:hidden;
+    }
+/*用户页面CSS*/
+    #area_user{
+        z-index: 3;
+        position:absolute;
+        background-color:var(--color-1);
+        height:100%;
+        width:100%;
+        display:none;
     }
 </style>

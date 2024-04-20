@@ -31,9 +31,9 @@ async function createLibFile(collection_name,type,file_content){
 	//过程中可能会重命名
 	if(file_content == null){
 		var file_content = {
-						collection_name : collection_name,
-						collection_objects : [] 
-					}
+			collection_name : collection_name,
+			collection_objects : [] 
+		}
 	}
 
 	var file_path = "../object_lib/" + type + "_lib/" + collection_name + ".tilemap"

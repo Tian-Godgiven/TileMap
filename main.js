@@ -2,36 +2,37 @@ const { app, BrowserWindow, screen, ipcMain, nativeTheme , globalShortcut} = req
 const { ipcRenderer } = require('electron');
 const path = require('path');
 
+
 require('./js/file/file_by_node.js');
+require('./js/server/server_by_node.js')
 
 module.exports.ipcRenderer = ipcRenderer;
 
 
-//窗口定义，包含监听和快捷键
+
+
+//窗口定义，包含监听
 const createWindow = () => {
   	// 创建浏览窗口
        var mainWindow = new BrowserWindow({
-        	width: 800, // 窗口宽度
-        	height: 600, // 窗口高度
-    		autoHideMenuBar:true,//隐藏菜单栏
+    		autoHideMenuBar:true,// 隐藏菜单栏
+            // 显示图标
     	    icon: path.join(__dirname, '/img/icon_small.png'),
-    		/*添加对渲染进程的node框架支持*/
+    		// 对渲染程序的node框架支持
     		webPreferences: {
     			nodeIntegration: true,
     			contextIsolation:false
     		},
       	})
 
-    	mainWindow.setBackgroundColor("#ffffff")
-
     	// 加载 index.html
     	mainWindow.loadFile('main.html')
-
+        // 初始最大化
     	mainWindow.once('ready-to-show', () => {
         // 最大化
     		maxSizeScreenWindow(mainWindow)
     		// 打开开发者工具
-      		mainWindow.webContents.openDevTools();
+      		// mainWindow.webContents.openDevTools();
     	})
 
     //监听
@@ -80,6 +81,7 @@ const createWindow = () => {
                 // 切换窗口的全屏状态
                 mainWindow.setFullScreen(!mainWindow.isFullScreen());
             });
+
         
         return mainWindow
 }
@@ -98,9 +100,6 @@ app.on('will-quit', () => {
 app.on('window-all-closed', () => {
   	if (process.platform !== 'darwin') app.quit()
 })
-
-
-
 
 
 //主进程功能函数

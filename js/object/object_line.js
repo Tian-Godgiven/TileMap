@@ -111,6 +111,9 @@ function endConnectingMode(){
 	connect_line_mode = true
 	//终止监听
 	$("#huabu_container").off("click.connectLineMode")
+	//清除类
+	$(".line_connect_start").removeClass('line_connect_start')
+	$(".line_connect_end").removeClass('line_connect_end')
 }
 
 //在画布内新创建一根线条，使其连接两个对象

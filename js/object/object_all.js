@@ -292,28 +292,28 @@ function ZIndexObject(object,type,value){
 //删除选中的对象
 function deleteObject(object,range,mode){
 
-		//进入撤销栈
-		if(mode != "undo"){
-			pushToUndo(object,"delete")
-		}
-		
+	//进入撤销栈
+	if(mode != "undo"){
+		pushToUndo(object,"delete")
+	}
+	
 
-		//根据对象调用不同的删除函数
-		if($(object).is(".line")){
-			deleteLine(object)
-		}	
-		else if($(object).is(".tile")){
-			deleteTile(object)
-		}
-		else if($(object).is(".composite")){
-			deleteComposite(object)
-		}
-		else if($(object).is(".huabu")){
-			deleteHuabu(object)
-		}
+	//根据对象调用不同的删除函数
+	if($(object).is(".line")){
+		deleteLine(object)
+	}	
+	else if($(object).is(".tile")){
+		deleteTile(object)
+	}
+	else if($(object).is(".composite")){
+		deleteComposite(object)
+	}
+	else if($(object).is(".huabu")){
+		deleteHuabu(object)
+	}
 
-		//解除其聚焦
-		unfocusingObject(object)
+	//解除其聚焦
+	unfocusingObject(object)
 	
 }
 

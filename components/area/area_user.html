@@ -1,0 +1,43 @@
+<html>
+	<div id="userArea_inner">
+		<div id="userArea_return" class="hover">返回</div>
+		<div id="userArea_left">
+			<div id="userArea_userIcon" class="hover" title="点击上传头像">点击上传头像</div>
+			<div id="userArea_userName_container">
+				<div id="userArea_userName">用户名</div>
+				<div>
+					<div id="userArea_changeUserName"></div>
+				</div>
+			</div>
+			<div id="userArea_buttons">
+				<div id="userArea_changePassword" class="hover">修改密码</div>
+				<div id="userArea_onlineRoom" class="hover">在线房间</div>
+				<div id="userArea_quit" class="hover">退出登陆</div>
+			</div>
+		</div>
+		<div id="userArea_right">
+			<div id="userArea_object">
+				<div class="userArea_title">已上传集合</div>
+				<div class="userArea_sideButton">
+					<div id="userArea_refreshObjectTable" title="刷新集合" class="hover"></div>
+					<div id="userArea_uploadObject" title="上传已有集合" class="hover"></div>
+				</div>
+				<table id="userArea_objectTable"></table>
+			</div>
+
+			<div id="userArea_file">
+				<div class="userArea_title">已保存文件</div>
+				<div class="userArea_sideButton">
+					<div id="userArea_refreshFileTable" title="刷新工程文件" class="hover"></div>
+					<div id="userArea_uploadTilemap" title="上传工程文件" class="hover"></div>
+				</div>
+				<table id="userArea_fileTable"></table>
+			</div>
+		</div>
+	</div>
+</html>
+
+<script src="./js/area/area_user.js"></script>
+
+<link rel="stylesheet" href="./css/area/area_user.css">
+<link rel="stylesheet" href="./node_modules/gridmanager/index.css">

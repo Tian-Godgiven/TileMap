@@ -12,7 +12,10 @@
   },
   "dependencies": {
     "@jsplumb/browser-ui": "^6.2.10",
-    "electron": "^29.2.0",
+    "cropperjs": "^1.6.1",
+    "electron": "^30.0.0",
+    "fetch": "^1.1.0",
+    "gridmanager": "^3.2.1",
     "image-size": "^1.1.1",
     "jsplumb": "^2.15.6"
   },

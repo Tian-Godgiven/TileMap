@@ -77,8 +77,9 @@ function pushToUndo(dom,type,undo_data){
 		undo_stack.shift()
 	}
 
-	//将对应的状态数据保存进栈
+	//将对应的状态数据保存进栈,并清空重做栈
 	undo_stack.push(undo_data)
+	redo_stack = []
 }
 
 //撤回
@@ -173,7 +174,7 @@ function redo(){
 	var redo_data = the_data["redo"]
 	var undo_data = the_data["undo"]
 	//将undo_data填装回去
-	pushToUndo(null,null,undo_data)
+	undo_stack.push(undo_data)
 
 	var state = redo_data["state"]
 	var target = redo_data["target"]

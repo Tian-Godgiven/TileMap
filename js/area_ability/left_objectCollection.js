@@ -17,7 +17,7 @@ function return_collection_lib(file_name,type){
 		return all_lib[type][file_name]
 	}
 }
-//搜索lib中的block_type对象，返回其所在的collection的type的file_name
+//搜索lib中的方块对象，返回其所在的collection的type的file_name
 function searchCollectionLib(object_type_name){
 	var result = []
 	//遍历all_lib三种collection_type

@@ -1,0 +1,206 @@
+<html>
+    <!-- 一个用户修改头像的菜单 -->
+	<div id="userIcon_change_menu" class='alert modal_menu over_mask'>
+        <div class="modal_menu_title"></div>
+        <div id="userIcon_change_menu_inner">
+            <img id="cropImg">
+            <input accept="image/*" type="file" id="cropReader">
+        </div>   
+        <div id="selectImg">选择图片</div>
+        <div id="userIcon_change_menu_button" class="">
+            <div id="userIcon_change_menu_quit" style="margin-right:5px;">取消</div>
+            <div id="userIcon_change_menu_save">保存</div>
+        </div>    
+    </div>
+</html>
+
+<script type="module" scoped>
+//引入Cropper.js
+const Cropper = require('cropperjs')
+
+//点击选择图片，触发Input的文件选择
+    $("#selectImg").on("click",function(){
+        $("#cropReader").click()
+    })
+
+// 响应cropper
+    $("#cropReader").on("change",function(){
+        if(CROPPER){
+            CROPPER.destroy()
+        }
+        loadingImg(event)
+    })
+ 
+//创建一个cropper的全局对象 
+    let CROPPER    
+
+    function loadingImg(event){
+        //读取上传文件
+        let reader = new FileReader();
+        if(event.target.files[0]){
+        
+        //readAsDataURL方法可以将File对象转化为data:URL格式的字符串（base64编码）
+            reader.readAsDataURL(event.target.files[0]);
+            reader.onload = (e)=>{
+                let dataURL = reader.result;
+                //将img的src改为刚上传的文件的转换格式
+                document.querySelector('#cropImg').src = dataURL;  
+                const image = document.getElementById('cropImg');  
+                
+                //创建cropper实例
+                CROPPER = new Cropper(image, {
+                    aspectRatio:1,
+                    viewMode:3,
+                    minContainerWidth:200,
+                    minContainerHeight:200,
+                    dragMode:'move',
+                    restore: false, // do not restore the cropped area when resizing the crop box
+                    guides: false, // do not display the dashed lines around the crop box
+                    center: false, // do not display the center indicator of the crop box
+                    highlight: false, // do not display the semi-transparent overlay over the non-cropped area
+                    cropBoxMovable: true, // allow moving the crop box
+                    cropBoxResizable: true, // allow resizing the crop box
+                    toggleDragModeOnDblclick: false, // do not allow toggling drag mode by double-clicking
+                    minCropBoxWidth: 150, // minimum width of the crop box
+                    minCropBoxHeight: 150, // minimum height of the crop box
+                })
+            }
+        }
+    }
+
+//将图片上传到服务器
+    $("#userIcon_change_menu_save").on("click",function(){
+        getData(CROPPER)
+        .then(base64URL=>{
+            //上传到服务器
+            uploadUserIcon(base64URL).then(bool=>{
+                if(bool){
+                    //使用这个图片修改当其用户头像
+                    changeUserIcon(base64URL)
+                    //关闭这个菜单
+                    hideModalMenu($("#userIcon_change_menu"))
+                }
+                else{
+                    alert("上传文件出错！")
+                }
+            })
+            
+        })
+        .catch((err)=>{
+            console.log("图片数据转换有误"+err)
+        })
+        
+    })
+    //将裁剪部分变为base64URL
+    function getData(cropper) {
+        return new Promise((resolve, reject) => {
+            try {
+                // 检查是否传入了有效的 Cropper 实例
+                if (!cropper) {
+                    throw new Error('Cropper instance is invalid.');
+                }
+
+                // getCroppedCanvas 方法可以将裁剪区域的数据转换成 canvas 数据
+                const canvas = cropper.getCroppedCanvas({
+                    maxWidth: 4096,
+                    maxHeight: 4096,
+                    fillColor: '#fff',
+                    imageSmoothingEnabled: true,
+                    imageSmoothingQuality: 'high'
+                });
+                if (!canvas) {
+                    throw new Error('Failed to get cropped canvas.');
+                }
+                // 将 Canvas 数据转换为 Base64 编码的数据URL并返回
+                const base64URL = canvas.toDataURL();
+               
+                resolve(base64URL)
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+//关闭菜单
+    $("#userIcon_change_menu_quit").on("click",function(){
+        hideModalMenu($("#userIcon_change_menu"))
+    })
+
+
+</script>
+
+<link rel="stylesheet" href="./node_modules/cropperjs/dist/cropper.css">
+<style type="text/css" scoped>
+
+
+    #cropReader{
+        display:none;
+    }
+    #userIcon_change_menu{
+        width:370px;
+        height:450px
+        background-color:var(--color-1);
+    }
+
+    #userIcon_change_menu_inner{
+        height:300px;
+        width:300px;
+        border-radius:50%;
+        border:1px solid var(--border-color);
+        position:relative;
+        left:50%;
+        transform: translate(-50%,0px);
+        background-position: center;
+        background-size: 100%;
+        background-repeat: no-repeat;
+    }
+
+    #cropImg{
+        display: block;
+        /* This rule is very important, please don't ignore this */
+        max-width: 100%;
+    }
+
+    .cropper-view-box{
+        border-radius:50% !important;
+    }
+
+/*按键*/
+    #selectImg{
+        font-size:20px;
+        display:flex;
+        align-items: center;
+        justify-content:center;
+        width:200px;
+        height:40px;
+        border:1px solid var(--border-color);
+        border-radius:5px;
+        position:relative;
+        left:50%;
+        top:10px;
+        transform: translate(-50%, 0px);
+        box-sizing: border-box;
+    }
+     #userIcon_change_menu_button{
+        margin-top:5px;
+        width:200px;
+        display:flex;
+        position:relative;
+        left:50%;
+        top:10px;
+        transform: translate(-50%, 0px);
+     }
+    #userIcon_change_menu_button > div{
+        font-size:18px;
+        display:flex;
+        align-items: center;
+        justify-content:center;
+        width:96px;
+        height:40px;
+        border:1px solid var(--border-color);
+        border-radius:5px;
+    }
+
+    #selectImg:hover , #userIcon_change_menu_button > div:hover{
+        background-color:var(--color-2);
+    }
+</style>
