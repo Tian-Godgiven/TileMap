@@ -2,8 +2,7 @@
 var clipboard
 var tile_style
 
-//剪贴板中可能出现的类
-//将内容存入剪贴板中
+//将复制对象的属性以json格式存入剪贴板中
 function pushClipboard(json,type){
 	if(type == "tile_style"){
 		tile_style = json
@@ -18,7 +17,6 @@ function ifClipboard(){
 		return false
 	}
 	else{
-		console.log("123")
 		return true
 	}
 }

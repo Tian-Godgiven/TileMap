@@ -2,14 +2,378 @@
   "file_head": {
     "app": "tilemap",
     "app_version": "1.0.0",
-    "create_time": "2024-04-15T09:20:24.930Z",
+    "create_time": "2024-04-20T15:58:39.749Z",
     "github": "https://github.com/Tian-Godgiven/TileMap"
   },
   "file_type": "object_lib",
   "file_data": {
     "collection_name": "通用",
     "collection_objects": [
-
+      {
+        "object_type": "tile",
+        "object_inner": {
+          "id": "tile_BS2cLYSRDcRAlPPasuPM",
+          "css": {
+            "font-size": "24px",
+            "border-width": "0px",
+            "border-top-style": "",
+            "border-right-style": "",
+            "border-bottom-style": "",
+            "border-left-style": "",
+            "border-top-color": "",
+            "border-right-color": "",
+            "border-bottom-color": "",
+            "border-left-color": "",
+            "border-image-source": "",
+            "border-image-slice": "",
+            "border-image-width": "",
+            "border-image-outset": "",
+            "border-image-repeat": "",
+            "width": "100px",
+            "height": "100px",
+            "color": "rgb(0, 0, 0)",
+            "opacity": "1",
+            "transform": "none",
+            "transform-origin": "0% 0%",
+            "background-image": "none",
+            "position": "relative",
+            "background-color": "rgba(255, 255, 255, 0)",
+            "background-blend-mode": "normal",
+            "border-radius": "0px",
+            "title_css": {
+              "text-decoration": "solid rgb(0, 0, 0)",
+              "font-weight": "normal",
+              "font-style": "normal",
+              "writing-mode": "horizontal-tb",
+              "text-align": "center",
+              "justify-content": "center",
+              "text-shadow": "none",
+              "font-size": "24px",
+              "user-select": "none"
+            }
+          },
+          "attr": {
+            "title": "",
+            "angle": "0",
+            "z_index": "1",
+            "title_horizontal": "0",
+            "title_vertical": "0",
+            "textblock_showstate": "normal",
+            "textblock_vertical": "center",
+            "textblock_horizontal": "right",
+            "background_color": "#FFFFFF00",
+            "gradient_direction": "top",
+            "gradient_color": "black",
+            "textblock_width": "170px",
+            "textblock_height": "200px"
+          },
+          "prop": {
+            "textblock_bindState": true,
+            "show_title": true,
+            "wrap_title": true,
+            "tile_link": false,
+            "tile_annotaition": false,
+            "background_gradient": true,
+            "size_limit": false
+          },
+          "data": {},
+          "title": "输入内容"
+        },
+        "type": "纯文本"
+      },
+      {
+        "object_type": "tile",
+        "object_inner": {
+          "id": "tile_BS2cLYSRDcRAlPPasuPM",
+          "css": {
+            "font-size": "24px",
+            "border": "2px solid var(--color-5)",
+            "width": "100px",
+            "height": "100px",
+            "color": "rgb(0, 0, 0)",
+            "opacity": "1",
+            "transform": "none",
+            "transform-origin": "0% 0%",
+            "background-image": "none",
+            "position": "relative",
+            "background-color": "rgb(255, 255, 255)",
+            "background-blend-mode": "normal",
+            "title_css": {
+              "text-decoration": "solid rgb(0, 0, 0)",
+              "font-weight": "normal",
+              "font-style": "normal",
+              "writing-mode": "horizontal-tb",
+              "text-align": "center",
+              "justify-content": "center",
+              "text-shadow": "none",
+              "font-size": "24px",
+              "user-select": "none"
+            }
+          },
+          "attr": {
+            "title": "",
+            "angle": "0",
+            "z_index": "1",
+            "title_horizontal": "0",
+            "title_vertical": "0",
+            "textblock_showstate": "normal",
+            "textblock_vertical": "center",
+            "textblock_horizontal": "right",
+            "background_color": "#FFFFFFFF",
+            "gradient_direction": "top",
+            "gradient_color": "black",
+            "textblock_width": "170px",
+            "textblock_height": "200px"
+          },
+          "prop": {
+            "textblock_bindState": true,
+            "show_title": true,
+            "wrap_title": true,
+            "tile_link": false,
+            "tile_annotaition": false,
+            "background_gradient": true,
+            "size_limit": false
+          },
+          "data": {},
+          "title": ""
+        },
+        "type": "磁贴"
+      },
+      {
+        "object_type": "tile",
+        "object_inner": {
+          "id": "tile_oKTNmEeE0MNafRvd8ZOz",
+          "css": {
+            "font-size": "24px",
+            "border": "2px solid var(--color-5)",
+            "width": "100px",
+            "height": "100px",
+            "color": "rgb(0, 0, 0)",
+            "opacity": "1",
+            "transform": "none",
+            "transform-origin": "0% 0%",
+            "background-image": "none",
+            "position": "relative",
+            "background-color": "rgb(255, 255, 255)",
+            "background-blend-mode": "normal",
+            "border-radius": "20px",
+            "title_css": {
+              "text-decoration": "solid rgb(0, 0, 0)",
+              "font-weight": "normal",
+              "font-style": "normal",
+              "writing-mode": "horizontal-tb",
+              "text-align": "center",
+              "justify-content": "center",
+              "text-shadow": "none",
+              "font-size": "24px",
+              "user-select": "none"
+            }
+          },
+          "attr": {
+            "title": "",
+            "angle": "0",
+            "z_index": "1",
+            "title_horizontal": "0",
+            "title_vertical": "0",
+            "textblock_showstate": "normal",
+            "textblock_vertical": "center",
+            "textblock_horizontal": "right",
+            "background_color": "#FFFFFFFF",
+            "gradient_direction": "top",
+            "gradient_color": "black",
+            "textblock_width": "170px",
+            "textblock_height": "200px"
+          },
+          "prop": {
+            "textblock_bindState": true,
+            "show_title": true,
+            "wrap_title": true,
+            "tile_link": false,
+            "tile_annotaition": false,
+            "background_gradient": true,
+            "size_limit": false
+          },
+          "data": {},
+          "title": ""
+        },
+        "type": "圆角矩形"
+      },
+      {
+        "object_type": "tile",
+        "object_inner": {
+          "id": "tile_eZN7ZuemQPeE2TbU1EAh",
+          "css": {
+            "font-size": "34px",
+            "border": "2px solid var(--color-5)",
+            "width": "188px",
+            "height": "100px",
+            "color": "rgb(0, 0, 0)",
+            "opacity": "1",
+            "transform": "none",
+            "transform-origin": "0% 0%",
+            "background-image": "none",
+            "position": "relative",
+            "background-color": "rgb(255, 255, 255)",
+            "background-blend-mode": "normal",
+            "title_css": {
+              "text-decoration": "solid rgb(0, 0, 0)",
+              "font-weight": "normal",
+              "font-style": "normal",
+              "writing-mode": "horizontal-tb",
+              "text-align": "center",
+              "justify-content": "center",
+              "text-shadow": "none",
+              "font-size": "24px",
+              "user-select": "none"
+            }
+          },
+          "attr": {
+            "title": "",
+            "angle": "0",
+            "z_index": "1",
+            "title_horizontal": "0",
+            "title_vertical": "0",
+            "textblock_showstate": "normal",
+            "textblock_vertical": "center",
+            "textblock_horizontal": "right",
+            "background_color": "#FFFFFFFF",
+            "gradient_direction": "top",
+            "gradient_color": "black",
+            "textblock_width": "170px",
+            "textblock_height": "200px"
+          },
+          "prop": {
+            "textblock_bindState": true,
+            "show_title": true,
+            "wrap_title": true,
+            "tile_link": false,
+            "tile_annotaition": false,
+            "background_gradient": true,
+            "size_limit": false
+          },
+          "data": {},
+          "title": ""
+        },
+        "type": "矩形"
+      },
+      {
+        "object_type": "tile",
+        "object_inner": {
+          "id": "tile_BS2cLYSRDcRAlPPasuPM",
+          "css": {
+            "font-size": "24px",
+            "border": "2px solid var(--color-5)",
+            "width": "100px",
+            "height": "100px",
+            "color": "rgb(0, 0, 0)",
+            "opacity": "1",
+            "transform": "none",
+            "transform-origin": "0% 0%",
+            "background-image": "none",
+            "position": "relative",
+            "background-color": "rgb(255, 255, 255)",
+            "background-blend-mode": "normal",
+            "border-radius": "50%",
+            "title_css": {
+              "text-decoration": "solid rgb(0, 0, 0)",
+              "font-weight": "normal",
+              "font-style": "normal",
+              "writing-mode": "horizontal-tb",
+              "text-align": "center",
+              "justify-content": "center",
+              "text-shadow": "none",
+              "font-size": "24px",
+              "user-select": "none"
+            }
+          },
+          "attr": {
+            "title": "",
+            "angle": "0",
+            "z_index": "1",
+            "title_horizontal": "0",
+            "title_vertical": "0",
+            "textblock_showstate": "normal",
+            "textblock_vertical": "center",
+            "textblock_horizontal": "right",
+            "background_color": "#FFFFFFFF",
+            "gradient_direction": "top",
+            "gradient_color": "black",
+            "textblock_width": "170px",
+            "textblock_height": "200px"
+          },
+          "prop": {
+            "textblock_bindState": true,
+            "show_title": true,
+            "wrap_title": true,
+            "tile_link": false,
+            "tile_annotaition": false,
+            "background_gradient": true,
+            "size_limit": false
+          },
+          "data": {},
+          "title": ""
+        },
+        "type": "圆形"
+      },
+      {
+        "object_type": "tile",
+        "object_inner": {
+          "id": "tile_j8R5TvYuaX3j3hcMDtSe",
+          "css": {
+            "font-size": "40px",
+            "border": "2px solid var(--color-5)",
+            "width": "165px",
+            "height": "117px",
+            "color": "rgb(0, 0, 0)",
+            "opacity": "1",
+            "transform": "none",
+            "transform-origin": "0% 0%",
+            "background-image": "none",
+            "position": "relative",
+            "background-color": "rgb(255, 255, 255)",
+            "background-blend-mode": "normal",
+            "border-radius": "50%",
+            "title_css": {
+              "text-decoration": "solid rgb(0, 0, 0)",
+              "font-weight": "normal",
+              "font-style": "normal",
+              "writing-mode": "horizontal-tb",
+              "text-align": "center",
+              "justify-content": "center",
+              "text-shadow": "none",
+              "font-size": "24px",
+              "user-select": "none"
+            }
+          },
+          "attr": {
+            "title": "",
+            "angle": "0",
+            "z_index": "1",
+            "title_horizontal": "0",
+            "title_vertical": "0",
+            "textblock_showstate": "normal",
+            "textblock_vertical": "center",
+            "textblock_horizontal": "right",
+            "background_color": "#FFFFFFFF",
+            "gradient_direction": "top",
+            "gradient_color": "black",
+            "textblock_width": "170px",
+            "textblock_height": "200px"
+          },
+          "prop": {
+            "textblock_bindState": true,
+            "show_title": true,
+            "wrap_title": true,
+            "tile_link": false,
+            "tile_annotaition": false,
+            "background_gradient": true,
+            "size_limit": false
+          },
+          "data": {},
+          "title": ""
+        },
+        "type": "椭圆"
+      }
     ]
   }
 }

@@ -1,0 +1,13 @@
+{
+  "file_head": {
+    "app": "tilemap",
+    "app_version": "1.0.0",
+    "create_time": "2024-04-21T01:53:52.430Z",
+    "github": "https://github.com/Tian-Godgiven/TileMap"
+  },
+  "file_type": "object_lib",
+  "file_data": {
+    "collection_name": "测试集合",
+    "collection_objects": []
+  }
+}

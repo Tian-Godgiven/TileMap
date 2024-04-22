@@ -7,10 +7,10 @@ const imageSize = require('image-size')
 
 //软件数据地址
 let appDir = __dirname;
-if (process.mainModule.filename.indexOf('app.asar') !== -1) {
-    // 如果处于 asar 打包模式下，需要调整路径
-    appDir = path.dirname(process.mainModule.filename);
-}
+// if (process.mainModule.filename.indexOf('app.asar') !== -1) {
+//     // 如果处于 asar 打包模式下，需要调整路径
+//     appDir = path.dirname(process.mainModule.filename);
+// }
 
 //创建文件时，确保其文件名不重复，若重复则加数字后缀
 function getUniqueFileName(directory_path, fileName) {

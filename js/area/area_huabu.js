@@ -25,7 +25,7 @@ function createNewHuabuMenu(type) {
     });
 }
 
-// 画布区域的选择功能，创建画布区域的套索并对选择的目标进行判定
+// 画布区域的select功能，创建画布区域的套索并对选择的目标进行判定
 $("#huabu_container").selectable({
 	distance:1,
 	filter:".huabu_object:not(.textblock,.component)",

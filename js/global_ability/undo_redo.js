@@ -105,7 +105,7 @@ function undo(){
 		var redo_info = objectToState(dom,target_type,"all")
 		deleteObject(dom,null,"undo")
 	}
-	//删除
+	//删除：即这个对象已被删除，重新将其生成
 	else if(state == "delete"){
 		//利用state_info中的数据重新生成这个对象
 		var dom = stateToObject(state_info,null,target_type,"create")

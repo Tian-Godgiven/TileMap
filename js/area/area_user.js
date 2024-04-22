@@ -234,7 +234,8 @@ const GridManager = require('gridmanager')
 	})
 
 //加载已上传的文件
-	function loadUserUploadFileInfo(){
+	function loadUserUploadFileInfo(){//清空
+		$("#userArea_fileTable").empty()
 		//获取服务端的集合信息
 		getUserUploadInfo("tilemap").then(result=>{
 			var success = result.success

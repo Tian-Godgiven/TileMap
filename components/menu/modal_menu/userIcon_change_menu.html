@@ -35,11 +35,11 @@ const Cropper = require('cropperjs')
     let CROPPER    
 
     function loadingImg(event){
-        //读取上传文件
+        //读取用户通过input选择的文件
         let reader = new FileReader();
         if(event.target.files[0]){
         
-        //readAsDataURL方法可以将File对象转化为data:URL格式的字符串（base64编码）
+            //readAsDataURL方法可以将File对象转化为data:URL格式的字符串（base64编码）
             reader.readAsDataURL(event.target.files[0]);
             reader.onload = (e)=>{
                 let dataURL = reader.result;

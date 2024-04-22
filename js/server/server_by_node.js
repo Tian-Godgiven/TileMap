@@ -1,6 +1,5 @@
 const http = require('http');
 const ipcMain = require('electron').ipcMain;
-// const fetch = require('fetch')
 
 // Express 服务器运行的端口
 const sever_port = "http://localhost:3000"
