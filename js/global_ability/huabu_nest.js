@@ -54,6 +54,10 @@ function openNestedHuabu(source,nested_huabu){
 			var source_huabu = $(source).parents(".huabu")
 		}
 
+		if($(nested_huabu).data("sourceHuabu_stack") == null){
+			nestHuabuToTile(source,nested_huabu)
+		}
+
 		//此外，如果没有设定打开目标，则默认为这个磁贴绑定的嵌套画布
 		if(nested_huabu == null){
 			nested_huabu = $("#"+$(source).data("nest_huabu"))
@@ -62,6 +66,12 @@ function openNestedHuabu(source,nested_huabu){
 	//如果是画布，则直接设定该画布为来源画布
 	else if($(source).is(".huabu")){
 		var source_huabu = source
+	}
+
+	if($(nested_huabu).data("sourceHuabu_stack") == undefined){
+		//为画布添加来源画布栈
+		$(nested_huabu).addClass("nest_huabu")
+		$(nested_huabu).data("sourceHuabu_stack",[])
 	}
 	
 	//将源画布保存进"来源画布"栈

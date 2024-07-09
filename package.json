@@ -43,7 +43,7 @@
     "url": "https://github.com/Tian-Godgiven/Tile-map/issues"
   },
   "homepage": "https://github.com/Tian-Godgiven/Tile-map#readme",
-  "config": {
+   "config": {
     "forge": {
       "electronPackagerConfig": {
         "extraResource": "./js/object_lib"

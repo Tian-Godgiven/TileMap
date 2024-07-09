@@ -624,6 +624,10 @@
 			}
 		}
 
+		if(json["nest"]){
+			closeNestedHuabu(huabu)
+		}
+
 		//返回这个画布对象
 		return huabu
 	}

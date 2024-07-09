@@ -2,7 +2,7 @@
   "file_head": {
     "app": "tilemap",
     "app_version": "1.0.0",
-    "create_time": "2024-04-20T16:26:52.334Z",
+    "create_time": "2024-04-24T09:32:10.629Z",
     "github": "https://github.com/Tian-Godgiven/TileMap"
   },
   "file_type": "object_lib",
@@ -58,7 +58,7 @@
             "wrap_title": true,
             "tile_link": false,
             "tile_annotaition": false,
-            "background_gradient": true,
+            "background_gradient": false,
             "size_limit": false
           },
           "data": {},
@@ -116,7 +116,7 @@
             "wrap_title": true,
             "tile_link": false,
             "tile_annotaition": false,
-            "background_gradient": true,
+            "background_gradient": false,
             "size_limit": false
           },
           "data": {},
@@ -174,7 +174,7 @@
             "wrap_title": true,
             "tile_link": false,
             "tile_annotaition": false,
-            "background_gradient": true,
+            "background_gradient": false,
             "size_limit": false
           },
           "data": {},
@@ -233,7 +233,7 @@
             "wrap_title": true,
             "tile_link": false,
             "tile_annotaition": false,
-            "background_gradient": true,
+            "background_gradient": false,
             "size_limit": false
           },
           "data": {},
@@ -305,7 +305,7 @@
                   "wrap_title": true,
                   "tile_link": false,
                   "tile_annotaition": false,
-                  "background_gradient": true,
+                  "background_gradient": false,
                   "size_limit": false
                 },
                 "data": {},
@@ -364,7 +364,7 @@
                   "wrap_title": true,
                   "tile_link": false,
                   "tile_annotaition": false,
-                  "background_gradient": true,
+                  "background_gradient": false,
                   "size_limit": false
                 },
                 "data": {},
@@ -424,7 +424,7 @@
                   "wrap_title": true,
                   "tile_link": false,
                   "tile_annotaition": false,
-                  "background_gradient": true,
+                  "background_gradient": false,
                   "size_limit": false
                 },
                 "data": {},
@@ -432,6 +432,240 @@
               }
             }
           ]
+        },
+        "type": "未命名"
+      },
+      {
+        "object_type": "tile",
+        "object_inner": {
+          "id": "tile_f1CsK4yQxzT0gzSmoeW9",
+          "css": {
+            "font-size": "24px",
+            "border": "2px solid var(--color-5)",
+            "width": "100px",
+            "height": "70px",
+            "color": "rgb(0, 0, 0)",
+            "opacity": "1",
+            "transform": "none",
+            "transform-origin": "0% 0%",
+            "background-image": "none",
+            "position": "relative",
+            "background-color": "rgb(255, 255, 255)",
+            "background-blend-mode": "normal",
+            "border-radius": "50%",
+            "title_css": {
+              "text-decoration": "solid rgb(0, 0, 0)",
+              "font-weight": "normal",
+              "font-style": "normal",
+              "writing-mode": "horizontal-tb",
+              "text-align": "center",
+              "justify-content": "center",
+              "text-shadow": "none",
+              "font-size": "16px"
+            }
+          },
+          "attr": {
+            "title": "222222",
+            "angle": "0",
+            "z_index": "1",
+            "title_horizontal": "0",
+            "title_vertical": "0",
+            "textblock_showstate": "normal",
+            "textblock_vertical": "center",
+            "textblock_horizontal": "right",
+            "background_color": "#FFFFFFFF",
+            "gradient_direction": "top",
+            "gradient_color": "black",
+            "textblock_width": "170px",
+            "textblock_height": "200px"
+          },
+          "prop": {
+            "textblock_bindState": true,
+            "show_title": true,
+            "wrap_title": true,
+            "tile_link": false,
+            "tile_annotaition": false,
+            "background_gradient": false,
+            "size_limit": false
+          },
+          "data": {},
+          "title": "磁贴1"
+        },
+        "type": "未命名"
+      },
+      {
+        "object_type": "tile",
+        "object_inner": {
+          "id": "tile_I5vPJ5H4rH69aVL5i8et",
+          "css": {
+            "font-size": "24px",
+            "border-width": "0px",
+            "width": "100px",
+            "height": "100px",
+            "color": "rgb(0, 0, 0)",
+            "opacity": "1",
+            "transform": "none",
+            "transform-origin": "0% 0%",
+            "background-image": "none",
+            "position": "relative",
+            "background-color": "rgba(255, 255, 255, 0)",
+            "background-blend-mode": "normal",
+            "border-radius": "0px",
+            "title_css": {
+              "text-decoration": "solid rgb(0, 0, 0)",
+              "font-weight": "normal",
+              "font-style": "normal",
+              "writing-mode": "horizontal-tb",
+              "text-align": "center",
+              "justify-content": "center",
+              "text-shadow": "none",
+              "font-size": "16px",
+              "user-select": "none"
+            }
+          },
+          "attr": {
+            "title": "",
+            "angle": "0",
+            "z_index": "1",
+            "title_horizontal": "0",
+            "title_vertical": "0",
+            "textblock_showstate": "normal",
+            "textblock_vertical": "center",
+            "textblock_horizontal": "right",
+            "background_color": "#FFFFFF00",
+            "gradient_direction": "top",
+            "gradient_color": "black",
+            "textblock_width": "170px",
+            "textblock_height": "200px"
+          },
+          "prop": {
+            "textblock_bindState": true,
+            "show_title": true,
+            "wrap_title": true,
+            "tile_link": false,
+            "tile_annotaition": false,
+            "background_gradient": false,
+            "size_limit": false
+          },
+          "data": {},
+          "title": "生物的分类"
+        },
+        "type": "未命名"
+      },
+      {
+        "object_type": "tile",
+        "object_inner": {
+          "id": "tile_xTM0En96wXToQg3n17C8",
+          "css": {
+            "font-size": "24px",
+            "border": "2px solid var(--color-5)",
+            "width": "100px",
+            "height": "68px",
+            "color": "rgb(0, 0, 0)",
+            "opacity": "1",
+            "transform": "none",
+            "transform-origin": "0% 0%",
+            "background-image": "none",
+            "position": "relative",
+            "background-color": "rgb(255, 255, 255)",
+            "background-blend-mode": "normal",
+            "title_css": {
+              "text-decoration": "solid rgb(0, 0, 0)",
+              "font-weight": "normal",
+              "font-style": "normal",
+              "writing-mode": "horizontal-tb",
+              "text-align": "center",
+              "justify-content": "center",
+              "text-shadow": "none",
+              "font-size": "16px",
+              "user-select": "none"
+            }
+          },
+          "attr": {
+            "title": "222222",
+            "angle": "0",
+            "z_index": "1",
+            "title_horizontal": "0",
+            "title_vertical": "0",
+            "textblock_showstate": "normal",
+            "textblock_vertical": "center",
+            "textblock_horizontal": "right",
+            "background_color": "#FFFFFFFF",
+            "gradient_direction": "top",
+            "gradient_color": "black",
+            "textblock_width": "170px",
+            "textblock_height": "200px"
+          },
+          "prop": {
+            "textblock_bindState": true,
+            "show_title": true,
+            "wrap_title": true,
+            "tile_link": false,
+            "tile_annotaition": false,
+            "background_gradient": false,
+            "size_limit": false
+          },
+          "data": {},
+          "title": "研究方法"
+        },
+        "type": "未命名"
+      },
+      {
+        "object_type": "tile",
+        "object_inner": {
+          "id": "tile_XdjAS7WoLOvSAIUBJSuV",
+          "css": {
+            "font-size": "21px",
+            "border": "2px solid var(--color-5)",
+            "width": "100px",
+            "height": "61px",
+            "color": "rgb(0, 0, 0)",
+            "opacity": "1",
+            "transform": "none",
+            "transform-origin": "0% 0%",
+            "background-image": "none",
+            "position": "relative",
+            "background-color": "rgb(255, 255, 255)",
+            "background-blend-mode": "normal",
+            "border-radius": "20px",
+            "title_css": {
+              "text-decoration": "solid rgb(0, 0, 0)",
+              "font-weight": "normal",
+              "font-style": "normal",
+              "writing-mode": "horizontal-tb",
+              "text-align": "center",
+              "justify-content": "center",
+              "text-shadow": "none",
+              "font-size": "16px",
+              "user-select": "none"
+            }
+          },
+          "attr": {
+            "title": "",
+            "angle": "0",
+            "z_index": "1",
+            "title_horizontal": "0",
+            "title_vertical": "0",
+            "textblock_showstate": "normal",
+            "textblock_vertical": "center",
+            "textblock_horizontal": "right",
+            "background_color": "#FFFFFFFF",
+            "gradient_direction": "top",
+            "gradient_color": "black",
+            "textblock_width": "170px",
+            "textblock_height": "200px"
+          },
+          "prop": {
+            "textblock_bindState": true,
+            "show_title": true,
+            "wrap_title": true,
+            "tile_link": false,
+            "tile_annotaition": false,
+            "background_gradient": false,
+            "size_limit": false
+          },
+          "data": {},
+          "title": "界"
         },
         "type": "未命名"
       }
