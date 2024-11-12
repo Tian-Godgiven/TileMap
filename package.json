@@ -31,7 +31,7 @@
     "@electron-forge/plugin-auto-unpack-natives": "^7.4.0",
     "@electron-forge/plugin-fuses": "^7.4.0",
     "@electron/fuses": "^1.8.0",
-    "electron": "latest",
+    "electron": "^33.2.0",
     "electron-packager": "^17.1.2"
   },
   "repository": {
@@ -43,7 +43,7 @@
     "url": "https://github.com/Tian-Godgiven/Tile-map/issues"
   },
   "homepage": "https://github.com/Tian-Godgiven/Tile-map#readme",
-   "config": {
+  "config": {
     "forge": {
       "electronPackagerConfig": {
         "extraResource": "./js/object_lib"
