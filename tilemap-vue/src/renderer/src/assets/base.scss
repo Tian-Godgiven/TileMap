@@ -1,0 +1,70 @@
+/* 亮色主题（默认） */
+:root {
+  --color--1: white;
+  --color-0: #FBFBFB;
+  --color-1: #F1F3F4;
+  --color-2: #E4E4E4;
+  --color-3: #CECECE;
+  --color-4: #9B9B9B;
+  --color-5: black;
+  --focusing-color: blue;
+  --border-color: #9B9B9B;
+  --text-color: black;
+  --warning-color-2: #E7CCCC;
+  --warning-color-1: #AE231E;
+  --warning-color-0: red;
+  --color-unlog: #686868;
+}
+
+/* 暗色主题 */
+[data-theme="dark"] {
+  --color--1: #1a1a1a;
+  --color-0: #202020;
+  --color-1: #2a2a2a;
+  --color-2: #353535;
+  --color-3: #454545;
+  --color-4: #888888;
+  --color-5: white;
+  --focusing-color: #4a9eff;
+  --border-color: #555555;
+  --text-color: #e0e0e0;
+  --warning-color-2: #4a2020;
+  --warning-color-1: #d84040;
+  --warning-color-0: #ff4444;
+  --color-unlog: #999999;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  font-weight: normal;
+}
+
+ul {
+  list-style: none;
+}
+
+body {
+  min-height: 100vh;
+  color: var(--text-color);
+  background: var(--color-1);
+  line-height: 1.6;
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
