@@ -4,6 +4,7 @@ import { useLineStore } from '../../stores/lineStore';
 import { useObjectLibStore } from '../../stores/objectLibStore';
 import { useHuabuStore } from '../../stores/huabuStore';
 import ObjectCollection from '../left/ObjectCollection.vue';
+import Swal from 'sweetalert2';
 
 const lineStore = useLineStore();
 const objectLibStore = useObjectLibStore();
@@ -44,17 +45,23 @@ async function loadAllLibs() {
 }
 
 async function createNewCollection() {
-  const name = prompt('输入集合名称：');
-  if (!name?.trim()) return;
-  const fileName = `${name.trim()}.tilemap`;
-  const data = { collection_name: name.trim(), collection_objects: [] };
-  await libAPI.writeFile('customize', fileName, data);
-  objectLibStore.addCollection({
-    name: name.trim(),
-    fileName,
-    collectionType: 'customize',
-    objects: []
+  const result = await Swal.fire({
+    html: '<div id="leftArea_create_collection_menu">输入集合名称：<input class="swal2-input" id="swal-collection-name" placeholder="集合名称"></div>',
+    showCancelButton: true,
+    confirmButtonText: '确认',
+    cancelButtonText: '取消',
+    scrollbarPadding: false,
+    preConfirm: () => {
+      const input = document.getElementById('swal-collection-name') as HTMLInputElement;
+      return input?.value.trim() || null;
+    }
   });
+  if (!result.isConfirmed || !result.value) return;
+  const name = result.value;
+  const fileName = `${name}.tilemap`;
+  const data = { collection_name: name, collection_objects: [] };
+  await libAPI.writeFile('customize', fileName, data);
+  objectLibStore.addCollection({ name, fileName, collectionType: 'customize', objects: [] });
 }
 
 async function importCollection() {

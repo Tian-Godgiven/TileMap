@@ -27,6 +27,7 @@ export const useUiStore = defineStore('ui', () => {
   const fileSaveAsMenuVisible = ref(false);
   const collectionEditMenuKey = ref<string | null>(null);
   const theme = ref<Theme>('light');
+  const showTextblock = ref(true);
 
   function setTool(tool: ActiveTool): void {
     activeTool.value = tool;
@@ -109,6 +110,10 @@ export const useUiStore = defineStore('ui', () => {
     showTopAbility.value = !showTopAbility.value;
   }
 
+  function toggleTextblock(): void {
+    showTextblock.value = !showTextblock.value;
+  }
+
   return {
     activeTool,
     rightPanelTab,
@@ -124,6 +129,7 @@ export const useUiStore = defineStore('ui', () => {
     fileSaveAsMenuVisible,
     collectionEditMenuKey,
     theme,
+    showTextblock,
     setTool,
     openContentPanel,
     closeContentPanel,
@@ -143,6 +149,7 @@ export const useUiStore = defineStore('ui', () => {
     openFileSaveAsMenu,
     closeFileSaveAsMenu,
     openCollectionEditMenu,
-    closeCollectionEditMenu
+    closeCollectionEditMenu,
+    toggleTextblock
   };
 });

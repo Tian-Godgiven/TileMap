@@ -2,6 +2,7 @@
 import { ref, computed, watch } from 'vue';
 import { useUiStore } from '../../stores/uiStore';
 import { useObjectLibStore, type ObjectTemplate } from '../../stores/objectLibStore';
+import MiniTile from '../common/MiniTile.vue';
 
 const uiStore = useUiStore();
 const objectLibStore = useObjectLibStore();
@@ -135,8 +136,8 @@ defineExpose({});
 </script>
 
 <template>
-  <div v-if="uiStore.collectionEditMenuKey" class="modal-mask">
-    <div id="collection_edit_menu">
+  <div v-if="uiStore.collectionEditMenuKey" class="mask_overlay_background">
+    <div id="collection_edit_menu" class="modal_menu">
       <div class="modal_menu_title">
         集合名：
         <input v-if="isCustomize" v-model="editingName" type="text" class="name_input" />
@@ -150,7 +151,7 @@ defineExpose({});
           :class="{ block_focusing: focusedIndex === i }"
           @click="selectObject(i)"
         >
-          <div class="object_preview">{{ obj.type }}</div>
+          <MiniTile :tile-data="obj.data" :size="70" />
           <input
             v-model="obj.type"
             type="text"
@@ -158,7 +159,7 @@ defineExpose({});
             @click.stop
             @blur="renameObject(i, obj.type)"
           />
-          <div class="delete_button" @click.stop="deleteObject(i)">✕</div>
+          <div class="delete_button" @click.stop="deleteObject(i)"></div>
           <div class="move_buttons">
             <div class="move_up" @click.stop="moveUp(i)">▲</div>
             <div class="move_down" @click.stop="moveDown(i)">▼</div>
@@ -166,8 +167,8 @@ defineExpose({});
         </div>
       </div>
       <div id="collection_edit_menu_button">
-        <div class="button" @click="exportCollection">导出本集合</div>
-        <div style="display: flex; gap: 8px">
+        <div class="button btn-left" @click="exportCollection">导出本集合</div>
+        <div class="btn-right">
           <div class="button" @click="close">取消</div>
           <div class="button" @click="exportObject">导出</div>
           <div class="button" @click="insertObject">导入</div>
@@ -179,11 +180,8 @@ defineExpose({});
 </template>
 
 <style lang="scss" scoped>
-.modal-mask {
+.mask_overlay_background {
   position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 500;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -192,16 +190,16 @@ defineExpose({});
 #collection_edit_menu {
   width: 620px;
   height: 420px;
-  background-color: var(--color-2);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  padding: 12px;
   display: flex;
   flex-direction: column;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .modal_menu_title {
+  position: relative;
   display: flex;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 8px;
   font-size: 18px;
@@ -213,28 +211,31 @@ defineExpose({});
 .name_display {
   flex: 1;
   background-color: var(--color-1);
+  border-radius: 5px;
   border: 1px solid var(--border-color);
-  border-radius: 3px;
-  padding: 4px 8px;
+  padding: 2px 6px;
   font-size: 16px;
 }
 
 .name_input:focus {
   outline: 1px solid var(--focusing-color);
 }
+
 .name_display {
   color: var(--color-4);
 }
 
 #collection_edit_menu_container {
-  flex: 1;
-  border-top: 1px solid var(--border-color);
-  border-bottom: 1px solid var(--border-color);
-  padding: 10px;
+  height: calc(100% - 70px);
+  margin: 10px 0;
+  width: 100%;
+  border-top: 1px solid gray;
+  border-bottom: 1px solid gray;
+  box-sizing: border-box;
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
   overflow-y: auto;
+  padding: 10px;
   align-content: flex-start;
 }
 
@@ -242,42 +243,40 @@ defineExpose({});
   position: relative;
   width: 104px;
   height: 113px;
+  padding: 12px 5px 5px;
+  margin: 0 3px 6px;
   background-color: var(--color-0);
   border: 1px solid var(--border-color);
   border-radius: 3px;
-  padding: 5px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-between;
 
   &:hover {
     background-color: var(--color-1);
   }
   &.block_focusing {
-    outline: 2px dashed var(--focusing-color);
+    outline: 2px dashed blue;
   }
 }
 
-.object_preview {
-  flex: 1;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  color: var(--color-4);
-  overflow: hidden;
-  text-overflow: ellipsis;
+:deep(.objectBlock_mini) {
+  height: 65px;
+  flex-shrink: 0;
 }
 
 .object_name {
+  font-size: 14px;
+  height: 18px;
   width: 100%;
-  font-size: 12px;
   text-align: center;
-  padding: 2px;
+  padding: 0 2px;
   border: 1px solid transparent;
   background: transparent;
+  line-height: 18px;
+  margin-top: auto;
 
   &:focus {
     border-color: var(--border-color);
@@ -287,23 +286,19 @@ defineExpose({});
 
 .delete_button {
   position: absolute;
-  top: -4px;
+  height: 24px;
+  width: 24px;
   right: -4px;
-  width: 20px;
-  height: 20px;
-  background-color: var(--color-2);
-  border: 1px solid var(--border-color);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  cursor: pointer;
+  top: -4px;
   z-index: 2;
-
-  &:hover {
-    background-color: var(--color-3);
-  }
+  background-color: inherit;
+  border-radius: 50%;
+  background-size: 70%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: url('../../assets/img/remove.png');
+  cursor: pointer;
+  border: none;
 }
 
 .move_buttons {
@@ -312,21 +307,22 @@ defineExpose({});
   left: 2px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
 }
 
 .move_up,
 .move_down {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   background-color: var(--color-2);
   border: 1px solid var(--border-color);
-  border-radius: 3px;
+  border-radius: 2px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 8px;
+  font-size: 7px;
   cursor: pointer;
+  line-height: 1;
 
   &:hover {
     background-color: var(--color-3);
@@ -334,22 +330,36 @@ defineExpose({});
 }
 
 #collection_edit_menu_button {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  position: relative;
+  height: 35px;
   margin-top: 10px;
 }
 
 .button {
-  padding: 6px 12px;
-  background-color: var(--color-1);
+  border-radius: 5px;
   border: 1px solid var(--border-color);
-  border-radius: 3px;
+  background-color: var(--color-2);
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  height: 35px;
   cursor: pointer;
   font-size: 14px;
 
   &:hover {
     background-color: var(--color-3);
   }
+}
+
+.btn-left {
+  position: absolute;
+  left: 0;
+}
+
+.btn-right {
+  position: absolute;
+  right: 0;
+  display: flex;
+  gap: 10px;
 }
 </style>

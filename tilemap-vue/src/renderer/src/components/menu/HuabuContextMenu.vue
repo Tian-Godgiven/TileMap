@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted, onUnmounted } from 'vue';
 import { useHuabuStore } from '../../stores/huabuStore';
 import { useClipboardStore } from '../../stores/clipboardStore';
 import { useHistoryStore } from '../../stores/historyStore';
 import { useTileStore } from '../../stores/tileStore';
+import { useConfirm } from '../../composables/useConfirm';
 
 const props = defineProps<{
   huabuId: string;
@@ -21,6 +22,7 @@ const huabuStore = useHuabuStore();
 const clipboardStore = useClipboardStore();
 const historyStore = useHistoryStore();
 const tileStore = useTileStore();
+const { confirm } = useConfirm();
 
 const huabu = computed(() => huabuStore.huabus.get(props.huabuId));
 const canUndo = computed(() => historyStore.canUndo);
@@ -31,10 +33,30 @@ const canReturnSource = computed(() => {
   return huabuStore.breadcrumb.length > 1;
 });
 
+function handleClickOutside(e: MouseEvent) {
+  const target = e.target as HTMLElement;
+  if (!target.closest('.context-menu')) {
+    emit('close');
+  }
+}
+
+onMounted(() => {
+  // 延迟添加监听器，避免立即触发
+  setTimeout(() => {
+    document.addEventListener('click', handleClickOutside);
+    document.addEventListener('contextmenu', handleClickOutside);
+  }, 0);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside);
+  document.removeEventListener('contextmenu', handleClickOutside);
+});
+
 function pasteHere() {
   const tile = clipboardStore.pasteTile();
   if (!tile || !huabu.value) return;
-  tileStore.createTile(props.huabuId, {
+  const newTile = tileStore.createTile(props.huabuId, {
     ...tile,
     style: {
       ...tile.style,
@@ -42,6 +64,8 @@ function pasteHere() {
       top: props.pasteY ?? tile.style.top
     }
   });
+  huabuStore.addTileId(props.huabuId, newTile.id);
+  historyStore.push({ type: 'tile-create', tileId: newTile.id, huabuId: props.huabuId, snapshot: { ...newTile, style: { ...newTile.style }, props: { ...newTile.props } } });
   emit('close');
 }
 
@@ -69,9 +93,9 @@ function selectAll() {
   emit('close');
 }
 
-function clearAll() {
+async function clearAll() {
   if (!huabu.value) return;
-  if (confirm('确认清空画布上的所有内容？')) {
+  if (await confirm('确认清空画布上的所有内容？')) {
     huabuStore.clearHuabu(props.huabuId);
   }
   emit('close');

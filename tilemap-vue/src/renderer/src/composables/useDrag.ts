@@ -1,5 +1,6 @@
 import { onUnmounted } from 'vue';
 import { useTileStore } from '../stores/tileStore';
+import { useHistoryStore } from '../stores/historyStore';
 
 interface DragOptions {
   huabuScale: () => number;
@@ -9,6 +10,7 @@ interface DragOptions {
 
 export function useDrag(options: DragOptions) {
   const tileStore = useTileStore();
+  const historyStore = useHistoryStore();
 
   let draggingId: string | null = null;
   let startPointerX = 0;
@@ -40,6 +42,19 @@ export function useDrag(options: DragOptions) {
 
   function onPointerUp(_e: PointerEvent) {
     if (!draggingId) return;
+    const tile = tileStore.tiles.get(draggingId);
+    if (tile) {
+      const afterLeft = tile.style.left;
+      const afterTop = tile.style.top;
+      if (afterLeft !== startLeft || afterTop !== startTop) {
+        historyStore.push({
+          type: 'tile-move',
+          tileId: draggingId,
+          before: { left: startLeft, top: startTop },
+          after: { left: afterLeft, top: afterTop }
+        });
+      }
+    }
     draggingId = null;
     options.onEnd?.();
   }

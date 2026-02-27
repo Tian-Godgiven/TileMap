@@ -4,15 +4,20 @@ import type { ObjectCollection, ObjectTemplate } from '../../stores/objectLibSto
 import { useObjectLibStore } from '../../stores/objectLibStore';
 import { useHuabuStore } from '../../stores/huabuStore';
 import { useTileStore } from '../../stores/tileStore';
+import { useHistoryStore } from '../../stores/historyStore';
 import { useUiStore } from '../../stores/uiStore';
+import MiniTile from '../common/MiniTile.vue';
+import { useConfirm } from '../../composables/useConfirm';
 
 const props = defineProps<{ collection: ObjectCollection; forceFold?: boolean }>();
 
 const objectLibStore = useObjectLibStore();
 const huabuStore = useHuabuStore();
 const tileStore = useTileStore();
+const historyStore = useHistoryStore();
 const uiStore = useUiStore();
 const libAPI = (window as any).libAPI;
+const { confirm } = useConfirm();
 
 const open = ref(true);
 const renamingName = ref(false);
@@ -30,10 +35,10 @@ watch(
 );
 
 async function saveToDisk() {
-  await libAPI.writeFile(props.collection.collectionType, props.collection.fileName, {
+  await libAPI.writeFile(props.collection.collectionType, props.collection.fileName, JSON.parse(JSON.stringify({
     collection_name: props.collection.name,
     collection_objects: props.collection.objects
-  });
+  })));
 }
 
 async function commitRename() {
@@ -66,13 +71,13 @@ async function appendFocusedTile() {
 }
 
 async function clearCollection() {
-  if (!confirm('确认清空该集合？')) return;
+  if (!(await confirm('确认清空该集合？'))) return;
   objectLibStore.clearCollection(props.collection.collectionType, props.collection.fileName);
   await saveToDisk();
 }
 
 async function deleteCollection() {
-  if (!confirm('确认删除该集合？这也会删除对应的本地文件！')) return;
+  if (!(await confirm('确认删除该集合？这也会删除对应的本地文件！'))) return;
   await libAPI.deleteFile(props.collection.collectionType, props.collection.fileName);
   objectLibStore.removeCollection(props.collection.collectionType, props.collection.fileName);
 }
@@ -90,8 +95,8 @@ function dropObjectOnCanvas(obj: ObjectTemplate, e: DragEvent) {
   const boardEl = document.querySelector('.huabu-board') as HTMLElement;
   if (!boardEl) return;
   const rect = boardEl.getBoundingClientRect();
-  const x = (e.clientX - rect.left) / scale - huabu.panX / scale;
-  const y = (e.clientY - rect.top) / scale - huabu.panY / scale;
+  const x = (e.clientX - rect.left) / scale;
+  const y = (e.clientY - rect.top) / scale;
   const tile = tileStore.createTile(huabuId, {
     title: obj.type,
     style: { ...(obj.data.style as any), left: x, top: y },
@@ -99,6 +104,50 @@ function dropObjectOnCanvas(obj: ObjectTemplate, e: DragEvent) {
   });
   huabuStore.addTileId(huabuId, tile.id);
   tileStore.focusTile(tile.id);
+  historyStore.push({ type: 'tile-create', tileId: tile.id, huabuId, snapshot: { ...tile, style: { ...tile.style }, props: { ...tile.props } } });
+}
+
+function onDragStart(obj: ObjectTemplate, e: DragEvent) {
+  if (!e.dataTransfer) return;
+
+  // 存储对象数据
+  e.dataTransfer.effectAllowed = 'copy';
+  e.dataTransfer.setData('application/json', JSON.stringify(obj));
+
+  // 获取当前画布的缩放比例
+  const huabu = huabuStore.activeHuabu;
+  const scale = huabu?.scale ?? 1;
+
+  // 创建幻影元素
+  const ghost = document.createElement('div');
+  ghost.style.position = 'absolute';
+  ghost.style.top = '-9999px';
+  ghost.style.opacity = '0.7';
+  ghost.style.pointerEvents = 'none';
+
+  // 渲染真实尺寸的 tile，应用画布缩放
+  const style = obj.data.style as any;
+  const width = (style.width ?? 100) * scale;
+  const height = (style.height ?? 100) * scale;
+  ghost.style.width = `${width}px`;
+  ghost.style.height = `${height}px`;
+  ghost.style.backgroundColor = style.backgroundColor ?? '#fff';
+  ghost.style.border = `${(style.borderWidth ?? 2) * scale}px ${style.borderStyle ?? 'solid'} ${style.borderColor ?? 'black'}`;
+  ghost.style.borderRadius = `${(style.borderRadius ?? 0) * scale}px`;
+  ghost.style.fontSize = `${(style.fontSize ?? 30) * scale}px`;
+  ghost.style.display = 'flex';
+  ghost.style.alignItems = 'center';
+  ghost.style.justifyContent = 'center';
+
+  if (obj.data.props?.showTitle && obj.data.title) {
+    ghost.textContent = obj.data.title;
+  }
+
+  document.body.appendChild(ghost);
+  e.dataTransfer.setDragImage(ghost, 0, 0);
+
+  // 清理幻影元素
+  setTimeout(() => document.body.removeChild(ghost), 0);
 }
 </script>
 
@@ -155,17 +204,10 @@ function dropObjectOnCanvas(obj: ObjectTemplate, e: DragEvent) {
         class="object-block"
         :title="obj.type"
         draggable="true"
-        @dragend="dropObjectOnCanvas(obj, $event)"
+        @dragstart="onDragStart(obj, $event)"
       >
         <div class="object-block-preview">
-          <div
-            class="object-mini-tile"
-            :style="{
-              backgroundColor: (obj.data.style as any)?.backgroundColor ?? '#fff',
-              width: '40px',
-              height: '40px'
-            }"
-          ></div>
+          <MiniTile :tile-data="obj.data" :size="44" />
         </div>
         <span class="object-block-name">{{ obj.type }}</span>
       </div>
@@ -252,46 +294,46 @@ function dropObjectOnCanvas(obj: ObjectTemplate, e: DragEvent) {
 }
 
 .collection-body {
+  background-color: var(--color-0);
+  width: 100%;
   display: flex;
+  padding: 5px;
+  overflow: hidden;
   flex-wrap: wrap;
-  gap: 4px;
-  padding: 6px;
-  background: var(--color-1);
+  box-sizing: border-box;
 }
 
 .object-block {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 56px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  width: 66px;
+  min-height: 75px;
+  padding: 5px 0;
+  margin: 0 3px;
   cursor: grab;
-  &:hover .object-block-preview {
-    border-color: var(--focusing-color);
+  &:hover {
+    background-color: var(--color-3);
   }
 }
 
 .object-block-preview {
-  width: 50px;
+  width: 100%;
   height: 50px;
-  border: 1px solid var(--border-color);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--color-0);
-}
-
-.object-mini-tile {
-  border: 1px solid var(--border-color);
+  overflow: hidden;
 }
 
 .object-block-name {
-  font-size: 11px;
+  margin-top: 5px;
+  font-size: 14px;
+  height: 20px;
   text-align: center;
   width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: var(--color-5);
 }
 
 .empty-hint {

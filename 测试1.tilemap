@@ -1,0 +1,64 @@
+{
+  "collection_name": "测试1",
+  "collection_objects": [
+    {
+      "type": "磁贴",
+      "objectType": "tile",
+      "data": {
+        "style": {
+          "width": 100,
+          "height": 100,
+          "backgroundColor": "#ffffff",
+          "borderStyle": "solid",
+          "borderWidth": 2,
+          "borderColor": "#333333",
+          "borderRadius": 0,
+          "fontSize": 24,
+          "titleColor": "#000000",
+          "titleAlign": "center",
+          "titleHorizontal": "0px",
+          "titleVertical": "0px",
+          "fontFamily": "",
+          "fontBold": false,
+          "fontItalic": false,
+          "fontVertical": false,
+          "fontOverline": false,
+          "fontStrikeline": false,
+          "fontUnderline": false,
+          "shadowEnabled": false,
+          "shadowColor": "#000000",
+          "shadowX": 2,
+          "shadowY": 2,
+          "shadowBlur": 4,
+          "backgroundImage": null,
+          "backgroundImageSet": "place",
+          "backgroundGradient": false,
+          "gradientDirection": null,
+          "gradientColor": null,
+          "zIndex": 1,
+          "angle": 0,
+          "left": 280.359375,
+          "top": 306
+        },
+        "props": {
+          "lock": false,
+          "showTitle": true,
+          "wrapTitle": true,
+          "contentPanelPinned": false,
+          "nestOpenMode": "dbclick",
+          "sizeLimit": false,
+          "annotationEnabled": false,
+          "annotation": "",
+          "textblockShowState": "normal",
+          "textblockBind": true,
+          "textblockWidth": 170,
+          "textblockHeight": 200,
+          "textblockVertical": "center",
+          "textblockHorizontal": "right",
+          "disableLinkPopup": false
+        },
+        "title": "磁贴"
+      }
+    }
+  ]
+}

@@ -13,7 +13,8 @@
       "Bash(grep:*)",
       "Bash(dir C:\\\\Users\\\\Administrator\\\\AppData\\\\Roaming\\\\tilemap-vue:*)",
       "Bash(\"C:/Users/Administrator/AppData/Roaming/tilemap-vue/object_lib/default_lib/1_通用_lib.tilemap\":*)",
-      "Bash(\"D:/tian/TileMap/tilemap-vue/resources/object_lib/default_lib/1_通用_lib.tilemap\":*)"
+      "Bash(\"D:/tian/TileMap/tilemap-vue/resources/object_lib/default_lib/1_通用_lib.tilemap\":*)",
+      "Bash(git:*)"
     ]
   }
 }

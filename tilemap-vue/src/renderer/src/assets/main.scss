@@ -6,11 +6,21 @@
   padding: 0;
 }
 
-html, body, #app {
+html, body {
   width: 100%;
   height: 100%;
   overflow: hidden;
   user-select: none;
+}
+
+#app {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  user-select: none;
+  position: fixed;
+  top: 0;
+  left: 0;
 }
 
 /* 通用工具类 */
@@ -111,6 +121,30 @@ select option {
   background-color: var(--color-3);
 }
 
+.slide_menu > .slide_title.folding::before {
+  content: "";
+  background-image: url('./img/simple_arrow_right_darken.png');
+  background-size: 20px 16px;
+  background-repeat: no-repeat;
+  background-position: center;
+  display: inline-block;
+  width: 20px;
+  height: 24px;
+  position: relative;
+}
+
+.slide_menu > .slide_title.unfolding::before {
+  content: "";
+  background-image: url('./img/simple_arrow_down.png');
+  background-size: 16px 16px;
+  background-repeat: no-repeat;
+  background-position: center;
+  display: inline-block;
+  width: 20px;
+  height: 24px;
+  position: relative;
+}
+
 .slide_inner {
   font-size: 16px;
   padding: 4px 0px;
@@ -119,6 +153,49 @@ select option {
 /* 折叠菜单 */
 .slide_menu.folding > .slide_inner {
   display: none;
+}
+
+/* 拾色器样式 */
+.colorpicker {
+  background-color: var(--color-2);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  display: flex;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 20px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--color-3);
+  }
+}
+
+.colorpicker_block {
+  width: 24px;
+  height: 16px;
+  border: 1px solid var(--color-5);
+  box-sizing: border-box;
+  background-color: var(--color-5);
+}
+
+.colorpicker_img {
+  margin-left: 2px;
+  position: relative;
+  top: -1px;
+  width: 16px;
+  height: 16px;
+  background-image: url('./img/colorpicker.png');
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-position: center center;
+}
+
+span:focus {
+  outline-color: var(--focusing-color);
+  background-color: var(--color-1);
 }
 
 /* 蒙版背景 */
@@ -132,6 +209,48 @@ select option {
   opacity: 0.7;
   left: 0px;
   top: 0px;
+}
+
+/* 弹出菜单 */
+.modal_menu {
+  display: block;
+  position: absolute;
+  background-color: var(--color-0);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  box-sizing: border-box;
+  box-shadow: var(--color-4) 0px 0px 10px;
+  padding: 20px;
+  z-index: 10003;
+  top: 200px;
+  left: 50%;
+  transform: translate(-50%, -5%);
+}
+
+.modal_menu_title {
+  position: relative;
+}
+
+.modal_menu_button {
+  position: absolute;
+  display: flex;
+  left: 50%;
+  bottom: 20px;
+  transform: translate(-50%, 0px);
+
+  > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1px 8px;
+    background-color: var(--color-2);
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+
+    &:hover {
+      background-color: var(--color-3);
+    }
+  }
 }
 
 /* 弹出提示信息 */
@@ -188,3 +307,4 @@ select option {
 .rightArea_design_inner_block {
   padding: 10px;
 }
+

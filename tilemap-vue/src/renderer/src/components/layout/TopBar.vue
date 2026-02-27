@@ -31,7 +31,8 @@ const fileStore = useFileStore();
   height: 100%;
   position: relative;
   display: flex;
-  .left{
+
+  .left {
     display: flex;
     flex-grow: 1;
   }
@@ -61,6 +62,14 @@ const fileStore = useFileStore();
   text-overflow: ellipsis;
   white-space: nowrap;
   line-height: 1;
+
+  span {
+    cursor: pointer;
+
+    &:hover {
+      color: var(--focusing-color);
+    }
+  }
 }
 
 #topArea_ability {

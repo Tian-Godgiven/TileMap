@@ -182,7 +182,7 @@ function isValidColor(value: string): boolean {
     <div id="colorpicker_wheel"></div>
 
     <div class="colorpicker-input">
-      <div class="cp-swatch" :style="{ backgroundColor: inputValue }"></div>
+      <div class="cp-swatch" :style="{ backgroundColor: inputValue, backgroundImage: inputValue === 'transparent' ? undefined : 'none' }"></div>
       <input v-model="inputValue" @input="onInputChange" />
       <button class="cp-btn cp-confirm" title="确认" @click="confirm"></button>
       <button class="cp-btn cp-copy" title="复制" @click="copyColor"></button>
@@ -203,7 +203,7 @@ function isValidColor(value: string): boolean {
             v-for="(color, idx) in memoryColors"
             :key="idx"
             class="colorblock"
-            :style="{ backgroundColor: color }"
+            :style="{ backgroundColor: color, backgroundImage: color === 'transparent' ? undefined : 'none' }"
             @click="selectMemoryColor(color)"
           ></div>
           <div class="colorblock delete" title="清空" @click="clearMemory">×</div>
@@ -218,7 +218,7 @@ function isValidColor(value: string): boolean {
             v-for="(color, idx) in selectColors"
             :key="idx"
             class="colorblock"
-            :style="{ backgroundColor: color }"
+            :style="{ backgroundColor: color, backgroundImage: color === 'transparent' ? undefined : 'none' }"
             @click="selectColor(color)"
           ></div>
         </div>

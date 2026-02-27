@@ -55,9 +55,33 @@ export function useCanvasPan(options: CanvasPanOptions) {
     if (!huabu) return;
 
     e.preventDefault();
-    const delta = e.deltaY > 0 ? -0.1 : 0.1;
-    const newScale = Math.max(0.1, Math.min(5, huabu.scale + delta));
-    huabuStore.setScale(huabuId, newScale);
+
+    // 计算缩放增量
+    const delta = e.deltaY > 0 ? -0.05 : 0.05;
+    const oldScale = huabu.scale;
+    const newScale = Math.max(0.1, Math.min(3, oldScale + delta));
+
+    // 以鼠标位置为中心缩放
+    const boardEl = (e.currentTarget as HTMLElement).querySelector('.huabu-board') as HTMLElement;
+    if (boardEl) {
+      const rect = boardEl.getBoundingClientRect();
+      // 鼠标在画布容器中的位置
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      // 鼠标在画布坐标系中的位置（缩放前）
+      const canvasX = (mouseX - huabu.panX) / oldScale;
+      const canvasY = (mouseY - huabu.panY) / oldScale;
+
+      // 计算新的 pan 值，使鼠标位置保持不变
+      const newPanX = mouseX - canvasX * newScale;
+      const newPanY = mouseY - canvasY * newScale;
+
+      huabuStore.setScale(huabuId, newScale);
+      huabuStore.setPan(huabuId, newPanX, newPanY);
+    } else {
+      huabuStore.setScale(huabuId, newScale);
+    }
   }
 
   onUnmounted(() => {

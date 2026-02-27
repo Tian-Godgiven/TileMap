@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import type { Tile, TileStyle, TileProps } from '../types';
 import type { JSONContent } from '@tiptap/vue-3';
+import { useHistoryStore } from './historyStore';
 
 function createId(): string {
   return `tile_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
@@ -107,9 +108,14 @@ export const useTileStore = defineStore('tile', () => {
     if (focusedTileId.value === id) focusedTileId.value = null;
   }
 
-  function updateTitle(id: string, title: string): void {
+  function updateTitle(id: string, title: string, pushHistory = true): void {
     const tile = tiles.value.get(id);
-    if (tile) tile.title = title;
+    if (!tile) return;
+    if (pushHistory) {
+      const historyStore = useHistoryStore();
+      historyStore.push({ type: 'tile-title', tileId: id, before: tile.title, after: title });
+    }
+    tile.title = title;
   }
 
   function updateContent(id: string, content: JSONContent | null): void {
@@ -117,14 +123,32 @@ export const useTileStore = defineStore('tile', () => {
     if (tile) tile.content = content;
   }
 
-  function updateStyle(id: string, style: Partial<TileStyle>): void {
+  function updateStyle(id: string, style: Partial<TileStyle>, pushHistory = true): void {
     const tile = tiles.value.get(id);
-    if (tile) Object.assign(tile.style, style);
+    if (!tile) return;
+    if (pushHistory) {
+      const historyStore = useHistoryStore();
+      const before: any = {};
+      for (const key of Object.keys(style)) {
+        before[key] = (tile.style as any)[key];
+      }
+      historyStore.push({ type: 'tile-style', tileId: id, before, after: style });
+    }
+    Object.assign(tile.style, style);
   }
 
-  function updateProps(id: string, props: Partial<TileProps>): void {
+  function updateProps(id: string, props: Partial<TileProps>, pushHistory = true): void {
     const tile = tiles.value.get(id);
-    if (tile) Object.assign(tile.props, props);
+    if (!tile) return;
+    if (pushHistory) {
+      const historyStore = useHistoryStore();
+      const before: any = {};
+      for (const key of Object.keys(props)) {
+        before[key] = (tile.props as any)[key];
+      }
+      historyStore.push({ type: 'tile-props', tileId: id, before, after: props });
+    }
+    Object.assign(tile.props, props);
   }
 
   function moveTile(id: string, left: number, top: number): void {
@@ -149,15 +173,17 @@ export const useTileStore = defineStore('tile', () => {
   }
 
   function selectTile(id: string): void {
-    selectedTileIds.value.add(id);
+    selectedTileIds.value = new Set(selectedTileIds.value).add(id);
   }
 
   function deselectTile(id: string): void {
-    selectedTileIds.value.delete(id);
+    const newSet = new Set(selectedTileIds.value);
+    newSet.delete(id);
+    selectedTileIds.value = newSet;
   }
 
   function clearSelection(): void {
-    selectedTileIds.value.clear();
+    selectedTileIds.value = new Set();
   }
 
   function toggleLock(id: string): void {

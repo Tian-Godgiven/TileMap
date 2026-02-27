@@ -6,6 +6,7 @@ import { useLineStore } from '../stores/lineStore';
 import { useFileStore } from '../stores/fileStore';
 import { useClipboardStore } from '../stores/clipboardStore';
 import { useUiStore } from '../stores/uiStore';
+import { useConfirm } from './useConfirm';
 
 export function useKeyboard() {
   const historyStore = useHistoryStore();
@@ -15,8 +16,9 @@ export function useKeyboard() {
   const fileStore = useFileStore();
   const clipboardStore = useClipboardStore();
   const uiStore = useUiStore();
+  const { confirm } = useConfirm();
 
-  function onKeyDown(e: KeyboardEvent) {
+  async function onKeyDown(e: KeyboardEvent) {
     const ctrl = e.ctrlKey || e.metaKey;
     const target = e.target as HTMLElement;
     // 如果焦点在输入框内，不拦截
@@ -41,7 +43,7 @@ export function useKeyboard() {
     if (ctrl && e.key === 'n') {
       e.preventDefault();
       if (fileStore.modified) {
-        if (!confirm('当前文件未保存，是否继续？')) return;
+        if (!(await confirm('当前文件未保存，是否继续？'))) return;
       }
       huabuStore.huabus.clear();
       huabuStore.huabuOrder = [];
@@ -83,8 +85,10 @@ export function useKeyboard() {
       if (tile && huabuStore.activeHuabuId) {
         e.preventDefault();
         clipboardStore.copyTile(tile);
+        const snapshot = { ...tile, style: { ...tile.style }, props: { ...tile.props } };
         huabuStore.removeTileId(huabuStore.activeHuabuId, tile.id);
         tileStore.deleteTile(tile.id);
+        historyStore.push({ type: 'tile-delete', tileId: snapshot.id, huabuId: huabuStore.activeHuabuId, snapshot });
       }
       return;
     }
@@ -102,6 +106,7 @@ export function useKeyboard() {
           tileStore.tiles.set(id, newTile);
           huabuStore.addTileId(huabuStore.activeHuabuId, id);
           tileStore.focusTile(id);
+          historyStore.push({ type: 'tile-create', tileId: id, huabuId: huabuStore.activeHuabuId, snapshot: { ...newTile } });
         }
       }
       return;
@@ -122,6 +127,7 @@ export function useKeyboard() {
           tileStore.tiles.set(id, newTile);
           huabuStore.addTileId(huabuStore.activeHuabuId, id);
           tileStore.focusTile(id);
+          historyStore.push({ type: 'tile-create', tileId: id, huabuId: huabuStore.activeHuabuId, snapshot: { ...newTile } });
         }
       }
       return;
@@ -158,8 +164,10 @@ export function useKeyboard() {
     if (e.key === 'Delete' || e.key === 'Backspace') {
       const tile = tileStore.focusedTile;
       if (tile && huabuStore.activeHuabuId) {
+        const snapshot = { ...tile, style: { ...tile.style }, props: { ...tile.props } };
         huabuStore.removeTileId(huabuStore.activeHuabuId, tile.id);
         tileStore.deleteTile(tile.id);
+        historyStore.push({ type: 'tile-delete', tileId: snapshot.id, huabuId: huabuStore.activeHuabuId, snapshot });
       }
       return;
     }

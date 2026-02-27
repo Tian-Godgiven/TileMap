@@ -3,6 +3,7 @@ import { computed, ref } from 'vue';
 import { useTileStore } from '../../stores/tileStore';
 import { useHuabuStore } from '../../stores/huabuStore';
 import { useClipboardStore } from '../../stores/clipboardStore';
+import { useHistoryStore } from '../../stores/historyStore';
 import ColorPicker from '../common/ColorPicker.vue';
 
 const props = defineProps<{
@@ -18,6 +19,7 @@ const emit = defineEmits<{
 const tileStore = useTileStore();
 const huabuStore = useHuabuStore();
 const clipboardStore = useClipboardStore();
+const historyStore = useHistoryStore();
 
 const tile = computed(() => tileStore.tiles.get(props.tileId));
 
@@ -52,14 +54,26 @@ function copyTile() {
 
 function cutTile() {
   if (!tile.value) return;
-  clipboardStore.copyTile(tile.value);
-  tileStore.deleteTile(tile.value.id);
+  const t = tile.value;
+  const huabuId = huabuStore.activeHuabuId;
+  if (!huabuId) return;
+  clipboardStore.copyTile(t);
+  const snapshot = { ...t, style: { ...t.style }, props: { ...t.props } };
+  huabuStore.removeTileId(huabuId, t.id);
+  tileStore.deleteTile(t.id);
+  historyStore.push({ type: 'tile-delete', tileId: snapshot.id, huabuId, snapshot });
   emit('close');
 }
 
 function deleteTile() {
   if (!tile.value) return;
-  tileStore.deleteTile(tile.value.id);
+  const t = tile.value;
+  const huabuId = huabuStore.activeHuabuId;
+  if (!huabuId) return;
+  const snapshot = { ...t, style: { ...t.style }, props: { ...t.props } };
+  huabuStore.removeTileId(huabuId, t.id);
+  tileStore.deleteTile(t.id);
+  historyStore.push({ type: 'tile-delete', tileId: snapshot.id, huabuId, snapshot });
   emit('close');
 }
 

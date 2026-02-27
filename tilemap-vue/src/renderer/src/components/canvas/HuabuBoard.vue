@@ -3,11 +3,13 @@ import { computed, ref } from 'vue';
 import { useHuabuStore } from '../../stores/huabuStore';
 import { useTileStore } from '../../stores/tileStore';
 import { useLineStore } from '../../stores/lineStore';
+import { useHistoryStore } from '../../stores/historyStore';
 import { useCompositeStore } from '../../stores/compositeStore';
 import { useDrag } from '../../composables/useDrag';
 import { useResize } from '../../composables/useResize';
 import { useCanvasPan } from '../../composables/useCanvasPan';
 import { useCompositeDrag } from '../../composables/useCompositeDrag';
+import { useLassoSelect } from '../../composables/useLassoSelect';
 import { generateLinePath } from '../../utils/geometry';
 import TileTextBlock from './TileTextBlock.vue';
 import TileContextMenu from '../menu/TileContextMenu.vue';
@@ -17,6 +19,7 @@ import LineContextMenu from '../menu/LineContextMenu.vue';
 const huabuStore = useHuabuStore();
 const tileStore = useTileStore();
 const lineStore = useLineStore();
+const historyStore = useHistoryStore();
 const compositeStore = useCompositeStore();
 
 const currentHuabu = computed(() => huabuStore.activeHuabu);
@@ -131,6 +134,7 @@ const drag = useDrag({ huabuScale: () => currentScale.value });
 const resize = useResize({ huabuScale: () => currentScale.value });
 const pan = useCanvasPan({ huabuId: () => huabuStore.activeHuabuId });
 const compositeDrag = useCompositeDrag({ huabuScale: () => currentScale.value });
+const lasso = useLassoSelect({ huabuScale: () => currentScale.value });
 
 const hoveredTileId = ref<string | null>(null);
 
@@ -149,19 +153,24 @@ function onWrapperPointerMove(e: PointerEvent) {
   resize.onPointerMove(e);
   pan.onPointerMove(e);
   compositeDrag.onPointerMove(e);
+  lasso.onPointerMove(e);
 }
 function onWrapperPointerUp(e: PointerEvent) {
   drag.onPointerUp(e);
   resize.onPointerUp();
   pan.onPointerUp();
   compositeDrag.onPointerUp();
+  lasso.onPointerUp();
 }
 
 function onTilePointerDown(e: PointerEvent, tileId: string) {
   if (lineStore.connectMode) {
     e.stopPropagation();
     if (huabuStore.activeHuabuId) {
-      lineStore.handleTileClick(huabuStore.activeHuabuId, tileId);
+      const newLine = lineStore.handleTileClick(huabuStore.activeHuabuId, tileId);
+      if (newLine) {
+        historyStore.push({ type: 'line-create', lineId: newLine.id, huabuId: huabuStore.activeHuabuId, snapshot: { ...newLine } });
+      }
     }
     return;
   }
@@ -246,10 +255,16 @@ function commitTitleEdit(tileId: string) {
 }
 
 function onBoardClick(e: MouseEvent) {
+  // 如果刚完成套索选择，不要清除聚焦
+  if (lasso.justFinishedLasso.value) {
+    return;
+  }
+
   if ((e.target as HTMLElement).classList.contains('huabu-board')) {
     tileStore.focusTile(null);
     tileStore.clearSelection();
     lineStore.focusLine(null);
+    compositeStore.focusComposite(null);
   }
   closeLineMenu();
   closeTileMenu();
@@ -311,6 +326,31 @@ function onBoardContextMenu(e: MouseEvent) {
 function closeBoardMenu() {
   boardMenu.value.visible = false;
 }
+
+function onDrop(e: DragEvent) {
+  e.preventDefault();
+  const huabuId = huabuStore.activeHuabuId;
+  if (!huabuId || !huabuStore.activeHuabu) return;
+  const data = e.dataTransfer?.getData('application/json');
+  if (!data) return;
+  const obj = JSON.parse(data);
+  const huabu = huabuStore.activeHuabu;
+  const scale = huabu.scale;
+  const boardEl = document.querySelector('.huabu-board') as HTMLElement;
+  if (!boardEl) return;
+  const rect = boardEl.getBoundingClientRect();
+  // 计算鼠标在画布坐标系中的位置
+  const x = (e.clientX - rect.left) / scale;
+  const y = (e.clientY - rect.top) / scale;
+  const tile = tileStore.createTile(huabuId, {
+    title: obj.type,
+    style: { ...(obj.data.style as any), left: x, top: y },
+    props: obj.data.props as any
+  });
+  huabuStore.addTileId(huabuId, tile.id);
+  tileStore.focusTile(tile.id);
+  historyStore.push({ type: 'tile-create', tileId: tile.id, huabuId, snapshot: { ...tile, style: { ...tile.style }, props: { ...tile.props } } });
+}
 </script>
 
 <template>
@@ -318,12 +358,25 @@ function closeBoardMenu() {
     class="huabu-board-wrapper"
     @pointermove="onWrapperPointerMove"
     @pointerup="onWrapperPointerUp"
-    @pointerdown="pan.onPointerDown"
     @wheel.prevent="pan.onWheel"
     @click="onBoardClick"
     @contextmenu="onBoardContextMenu"
+    @dragover.prevent
+    @drop="onDrop"
   >
-    <div v-if="currentHuabu" class="huabu-board" :style="boardStyle">
+    <div
+      v-if="currentHuabu"
+      class="huabu-board"
+      :style="boardStyle"
+      @pointerdown="
+        (e) => {
+          lasso.onPointerDown(e);
+          pan.onPointerDown(e);
+        }
+      "
+    >
+      <!-- 套索选择框 -->
+      <div class="lasso-selection" :style="lasso.getLassoStyle()"></div>
       <!-- 连线层（在磁贴下方） -->
       <svg class="line-layer" :width="currentHuabu.style.width" :height="currentHuabu.style.height">
         <defs>
@@ -428,7 +481,33 @@ function closeBoardMenu() {
             zIndex: tileStore.tiles.get(tileId)?.style.zIndex || 1,
             backgroundColor: tileStore.tiles.get(tileId)?.style.backgroundColor,
             transform: `rotate(${tileStore.tiles.get(tileId)?.style.angle || 0}deg)`,
-            fontSize: `${tileStore.tiles.get(tileId)?.style.fontSize || 14}px`
+            fontSize: `${tileStore.tiles.get(tileId)?.style.fontSize || 14}px`,
+            borderStyle: tileStore.tiles.get(tileId)?.style.borderStyle,
+            borderWidth: `${tileStore.tiles.get(tileId)?.style.borderWidth || 2}px`,
+            borderColor: tileStore.tiles.get(tileId)?.style.borderColor,
+            borderRadius: (() => {
+              const tile = tileStore.tiles.get(tileId);
+              if (!tile) return '0px';
+              return tile.style.borderRadius >= Math.min(tile.style.width, tile.style.height) / 2
+                ? '50%'
+                : `${tile.style.borderRadius}px`;
+            })(),
+            backgroundImage:
+              tileStore.tiles.get(tileId)?.style.backgroundGradient &&
+              tileStore.tiles.get(tileId)?.style.gradientColor
+                ? `${tileStore.tiles.get(tileId)?.style.gradientDirection === 'radial' ? 'radial-gradient' : `linear-gradient(to ${tileStore.tiles.get(tileId)?.style.gradientDirection})`}(${tileStore.tiles.get(tileId)?.style.backgroundColor}, ${tileStore.tiles.get(tileId)?.style.gradientColor})`
+                : tileStore.tiles.get(tileId)?.style.backgroundImage
+                  ? `url(${tileStore.tiles.get(tileId)?.style.backgroundImage})`
+                  : undefined,
+            backgroundSize:
+              tileStore.tiles.get(tileId)?.style.backgroundImageSet === 'stretch'
+                ? '100% 100%'
+                : tileStore.tiles.get(tileId)?.style.backgroundImageSet === 'repeat'
+                  ? 'auto'
+                  : 'contain',
+            backgroundRepeat:
+              tileStore.tiles.get(tileId)?.style.backgroundImageSet === 'repeat' ? 'repeat' : 'no-repeat',
+            backgroundPosition: 'center'
           }"
         >
           <div v-if="tileStore.tiles.get(tileId)?.props.showTitle" class="tile_title">
@@ -463,7 +542,10 @@ function closeBoardMenu() {
           borderStyle: tile.style.borderStyle,
           borderWidth: `${tile.style.borderWidth}px`,
           borderColor: tile.style.borderColor,
-          borderRadius: `${tile.style.borderRadius}px`,
+          borderRadius:
+            tile.style.borderRadius >= Math.min(tile.style.width, tile.style.height) / 2
+              ? '50%'
+              : `${tile.style.borderRadius}px`,
           backgroundImage:
             tile.style.backgroundGradient && tile.style.gradientColor
               ? `${tile.style.gradientDirection === 'radial' ? 'radial-gradient' : `linear-gradient(to ${tile.style.gradientDirection})`}(${tile.style.backgroundColor}, ${tile.style.gradientColor})`
@@ -619,7 +701,7 @@ function closeBoardMenu() {
   height: 100%;
   overflow: hidden;
   position: relative;
-  background-color: var(--color-0);
+  background-color: #EFEFEF;
   cursor: default;
 }
 
@@ -645,7 +727,7 @@ function closeBoardMenu() {
   position: absolute;
   cursor: default;
   z-index: 1;
-  box-sizing: border-box;
+  box-sizing: content-box;
 
   &.focusing {
     outline: 2px dashed var(--focusing-color);
@@ -670,12 +752,21 @@ function closeBoardMenu() {
     outline-offset: 2px;
   }
 
+  &.selected {
+    outline: 2px solid var(--focusing-color);
+    outline-offset: 2px;
+  }
+
   &.line_connect_start {
-    box-shadow: 0px 0px 10px 3px red;
+    outline: 2px solid #e67e22;
+    outline-offset: 2px;
+    box-shadow: 0px 0px 6px 2px rgba(230, 126, 34, 0.5);
   }
 
   &.line_connect_end {
-    box-shadow: 0px 0px 10px 3px green;
+    outline: 2px dashed #2980b9;
+    outline-offset: 2px;
+    box-shadow: 0px 0px 6px 2px rgba(41, 128, 185, 0.4);
   }
 }
 
@@ -865,5 +956,11 @@ function closeBoardMenu() {
   &:hover {
     opacity: 0.9;
   }
+}
+
+.lasso-selection {
+  position: absolute;
+  pointer-events: none;
+  z-index: 9999;
 }
 </style>

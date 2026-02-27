@@ -1,6 +1,10 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import type { Tile, Line } from '../types';
+import { useTileStore } from './tileStore';
+import { useHuabuStore } from './huabuStore';
+import { useLineStore } from './lineStore';
+import { useFileStore } from './fileStore';
 
 export type HistoryEntry =
   | {
@@ -21,6 +25,18 @@ export type HistoryEntry =
       before: Partial<Tile['style']>;
       after: Partial<Tile['style']>;
     }
+  | {
+      type: 'tile-props';
+      tileId: string;
+      before: Partial<Tile['props']>;
+      after: Partial<Tile['props']>;
+    }
+  | {
+      type: 'tile-title';
+      tileId: string;
+      before: string;
+      after: string;
+    }
   | { type: 'tile-create'; tileId: string; huabuId: string; snapshot: Tile }
   | { type: 'tile-delete'; tileId: string; huabuId: string; snapshot: Tile }
   | { type: 'line-create'; lineId: string; huabuId: string; snapshot: Line }
@@ -39,13 +55,10 @@ export const useHistoryStore = defineStore('history', () => {
     undoStack.value.push(entry);
     if (undoStack.value.length > MAX_HISTORY) undoStack.value.shift();
     redoStack.value = [];
+    useFileStore().markUnsaved();
   }
 
   function applyEntry(entry: HistoryEntry, direction: 'undo' | 'redo'): void {
-    // lazy import to avoid circular deps
-    const { useTileStore } = require('./tileStore');
-    const { useHuabuStore } = require('./huabuStore');
-    const { useLineStore } = require('./lineStore');
     const tileStore = useTileStore();
     const huabuStore = useHuabuStore();
     const lineStore = useLineStore();
@@ -64,6 +77,12 @@ export const useHistoryStore = defineStore('history', () => {
     } else if (entry.type === 'tile-style') {
       const style = direction === 'undo' ? entry.before : entry.after;
       tileStore.updateStyle(entry.tileId, style);
+    } else if (entry.type === 'tile-props') {
+      const props = direction === 'undo' ? entry.before : entry.after;
+      tileStore.updateProps(entry.tileId, props);
+    } else if (entry.type === 'tile-title') {
+      const title = direction === 'undo' ? entry.before : entry.after;
+      tileStore.updateTitle(entry.tileId, title);
     } else if (entry.type === 'tile-create') {
       if (direction === 'undo') {
         huabuStore.removeTileId(entry.huabuId, entry.tileId);
@@ -104,6 +123,7 @@ export const useHistoryStore = defineStore('history', () => {
     if (!entry) return;
     applyEntry(entry, 'undo');
     redoStack.value.push(entry);
+    useFileStore().markUnsaved();
   }
 
   function redo(): void {
@@ -111,6 +131,7 @@ export const useHistoryStore = defineStore('history', () => {
     if (!entry) return;
     applyEntry(entry, 'redo');
     undoStack.value.push(entry);
+    useFileStore().markUnsaved();
   }
 
   function clear(): void {

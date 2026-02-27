@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 import type { Composite, CompositeStyle, TileRelativePosition } from '../types';
 import { useTileStore } from './tileStore';
 import { useLineStore } from './lineStore';
+import { useHuabuStore } from './huabuStore';
 
 function createId(): string {
   return `composite_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
@@ -27,6 +28,7 @@ export const useCompositeStore = defineStore('composite', () => {
 
     const tileStore = useTileStore();
     const lineStore = useLineStore();
+    const huabuStore = useHuabuStore();
 
     // 过滤出两端都在 tileIds 中的连线
     const validLineIds = lineIds.filter((lineId) => {
@@ -104,6 +106,18 @@ export const useCompositeStore = defineStore('composite', () => {
     };
 
     composites.value.set(id, composite);
+
+    // 将组合体添加到画布
+    huabuStore.addCompositeId(huabuId, id);
+
+    // 从画布中移除这些磁贴和连线（它们现在属于组合体）
+    for (const tileId of tileIds) {
+      huabuStore.removeTileId(huabuId, tileId);
+    }
+    for (const lineId of validLineIds) {
+      huabuStore.removeLineId(huabuId, lineId);
+    }
+
     return composite;
   }
 
@@ -120,11 +134,27 @@ export const useCompositeStore = defineStore('composite', () => {
   }
 
   // 摧毁组合体（将磁贴和连线返回画布）
-  function destroyComposite(id: string): void {
+  function destroyComposite(id: string, huabuId?: string): void {
     const composite = composites.value.get(id);
     if (!composite) return;
 
     const tileStore = useTileStore();
+    const huabuStore = useHuabuStore();
+
+    // 如果没有提供 huabuId，尝试从当前活动画布中找到
+    if (!huabuId) {
+      for (const [hId, huabu] of huabuStore.huabus.entries()) {
+        if (huabu.compositeIds.includes(id)) {
+          huabuId = hId;
+          break;
+        }
+      }
+    }
+
+    if (!huabuId) {
+      console.warn('Cannot destroy composite: huabuId not found');
+      return;
+    }
 
     // 将磁贴位置从相对位置转换回绝对位置
     for (const tileId of composite.tileIds) {
@@ -139,8 +169,19 @@ export const useCompositeStore = defineStore('composite', () => {
       const width = (parseFloat(relPos.width) / 100) * composite.style.width;
       const height = (parseFloat(relPos.height) / 100) * composite.style.height;
 
-      tileStore.updateStyle(tileId, { left, top, width, height });
+      tileStore.updateStyle(tileId, { left, top, width, height }, false);
     }
+
+    // 将磁贴和连线返回画布
+    for (const tileId of composite.tileIds) {
+      huabuStore.addTileId(huabuId, tileId);
+    }
+    for (const lineId of composite.lineIds) {
+      huabuStore.addLineId(huabuId, lineId);
+    }
+
+    // 从画布中移除组合体
+    huabuStore.removeCompositeId(huabuId, id);
 
     composites.value.delete(id);
     if (focusedCompositeId.value === id) focusedCompositeId.value = null;
@@ -153,7 +194,6 @@ export const useCompositeStore = defineStore('composite', () => {
 
     const tileStore = useTileStore();
     const lineStore = useLineStore();
-    const { useHuabuStore } = require('./huabuStore');
     const huabuStore = useHuabuStore();
 
     // 删除所有磁贴
@@ -198,6 +238,13 @@ export const useCompositeStore = defineStore('composite', () => {
 
   // 聚焦组合体
   function focusComposite(id: string | null): void {
+    // 如果之前聚焦的是临时组合体，销毁它
+    if (focusedCompositeId.value) {
+      const prevComposite = composites.value.get(focusedCompositeId.value);
+      if (prevComposite?.isTemp) {
+        destroyComposite(focusedCompositeId.value);
+      }
+    }
     focusedCompositeId.value = id;
   }
 

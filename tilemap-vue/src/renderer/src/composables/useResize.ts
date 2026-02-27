@@ -1,5 +1,6 @@
 import { onUnmounted } from 'vue';
 import { useTileStore } from '../stores/tileStore';
+import { useHistoryStore } from '../stores/historyStore';
 
 interface ResizeOptions {
   huabuScale: () => number;
@@ -11,6 +12,7 @@ type ResizeHandle = 'se' | 'sw' | 'ne' | 'nw' | 'n' | 's' | 'e' | 'w';
 
 export function useResize(options: ResizeOptions) {
   const tileStore = useTileStore();
+  const historyStore = useHistoryStore();
 
   let resizingId: string | null = null;
   let handle: ResizeHandle = 'se';
@@ -77,6 +79,15 @@ export function useResize(options: ResizeOptions) {
 
   function onPointerUp() {
     if (!resizingId) return;
+    const tile = tileStore.tiles.get(resizingId);
+    if (tile) {
+      historyStore.push({
+        type: 'tile-resize',
+        tileId: resizingId,
+        before: { left: startLeft, top: startTop, width: startWidth, height: startHeight },
+        after: { left: tile.style.left, top: tile.style.top, width: tile.style.width, height: tile.style.height }
+      });
+    }
     resizingId = null;
     options.onEnd?.();
   }

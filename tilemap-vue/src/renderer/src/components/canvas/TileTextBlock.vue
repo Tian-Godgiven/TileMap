@@ -4,6 +4,7 @@ import { useEditor, EditorContent } from '@tiptap/vue-3';
 import StarterKit from '@tiptap/starter-kit';
 import type { Tile } from '../../types';
 import { useTileStore } from '../../stores/tileStore';
+import { useUiStore } from '../../stores/uiStore';
 
 const props = defineProps<{
   tile: Tile;
@@ -11,6 +12,7 @@ const props = defineProps<{
 }>();
 
 const tileStore = useTileStore();
+const uiStore = useUiStore();
 
 // 只读编辑器，用于展示内容
 const editor = useEditor({
@@ -89,10 +91,20 @@ function setEnternalShow() {
 function setEnternalHide() {
   tileStore.updateProps(props.tile.id, { textblockShowState: 'enternalHide' });
 }
+
+// 判断是否应该显示 textblock
+const shouldShow = computed(() => {
+  // 如果全局隐藏了 textblock，则不显示
+  if (!uiStore.showTextblock) return false;
+  // 如果设置了永久隐藏，则不显示
+  if (props.tile.props.textblockShowState === 'enternalHide') return false;
+  // 其他情况显示
+  return true;
+});
 </script>
 
 <template>
-  <div class="textblock" :style="blockStyle">
+  <div v-show="shouldShow" class="textblock" :style="blockStyle">
     <div class="textblock_bar">
       <div class="textblock_title">{{ tile.title }}</div>
       <div class="textblock_button">

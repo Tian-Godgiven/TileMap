@@ -20,20 +20,23 @@ const lineTypeOpen = ref(false);
 
 function scaleUp() {
   if (!huabuStore.activeHuabuId) return;
-  const s = (activeHuabu.value?.scale ?? 1) + 0.1;
+  const s = Math.min(3, (activeHuabu.value?.scale ?? 1) + 0.05);
   huabuStore.setScale(huabuStore.activeHuabuId, s);
 }
 
 function scaleDown() {
   if (!huabuStore.activeHuabuId) return;
-  const s = (activeHuabu.value?.scale ?? 1) - 0.1;
+  const s = Math.max(0.1, (activeHuabu.value?.scale ?? 1) - 0.05);
   huabuStore.setScale(huabuStore.activeHuabuId, s);
 }
 
 function deleteSelected() {
   if (!focusedTile.value || !huabuStore.activeHuabuId) return;
-  huabuStore.removeTileId(huabuStore.activeHuabuId, focusedTile.value.id);
-  tileStore.deleteTile(focusedTile.value.id);
+  const tile = focusedTile.value;
+  const snapshot = { ...tile, style: { ...tile.style }, props: { ...tile.props } };
+  huabuStore.removeTileId(huabuStore.activeHuabuId, tile.id);
+  tileStore.deleteTile(tile.id);
+  historyStore.push({ type: 'tile-delete', tileId: snapshot.id, huabuId: huabuStore.activeHuabuId, snapshot });
 }
 
 function zIndexUp() {
@@ -43,9 +46,7 @@ function zIndexUp() {
 
 function zIndexDown() {
   if (!focusedTile.value) return;
-  tileStore.updateStyle(focusedTile.value.id, {
-    zIndex: Math.max(1, focusedTile.value.style.zIndex - 1)
-  });
+  tileStore.updateStyle(focusedTile.value.id, { zIndex: Math.max(1, focusedTile.value.style.zIndex - 1) });
 }
 
 function setLineStyle(style: string) {
@@ -202,17 +203,8 @@ function closeNestHuabu() {
     </div>
 
     <!-- 面包屑导航（嵌套画布时显示） -->
-    <div v-if="huabuStore.breadcrumb.length > 1" class="breadcrumb-group">
-      <template v-for="(huabu, idx) in huabuStore.breadcrumbHuabus" :key="huabu.id">
-        <span
-          class="breadcrumb-item"
-          :class="{ current: idx === huabuStore.breadcrumb.length - 1 }"
-          @click="huabuStore.returnToBreadcrumb(huabu.id)"
-          >{{ huabu.name }}</span
-        >
-        <span v-if="idx < huabuStore.breadcrumb.length - 1" class="breadcrumb-sep">›</span>
-      </template>
-      <span class="breadcrumb-close" title="关闭嵌套画布" @click="closeNestHuabu">✕</span>
+    <div v-if="huabuStore.breadcrumb.length > 1" class="breadcrumb-return" @click="closeNestHuabu">
+      返回
     </div>
   </div>
 </template>
@@ -221,34 +213,32 @@ function closeNestHuabu() {
 #huabu_ability_inner {
   display: flex;
   height: 100%;
-  align-items: center;
+  align-items: stretch;
 
-  > div {
+  > div:not(.breadcrumb-group) {
     display: flex;
-
-    &::after {
-      content: '';
-      height: 100%;
-      width: 1px;
-      display: block;
-      background-color: var(--border-color);
-    }
+    align-items: stretch;
+    border-right: 1px solid var(--border-color);
 
     > .draw_block:first-child {
-      padding-left: 15px;
+      padding-left: 10px;
     }
     > .draw_block:last-child {
-      padding-right: 15px;
+      padding-right: 10px;
     }
+  }
+
+  > div:not(.breadcrumb-group):last-child {
+    border-right: none;
   }
 }
 
 .draw_block {
   text-align: center;
-  padding: 0 5px;
-  height: 49px;
-  min-width: 25px;
-  font-size: 20px;
+  padding: 0 10px;
+  height: 100%;
+  min-width: 44px;
+  font-size: 16px;
   flex-shrink: 0;
   display: flex;
   justify-content: center;
@@ -256,7 +246,7 @@ function closeNestHuabu() {
   cursor: pointer;
   user-select: none;
   background-repeat: no-repeat;
-  background-size: 30px 30px;
+  background-size: 25px 25px;
   background-position: center;
 
   &:hover {
@@ -264,12 +254,12 @@ function closeNestHuabu() {
   }
 
   &.disabled {
-    opacity: 0.4;
+    opacity: 0.3;
     pointer-events: none;
   }
 
   &.active {
-    background-color: var(--color-3);
+    background-color: var(--color-4);
   }
 }
 
@@ -304,43 +294,32 @@ function closeNestHuabu() {
 #huabu_ability_ScaleShow {
   justify-content: flex-end;
   text-align: right;
-  min-width: 70px;
+  min-width: 60px;
   font-size: 16px;
+  padding-right: 5px;
 }
 
-.breadcrumb-group {
+.breadcrumb-return {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 100%;
+  width: 50px;
+  height: 40px;
+  background-color: var(--color-2);
+  border-top: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  border-bottom-right-radius: 5px;
   display: flex;
   align-items: center;
-  padding: 0 10px;
-  font-size: 16px;
-  gap: 4px;
-}
-
-.breadcrumb-item {
-  cursor: pointer;
-  color: var(--color-4);
-
-  &:hover {
-    color: var(--text-color);
-    text-decoration: underline;
-  }
-
-  &.current {
-    color: var(--text-color);
-    font-weight: bold;
-    cursor: default;
-    text-decoration: none;
-  }
-}
-
-.breadcrumb-close {
-  cursor: pointer;
-  padding: 0 6px;
-  color: var(--color-4);
+  justify-content: center;
   font-size: 14px;
+  cursor: pointer;
+  user-select: none;
 
   &:hover {
-    color: var(--warning-color-1);
+    background-color: var(--color-3);
   }
 }
 
@@ -351,9 +330,8 @@ function closeNestHuabu() {
   z-index: 100;
   background-color: var(--color-2);
   border: 1px solid var(--border-color);
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
-  min-width: 100px;
+  border-top: none;
+  min-width: 120px;
   font-size: 14px;
 }
 
@@ -366,7 +344,7 @@ function closeNestHuabu() {
 }
 
 .huabu_ability_button {
-  padding: 5px 10px;
+  padding: 6px 12px;
   cursor: pointer;
   white-space: nowrap;
   position: relative;
@@ -383,10 +361,10 @@ function closeNestHuabu() {
       content: '';
       display: block;
       position: absolute;
-      right: 6px;
+      right: 8px;
       top: 50%;
-      height: 14px;
-      width: 14px;
+      height: 12px;
+      width: 12px;
       background-image: url('../../../assets/img/check.png');
       background-position: center;
       background-size: 100%;
@@ -398,11 +376,11 @@ function closeNestHuabu() {
 
 .line_style_btn,
 .line_type_btn {
-  width: 90px;
-  height: 24px;
+  width: 100px;
+  height: 28px;
   padding-right: 30px;
-  background-position: 10px center;
-  background-size: 55px auto;
+  background-position: 12px center;
+  background-size: 50px auto;
   background-repeat: no-repeat;
 }
 

@@ -62,19 +62,21 @@ function huabuWidth() {
       <div v-if="uiStore.showLeftPanel" id="area_left" :style="{ width: leftWidth + '%' }">
         <LeftPanel />
       </div>
-      <div
-        v-if="uiStore.showLeftPanel"
-        class="resize-bar"
-        @mousedown="startResize($event, 'left')"
-      ></div>
       <div id="area_huabu" :style="{ width: huabuWidth() }">
+        <div
+          v-if="uiStore.showLeftPanel"
+          id="left_resize"
+          class="resize_block"
+          @mousedown="startResize($event, 'left')"
+        ></div>
+        <div
+          v-if="uiStore.showRightPanel"
+          id="right_resize"
+          class="resize_block"
+          @mousedown="startResize($event, 'right')"
+        ></div>
         <HuabuArea />
       </div>
-      <div
-        v-if="uiStore.showRightPanel"
-        class="resize-bar"
-        @mousedown="startResize($event, 'right')"
-      ></div>
       <div v-if="uiStore.showRightPanel" id="area_right" :style="{ width: rightWidth + '%' }">
         <RightPanel />
       </div>
@@ -121,23 +123,32 @@ function huabuWidth() {
   box-sizing: border-box;
 }
 
+.resize_block {
+  opacity: 0;
+  top: 50px;
+  height: calc(100% - 80px);
+  width: 15px;
+  background-color: var(--color-4);
+  position: absolute;
+  z-index: 2;
+  cursor: col-resize;
+
+  &:hover {
+    opacity: 0.3;
+  }
+}
+
+#left_resize {
+  left: 0;
+}
+
+#right_resize {
+  right: 0;
+}
+
 #area_right {
   flex-shrink: 0;
   height: 100%;
   overflow: hidden;
-}
-
-.resize-bar {
-  flex-shrink: 0;
-  width: 4px;
-  height: 100%;
-  cursor: col-resize;
-  background: transparent;
-  z-index: 10;
-
-  &:hover {
-    background: var(--color-4);
-    opacity: 0.3;
-  }
 }
 </style>

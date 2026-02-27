@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useLineStore } from '../../stores/lineStore';
+import { useHuabuStore } from '../../stores/huabuStore';
+import { useHistoryStore } from '../../stores/historyStore';
 import ColorPicker from '../common/ColorPicker.vue';
 
 const props = defineProps<{
@@ -14,6 +16,8 @@ const emit = defineEmits<{
 }>();
 
 const lineStore = useLineStore();
+const huabuStore = useHuabuStore();
+const historyStore = useHistoryStore();
 
 const line = computed(() => lineStore.lines.get(props.lineId));
 
@@ -41,7 +45,13 @@ function onColorConfirm(color: string) {
 
 function deleteLine() {
   if (!line.value) return;
-  lineStore.deleteLine(line.value.id);
+  const l = line.value;
+  const huabuId = huabuStore.activeHuabuId;
+  if (!huabuId) return;
+  const snapshot = { ...l, style: { ...l.style } };
+  huabuStore.removeLineId(huabuId, l.id);
+  lineStore.deleteLine(l.id);
+  historyStore.push({ type: 'line-delete', lineId: snapshot.id, huabuId, snapshot });
   emit('close');
 }
 

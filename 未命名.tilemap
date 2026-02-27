@@ -1,0 +1,100 @@
+{
+  "tilemap": {
+    "information": "",
+    "huabuOrder": [
+      "huabu_1772180851892_2qzd2"
+    ],
+    "huabus": {
+      "huabu_1772180851892_2qzd2": {
+        "id": "huabu_1772180851892_2qzd2",
+        "name": "画布 1",
+        "scale": 1,
+        "panX": 0,
+        "panY": 0,
+        "style": {
+          "width": 2000,
+          "height": 1500,
+          "backgroundColor": "#ffffff",
+          "backgroundImage": null,
+          "backgroundImageSet": null
+        },
+        "grid": {
+          "show": false,
+          "size": 20,
+          "color": "#e0e0e0"
+        },
+        "tileIds": [
+          "tile_1772180853603_l1qgk"
+        ],
+        "lineIds": [],
+        "compositeIds": [],
+        "isNested": false,
+        "nestFromTileId": null,
+        "parentHuabuId": null
+      }
+    },
+    "tiles": {
+      "tile_1772180853603_l1qgk": {
+        "id": "tile_1772180853603_l1qgk",
+        "title": "磁111111贴11",
+        "content": null,
+        "style": {
+          "width": 100,
+          "height": 100,
+          "backgroundColor": "#ffffff",
+          "borderStyle": "solid",
+          "borderWidth": 2,
+          "borderColor": "#333333",
+          "borderRadius": 0,
+          "fontSize": 24,
+          "titleColor": "#000000",
+          "titleAlign": "center",
+          "titleHorizontal": "0px",
+          "titleVertical": "0px",
+          "fontFamily": "",
+          "fontBold": false,
+          "fontItalic": false,
+          "fontVertical": false,
+          "fontOverline": false,
+          "fontStrikeline": false,
+          "fontUnderline": false,
+          "shadowEnabled": false,
+          "shadowColor": "#000000",
+          "shadowX": 2,
+          "shadowY": 2,
+          "shadowBlur": 4,
+          "backgroundImage": null,
+          "backgroundImageSet": "place",
+          "backgroundGradient": false,
+          "gradientDirection": null,
+          "gradientColor": null,
+          "zIndex": 1,
+          "angle": 0,
+          "left": 236.359375,
+          "top": 156
+        },
+        "props": {
+          "lock": false,
+          "showTitle": true,
+          "wrapTitle": true,
+          "contentPanelPinned": false,
+          "nestOpenMode": "dbclick",
+          "sizeLimit": false,
+          "annotationEnabled": false,
+          "annotation": "",
+          "textblockShowState": "normal",
+          "textblockBind": true,
+          "textblockWidth": 170,
+          "textblockHeight": 200,
+          "textblockVertical": "center",
+          "textblockHorizontal": "right",
+          "disableLinkPopup": false
+        },
+        "lineIds": [],
+        "nestHuabuId": null,
+        "link": null
+      }
+    },
+    "lines": {}
+  }
+}

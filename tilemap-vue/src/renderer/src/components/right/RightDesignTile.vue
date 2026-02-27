@@ -14,6 +14,7 @@ function us(style: object) {
   if (!tile.value) return;
   tileStore.updateStyle(tile.value.id, style as any);
 }
+
 function up(props: object) {
   if (!tile.value) return;
   tileStore.updateProps(tile.value.id, props as any);

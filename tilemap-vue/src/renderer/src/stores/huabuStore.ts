@@ -155,7 +155,10 @@ export const useHuabuStore = defineStore('huabu', () => {
   }
 
   function addCompositeId(huabuId: string, compositeId: string): void {
-    huabus.value.get(huabuId)?.compositeIds.push(compositeId);
+    const huabu = huabus.value.get(huabuId);
+    if (huabu) {
+      huabu.compositeIds.push(compositeId);
+    }
   }
 
   function removeCompositeId(huabuId: string, compositeId: string): void {
